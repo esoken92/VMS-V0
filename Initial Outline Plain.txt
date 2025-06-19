@@ -1,0 +1,251 @@
+
+18 June 2025 - 15:06
+Initial Outline of what program should acheive
+
+I would like to make a program that monitors the Wellington Group tyre flow through their retreading factory:
+Ideally the program should be able to have the following layout:
+
+    1. Inbound - Tyres that are en route to the factory and due for pickup. The date the request was made to collect them should be recorded for tracking.
+
+    2. Landed - Tyres that have arrived at the factory and await their first inspection. They are typically stored in the warehouse and tagged for identification.
+
+    3. First Inspection - The tyres undergo an initial quality check. At this stage, tyres may be rejected based on factors such as:
+        - Excessive wear or damage
+        - Structural deformities
+        - Irregular tread patterns
+        - Previous repairs affecting integrity
+        - Other
+
+    Rejected tyres should be tagged and routed to outbound with recorded rejection reasons.
+
+    4. Buffing - The remaining tread is removed to prepare the casing for retreading. Possible faults that could lead to rejection include:
+        - Uneven buffing
+        - Excessive casing damage
+        - Exposed cords or weak structural integrity
+        - Other
+
+    Any rejected tyres are marked and sent to outbound with documented reasons.
+
+    5. Skiving - Defects, excess rubber, and impurities are removed from the tyre surface. Possible rejection reasons include:
+        - Cracks or cuts in the rubber
+        - Uneven surface or contamination
+        - Air pockets or structural weaknesses
+        - Other
+
+    If necessary, rejected tyres are redirected to outbound.
+
+    6. Cushioning - A fresh rubber layer is applied for smooth adhesion between the casing and the new tread. Rejection factors could include:
+        - Poor bonding or adhesion issues
+        - Presence of air bubbles or voids
+        - Incorrect material application
+        - Other
+
+    Rejected tyres should be tagged and documented for outbound.
+
+    7. Building - The tread is applied, securing the tyre's reconstructed structure. Possible reasons for rejection:
+        - Misaligned tread application
+        - Weak bonding or poor structural integrity
+        - Material defects or inconsistencies
+        - Other
+
+    Rejected tyres must be recorded before being moved to outbound.
+
+    8. Enveloping - The tyre is placed inside an envelope or curing chamber to prepare for vulcanization. Rejection causes may include:
+        - Improper sealing leading to air leaks
+        - Contaminated surfaces impacting adhesion
+        - Incorrect placement or equipment failure
+        - Other
+
+    Rejected tyres should be tracked and sent to outbound.
+
+    9. Curing - The tyre undergoes heat treatment to permanently bond the tread to the casing. Possible defects leading to rejection:
+        - Uneven heat distribution
+        - Improper curing temperature or timing
+        - Warped structure or internal defects
+        - Other
+
+    Rejected tyres should be removed from production and documented.
+
+    10. Final Inspection - A thorough check ensures the tyre meets safety and quality standards. Reasons for rejection could include:
+        - Incorrect tread wear or pattern issues
+        - Structural integrity failure
+        - Surface inconsistencies or external damage
+        - Other
+
+    Failed tyres must be tagged and moved to outbound for disposal or return.
+
+    11. Painting - A protective coat or marking is applied to the tyre. While rare, rejection could occur due to:
+        - Uneven or incomplete paint coverage
+        - Incorrect labeling or identification marks
+        - Material contamination or surface defects
+        - Other
+
+    Any rejected tyres must be recorded and routed to outbound.
+
+    12. Outbound - Rejected tyres are sent for disposal or return, while approved tyres are dispatched for delivery with proper inventory tracking.
+
+
+
+Notes for all sections:
+    Each tyre needs a serial number captured on Landed and this will be maintained throughout.
+    All rejected tyres throughout the process needs to be identified so no more cost on those tyres are incurred and a reason given.
+    A time must be noted such that every movement through the factory is recorded, time and date of rejections and movemets through each part of the factory needs to be accurate to the nearest second.
+    
+The structure for activity
+    - ESO Team has administration access and full system monitoring - Able to do all functions and database edits
+        - Owners access that permits view and edits of database, adding of users, owner should have all functions of each section.
+            - Sales Manager access that allows edits of database and access to all functions related to sales - Such as Inbound and Outbound.
+                - Under the Sales Manager: Sales Person function that allows viewing of all process but only allows inbound loading of items and removing of items that they have loaded on.
+            - Factory Manager, This allows Viewing of all but only Access to factory specific functions. They can also edit the database.
+                - Each station in the factory should have a specific user login
+                - The Station login should be two parts 
+                    1. Login on station and sets that fucntions to station only.
+                    2. Login on station user - this will help us identify which user was at each station and what they did at each station.
+            - Dispatch Manager - Able to View and Edit inbound and outbound activity.
+                    - Each Dispactcher station in the factory should have a specific user login
+                - The Station login should be two parts 
+                    1. Login on station and sets that fucntions to station only.
+                    2. Login on station user - this will help us identify which user was at each station and what they did at each station.
+
+
+    Overall When database is manually edited then the change should record the previous values and new values and the date and times so that a roll-back can be put in place if someone has messsed up too much.
+    Each Station namely:
+        Landed
+        First Inspection
+        Buffing
+        Skiving
+        Cushioning
+        Building
+        Enveloping
+        Curing
+        Final Inspection
+        Painting
+
+Each should have a station login; then a user login - or the user should be able to select which station they want to login on the login screen.
+    - Username:
+    - Station: Drop down list of station
+    - Password: 
+Authentication should verify password and whether user is allowed access to that workstation. This is basically a role.
+
+For Tyre Identity - I would like to add a option to scan, print and generate barcodes that can be used to identify the tyres.
+
+The stations functions should be: Every activity on station should be recorded so that the Managers can see who did what work and what time to nearest second. When rejected, the tyre is immediateely moved to outbound as rejected.
+
+    1. Inbound - Tyres should be able to be loaded with the customers details and batches should be identified - sizes of tyres should be visible - Namely 385/315/275/245/235/215/12R/11R so I should see " Thompson Transport - 385 - 10 units " As an example. An Inbound list needs to be printed so the dispatch team can determine routes for the day.
+
+    2. Landed - This should just mention the previous "Thompson Transport - 385 - 10 units" I should be able to check this in (arrived), attach a serial number to each tyre (SN Attached), mark as tagged (Tagged). Each activity should have a date, time and user attached for monitoring purposes.
+
+    3. First Inspection - Tyres arrive, checked in (Check in), inspection result (passed / caution / rejected) - when passed, this is good and just goes through. When caution a note can be added for the other stations or manager. Reject - a drop down list of reasons can be given or a user typed reason can be added.
+    Tyres may be rejected based on factors such as:
+        - Excessive wear or damage
+        - Structural deformities
+        - Irregular tread patterns
+        - Previous repairs affecting integrity
+        - Other
+
+    Rejected tyres should be tagged and routed to outbound with recorded rejection reasons.
+
+    4. Buffing - Tyres arrive, checked in (Check in), Buffing result (passed / caution / rejected) - when passed, this is good and just goes through. When caution a note can be added for the other stations or manager. Reject - a drop down list of reasons can be given or a user typed reason can be added. 
+    Possible faults that could lead to rejection include:
+        - Uneven buffing
+        - Excessive casing damage
+        - Exposed cords or weak structural integrity
+        - Other
+
+    Any rejected tyres are marked and sent to outbound with documented reasons.
+
+    5. Skiving - Tyres arrive, checked in (Check in), Skiving result (passed / caution / rejected) - when passed, this is good and just goes through. When caution a note can be added for the other stations or manager. Reject - a drop down list of reasons can be given or a user typed reason can be added. 
+    Rejection factors could include:
+        - Cracks or cuts in the rubber
+        - Uneven surface or contamination
+        - Air pockets or structural weaknesses
+        - Other
+
+    If necessary, rejected tyres are redirected to outbound.
+
+    6. Cushioning - Tyres arrive, checked in (Check in), Cushioning result (passed / caution / rejected) - when passed, this is good and just goes through. When caution a note can be added for the other stations or manager. Reject - a drop down list of reasons can be given or a user typed reason can be added. 
+    Rejection factors could include:
+        - Poor bonding or adhesion issues
+        - Presence of air bubbles or voids
+        - Incorrect material application
+        - Other
+
+    Rejected tyres should be tagged and documented for outbound.
+
+    7. Building - Tyres arrive, checked in (Check in), Building result (passed / caution / rejected) - when passed, this is good and just goes through. When caution a note can be added for the other stations or manager. Reject - a drop down list of reasons can be given or a user typed reason can be added. 
+    Possible reasons for rejection:
+        - Misaligned tread application
+        - Weak bonding or poor structural integrity
+        - Material defects or inconsistencies
+        - Other
+
+    Rejected tyres must be recorded before being moved to outbound.
+
+    8. Enveloping - Tyres arrive, checked in (Check in), Enveloping result (passed / caution / rejected) - when passed, this is good and just goes through. When caution a note can be added for the other stations or manager. Reject - a drop down list of reasons can be given or a user typed reason can be added. 
+    Rejection causes may include:
+        - Improper sealing leading to air leaks
+        - Contaminated surfaces impacting adhesion
+        - Incorrect placement or equipment failure
+        - Other
+
+    Rejected tyres should be tracked and sent to outbound.
+
+    9. Curing - Tyres arrive, checked in (Check in), Curing result (passed / caution / rejected) - when passed, this is good and just goes through. When caution a note can be added for the other stations or manager. Reject - a drop down list of reasons can be given or a user typed reason can be added. 
+    Possible defects leading to rejection:
+        - Uneven heat distribution
+        - Improper curing temperature or timing
+        - Warped structure or internal defects
+        - Other
+
+    Rejected tyres should be removed from production and documented.
+
+    10. Final Inspection - Tyres arrive, checked in (Check in), Final Inspection result (passed / caution / rejected) - when passed, this is good and just goes through. When caution a note can be added for the other stations or manager. Reject - a drop down list of reasons can be given or a user typed reason can be added. 
+    Reasons for rejection could include:
+        - Incorrect tread wear or pattern issues
+        - Structural integrity failure
+        - Surface inconsistencies or external damage
+        - Other
+
+    Failed tyres must be tagged and moved to outbound for disposal or return.
+
+    11. Painting - Tyres arrive, checked in (Check in), Painting result (passed / caution / rejected) - when passed, this is good and just goes through. When caution a note can be added for the other stations or manager. Reject - a drop down list of reasons can be given or a user typed reason can be added. 
+    While rare, rejection could occur due to:
+        - Uneven or incomplete paint coverage
+        - Incorrect labeling or identification marks
+        - Material contamination or surface defects
+        - Other
+
+    Any rejected tyres must be recorded and routed to outbound.
+
+    12. Outbound - Rejected tyres are sent for disposal or return, while approved tyres are dispatched for delivery with proper inventory tracking.
+        Reject Summaries can be output by Customer / batches
+        Overall Outbound list needs to be made by date
+        Outbound lists need to be printed so that the dispatch team can determine the route for the day. 
+
+
+Technical Considerations
+    - All data should be secure and encryted when sending, receiving and storage. Set Firestore rules to limit document access by uid or role
+    - RBAC should be in full effect with ESO team having full control.
+    - No sensitive logic in frontend — all rejections, timestamps, and validations must be enforced on the server.
+    - Use middleware on the backend to check roles (e.g., isAdmin, isManager)
+    - Use role claims in JWT or Firebase custom claims
+    - Frontend hides buttons/screens based on role
+    - Use UUIDs or server-generated tyre IDs to prevent spoofing.
+    - Disable browser dev tools in production (console.log stripping, no debug tools exposed).
+    - Obfuscate production builds.
+    Every user action (e.g., reject tyre, update status) should:
+        - Be logged with timestamp
+        - Include userId, IP, device type
+        - Be viewable only by Admin or Auditor role
+    Secure Communication:
+        - HTTPS only — enforced on all endpoints
+        - Use SSL pinning for mobile app if extremely sensitive
+        - Rate-limit API calls to prevent brute-force attacks
+    Security Testing:
+        - OWASP ZAP for web app scanning
+        - Mobile Security Framework (MobSF) for mobile app
+    
+    
+
+
+
