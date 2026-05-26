@@ -17,7 +17,7 @@ export interface Database {
         Row: {
           id: string
           user_id: string
-          role: 'super_admin' | 'admin' | 'fleet_dispatch' | 'staff'
+          role: 'super_admin' | 'admin' | 'manager' | 'fleet_dispatch' | 'staff'
           full_name: string
           created_at: string
           updated_at: string
@@ -25,7 +25,7 @@ export interface Database {
         Insert: {
           id?: string
           user_id: string
-          role?: 'super_admin' | 'admin' | 'fleet_dispatch' | 'staff'
+          role?: 'super_admin' | 'admin' | 'manager' | 'fleet_dispatch' | 'staff'
           full_name: string
           created_at?: string
           updated_at?: string
@@ -33,7 +33,7 @@ export interface Database {
         Update: {
           id?: string
           user_id?: string
-          role?: 'super_admin' | 'admin' | 'fleet_dispatch' | 'staff'
+          role?: 'super_admin' | 'admin' | 'manager' | 'fleet_dispatch' | 'staff'
           full_name?: string
           created_at?: string
           updated_at?: string
@@ -429,7 +429,7 @@ export interface Database {
       [_ in never]: never
     }
     Enums: {
-      user_role: 'super_admin' | 'admin' | 'fleet_dispatch' | 'staff'
+      user_role: 'super_admin' | 'admin' | 'manager' | 'fleet_dispatch' | 'staff'
       item_type: 'consumable' | 'fluid' | 'tool' | 'tire'
       movement_type: 'inbound' | 'outbound' | 'adjustment' | 'scrap' | 'tool_checkout' | 'receiving'
       stock_take_status: 'open' | 'completed'

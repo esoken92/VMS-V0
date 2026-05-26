@@ -1,10 +1,246 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus, Search, ClipboardList, CheckCircle, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, Search, ClipboardList, CheckCircle, Clock, Play, Eye } from 'lucide-react';
+import { useAuth } from '@/components/providers/AuthProvider';
+import { createClient } from '@/lib/supabase/client';
+
+interface StockTake {
+  id: string;
+  started_by: string;
+  status: 'open' | 'completed';
+  started_at: string;
+  completed_at: string | null;
+  notes: string | null;
+}
+
+interface StockTakeItem {
+  id: string;
+  stock_take_id: string;
+  product_id: string;
+  system_qty: number;
+  physical_qty: number | null;
+  variance: number | null;
+}
+
+interface Product {
+  id: string;
+  sku: string;
+  name: string;
+  current_stock: number;
+  unit_of_measure: string;
+}
 
 export default function StockTakesPage() {
+  const { profile } = useAuth();
+  // @ts-ignore - Supabase type issue
+  const supabase = createClient();
   const [searchQuery, setSearchQuery] = useState('');
+  const [stockTakes, setStockTakes] = useState<StockTake[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [activeStockTake, setActiveStockTake] = useState<StockTake | null>(null);
+  const [countingMode, setCountingMode] = useState(false);
+  const [countedItems, setCountedItems] = useState<Record<string, number>>({});
+  const [notes, setNotes] = useState('');
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  useEffect(() => {
+    fetchStockTakes();
+    fetchProducts();
+  }, []);
+
+  const fetchStockTakes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('stock_takes')
+        .select(`
+          *,
+          profiles (full_name)
+        `)
+        .order('started_at', { ascending: false });
+      if (error) throw error;
+      setStockTakes(data || []);
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('sku');
+      if (error) throw error;
+      setProducts(data || []);
+    } catch (err: any) {
+      console.error('Error fetching products:', err);
+    }
+  };
+
+  const handleStartStockTake = async () => {
+    if (!profile) return;
+    try {
+      const { error } = await (supabase as any)
+        .from('stock_takes')
+        .insert({
+          started_by: profile.id,
+          status: 'open',
+        });
+
+      if (error) throw error;
+      setMessage({ type: 'success', text: 'Stock take started successfully' });
+      fetchStockTakes();
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message });
+    }
+  };
+
+  const handleContinueStockTake = async (stockTake: StockTake) => {
+    setActiveStockTake(stockTake);
+    setCountedItems({});
+    setNotes(stockTake.notes || '');
+    
+    // Load existing counts for this stock take
+    try {
+      const { data: items } = await supabase
+        .from('stock_take_items')
+        .select('*')
+        .eq('stock_take_id', stockTake.id);
+      
+      if (items) {
+        const existingCounts: Record<string, number> = {};
+        items.forEach((item: any) => {
+          if (item.physical_qty !== null) {
+            existingCounts[item.product_id] = item.physical_qty;
+          }
+        });
+        setCountedItems(existingCounts);
+      }
+    } catch (err) {
+      console.error('Error loading existing counts:', err);
+    }
+    
+    setCountingMode(true);
+  };
+
+  const handleViewStockTake = (stockTake: StockTake) => {
+    setActiveStockTake(stockTake);
+    setShowModal(true);
+  };
+
+  const handleSaveDraft = async () => {
+    if (!activeStockTake || !profile) return;
+
+    try {
+      // Save only counted items
+      for (const [productId, physicalQty] of Object.entries(countedItems)) {
+        const product = products.find(p => p.id === productId);
+        if (!product) continue;
+
+        const variance = physicalQty - product.current_stock;
+
+        await (supabase as any)
+          .from('stock_take_items')
+          .upsert({
+            stock_take_id: activeStockTake.id,
+            product_id: productId,
+            system_qty: product.current_stock,
+            physical_qty: physicalQty,
+            variance: variance,
+            counted_by: profile.id,
+            counted_at: new Date().toISOString(),
+          }, {
+            onConflict: 'stock_take_id,product_id'
+          });
+      }
+
+      // Update notes
+      const { error: updateError } = await (supabase as any)
+        .from('stock_takes')
+        .update({
+          notes: notes,
+        })
+        .eq('id', activeStockTake.id);
+
+      if (updateError) throw updateError;
+
+      setMessage({ type: 'success', text: 'Draft saved successfully' });
+      setCountingMode(false);
+      setActiveStockTake(null);
+      fetchStockTakes();
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message });
+    }
+  };
+
+  const handleCompleteStockTake = async () => {
+    if (!activeStockTake || !profile) return;
+
+    try {
+      // Create stock take items for all products
+      for (const product of products) {
+        const physicalQty = countedItems[product.id] !== undefined ? countedItems[product.id] : null;
+        const variance = physicalQty !== null ? physicalQty - product.current_stock : null;
+
+        await (supabase as any)
+          .from('stock_take_items')
+          .upsert({
+            stock_take_id: activeStockTake.id,
+            product_id: product.id,
+            system_qty: product.current_stock,
+            physical_qty: physicalQty,
+            variance: variance,
+            counted_by: profile.id,
+            counted_at: new Date().toISOString(),
+          }, {
+            onConflict: 'stock_take_id,product_id'
+          });
+      }
+
+      // Update stock take status
+      const { error: updateError } = await (supabase as any)
+        .from('stock_takes')
+        .update({
+          status: 'completed',
+          completed_at: new Date().toISOString(),
+          notes: notes,
+        })
+        .eq('id', activeStockTake.id);
+
+      if (updateError) throw updateError;
+
+      setMessage({ type: 'success', text: 'Stock take completed successfully' });
+      setCountingMode(false);
+      setActiveStockTake(null);
+      fetchStockTakes();
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message });
+    }
+  };
+
+  const filteredStockTakes = stockTakes.filter(stockTake =>
+    stockTake.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (stockTake as any).profiles?.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'open': return 'bg-blue-100 text-blue-700';
+      case 'completed': return 'bg-green-100 text-green-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  const getProgress = (stockTake: StockTake) => {
+    // This would need to be calculated from stock_take_items
+    // For now, return a placeholder
+    return '0/0';
+  };
 
   return (
     <div className="space-y-6">
@@ -13,33 +249,95 @@ export default function StockTakesPage() {
           <h1 className="text-2xl font-bold text-gray-900">Stock Takes</h1>
           <p className="text-gray-600 mt-1">Perform blind inventory counts</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        <button
+          onClick={handleStartStockTake}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
           <Plus className="h-4 w-4" />
           Start New Stock Take
         </button>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <button className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors">
-          <div className="p-2 bg-blue-100 rounded-lg">
-            <ClipboardList className="h-5 w-5 text-blue-600" />
+      {/* Message */}
+      {message && (
+        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+          {message.text}
+        </div>
+      )}
+
+      {/* Counting Mode */}
+      {countingMode && activeStockTake && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <ClipboardList className="h-6 w-6 text-blue-600" />
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Stock Take in Progress</h2>
+                <p className="text-sm text-gray-600">ID: {activeStockTake.id}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setCountingMode(false)}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
           </div>
-          <div className="text-left">
-            <p className="font-medium text-gray-900">Start Blind Count</p>
-            <p className="text-sm text-gray-600">Begin new stock take session</p>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={2}
+              placeholder="Add notes about this stock take..."
+            />
           </div>
-        </button>
-        <button className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors">
-          <div className="p-2 bg-green-100 rounded-lg">
-            <CheckCircle className="h-5 w-5 text-green-600" />
+
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {products.map((product) => (
+              <div key={product.id} className="flex items-center gap-4 p-3 bg-white rounded-lg border border-gray-200">
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900">{product.sku} - {product.name}</p>
+                  <p className="text-sm text-gray-600">System: {product.current_stock} {product.unit_of_measure}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm text-gray-700">Count:</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={countedItems[product.id] !== undefined ? countedItems[product.id] : ''}
+                    onChange={(e) => setCountedItems({
+                      ...countedItems,
+                      [product.id]: parseFloat(e.target.value) || 0
+                    })}
+                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="0"
+                  />
+                  <span className="text-sm text-gray-600">{product.unit_of_measure}</span>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="text-left">
-            <p className="font-medium text-gray-900">Complete Stock Take</p>
-            <p className="text-sm text-gray-600">Finalize and submit counts</p>
+
+          <div className="flex justify-end gap-3 mt-4">
+            <button
+              onClick={handleSaveDraft}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Save Draft
+            </button>
+            <button
+              onClick={handleCompleteStockTake}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <CheckCircle className="h-4 w-4" />
+              Complete Stock Take
+            </button>
           </div>
-        </button>
-      </div>
+        </div>
+      )}
 
       {/* Search */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
@@ -57,57 +355,113 @@ export default function StockTakesPage() {
 
       {/* Stock Takes Table */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Zone</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            <tr className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">ST-2024-001</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Zone A</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2024-01-15 09:00</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">45/120</td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">In Progress</span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                <button className="text-blue-600 hover:text-blue-700 font-medium">Continue</button>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">ST-2024-002</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Zone B</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2024-01-14 14:30</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">0/85</td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded">Pending</span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                <button className="text-blue-600 hover:text-blue-700 font-medium">Start</button>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50">
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">ST-2024-003</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Zone C</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">2024-01-13 10:00</td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">95/95</td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">Completed</span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                <button className="text-blue-600 hover:text-blue-700 font-medium">View</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        {loading ? (
+          <div className="p-8 text-center text-gray-500">Loading stock takes...</div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started By</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {filteredStockTakes.map((stockTake) => (
+                <tr key={stockTake.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{stockTake.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {(stockTake as any).profiles?.full_name || 'Unknown'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {new Date(stockTake.started_at).toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{getProgress(stockTake)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 py-1 text-xs font-medium rounded ${getStatusColor(stockTake.status)}`}>
+                      {stockTake.status.charAt(0).toUpperCase() + stockTake.status.slice(1)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    {stockTake.status === 'open' ? (
+                      <button
+                        onClick={() => handleContinueStockTake(stockTake)}
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        <Play className="h-4 w-4" />
+                        Continue
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleViewStockTake(stockTake)}
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        <Eye className="h-4 w-4" />
+                        View
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {filteredStockTakes.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">No stock takes found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
+
+      {/* View Modal */}
+      {showModal && activeStockTake && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">Stock Take Details</h2>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                  <p className="text-sm text-gray-600">ID</p>
+                  <p className="font-medium text-gray-900">{activeStockTake.id}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Status</p>
+                  <p className="font-medium text-gray-900 capitalize">{activeStockTake.status}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Started</p>
+                  <p className="font-medium text-gray-900">{new Date(activeStockTake.started_at).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Completed</p>
+                  <p className="font-medium text-gray-900">
+                    {activeStockTake.completed_at ? new Date(activeStockTake.completed_at).toLocaleString() : 'N/A'}
+                  </p>
+                </div>
+              </div>
+              {activeStockTake.notes && (
+                <div className="mb-6">
+                  <p className="text-sm text-gray-600 mb-1">Notes</p>
+                  <p className="text-gray-900">{activeStockTake.notes}</p>
+                </div>
+              )}
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

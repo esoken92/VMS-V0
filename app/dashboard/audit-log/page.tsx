@@ -1,45 +1,114 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Shield, AlertTriangle, Eye, Download } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+
+interface ActivityLog {
+  id: string;
+  user_id: string;
+  action: string;
+  table_name: string | null;
+  record_id: string | null;
+  old_values: any;
+  new_values: any;
+  ip_address: string | null;
+  created_at: string;
+}
 
 export default function AuditLogPage() {
+  // @ts-ignore - Supabase type issue
+  const supabase = createClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('all');
+  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedLog, setSelectedLog] = useState<ActivityLog | null>(null);
 
-  const activities = [
-    { id: 1, action: 'LOGIN', user: 'John Doe', table: 'users', timestamp: '2024-01-15 10:30:00', type: 'auth' },
-    { id: 2, action: 'INSERT', user: 'Jane Smith', table: 'products', details: 'Added Brake Pad Set', timestamp: '2024-01-15 09:15:00', type: 'data' },
-    { id: 3, action: 'UPDATE', user: 'John Doe', table: 'stock_movements', details: 'Stock take completed', timestamp: '2024-01-15 08:45:00', type: 'data' },
-    { id: 4, action: 'SUSPICIOUS', user: 'Unknown', table: 'auth', details: 'Multiple failed login attempts', timestamp: '2024-01-15 08:30:00', type: 'alert' },
-    { id: 5, action: 'DELETE', user: 'Jane Smith', table: 'products', details: 'Removed Oil Filter', timestamp: '2024-01-15 07:20:00', type: 'data' },
-  ];
+  useEffect(() => {
+    fetchActivityLogs();
+  }, []);
 
-  const filteredActivities = activities.filter(activity => {
-    if (filter === 'all') return true;
-    return activity.type === filter;
+  const fetchActivityLogs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('activity_logs')
+        .select(`
+          *,
+          profiles (full_name)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      setActivityLogs(data || []);
+    } catch (err) {
+      console.error('Error fetching activity logs:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleExport = () => {
+    const headers = ['Timestamp', 'User', 'Action', 'Table', 'Record ID', 'IP Address'];
+    const rows = activityLogs.map(log => [
+      log.created_at,
+      (log as any).profiles?.full_name || 'Unknown',
+      log.action,
+      log.table_name || '-',
+      log.record_id || '-',
+      log.ip_address || '-',
+    ]);
+    
+    const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `audit-log-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const handleViewDetails = (log: ActivityLog) => {
+    setSelectedLog(log);
+    setShowDetailModal(true);
+  };
+
+  const filteredLogs = activityLogs.filter(log => {
+    const userProfile = (log as any).profiles;
+    const matchesSearch = 
+      userProfile?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      log.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      log.table_name?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (filter === 'all') return matchesSearch;
+    return matchesSearch && log.action.toLowerCase() === filter.toLowerCase();
   });
+
+  const getActionColor = (action: string) => {
+    const actionLower = action.toLowerCase();
+    if (actionLower.includes('insert') || actionLower.includes('create')) return 'bg-green-100 text-green-700';
+    if (actionLower.includes('update') || actionLower.includes('edit')) return 'bg-blue-100 text-blue-700';
+    if (actionLower.includes('delete') || actionLower.includes('remove')) return 'bg-red-100 text-red-700';
+    if (actionLower.includes('login') || actionLower.includes('auth')) return 'bg-purple-100 text-purple-700';
+    return 'bg-gray-100 text-gray-700';
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Audit Log</h1>
-          <p className="text-gray-600 mt-1">System activity monitoring and fraud detection</p>
+          <p className="text-gray-600 mt-1">System activity monitoring</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+        <button
+          onClick={handleExport}
+          className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
           <Download className="h-4 w-4" />
           Export Log
         </button>
-      </div>
-
-      {/* Anti-fraud Alert Banner */}
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
-        <AlertTriangle className="h-5 w-5 text-red-600" />
-        <div>
-          <p className="text-sm font-medium text-red-800">Security Alert</p>
-          <p className="text-sm text-red-700">Multiple failed login attempts detected from IP 192.168.1.105</p>
-        </div>
       </div>
 
       {/* Search and Filters */}
@@ -60,10 +129,11 @@ export default function AuditLogPage() {
             onChange={(e) => setFilter(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="all">All Activities</option>
-            <option value="auth">Authentication</option>
-            <option value="data">Data Changes</option>
-            <option value="alert">Security Alerts</option>
+            <option value="all">All Actions</option>
+            <option value="INSERT">Insert</option>
+            <option value="UPDATE">Update</option>
+            <option value="DELETE">Delete</option>
+            <option value="LOGIN">Login</option>
           </select>
         </div>
       </div>
@@ -74,46 +144,126 @@ export default function AuditLogPage() {
           <Shield className="h-5 w-5 text-blue-600" />
           <h2 className="text-sm font-semibold text-gray-900">Activity Log</h2>
         </div>
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Table</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {filteredActivities.map((activity) => (
-              <tr key={activity.id} className={`hover:bg-gray-50 ${activity.type === 'alert' ? 'bg-red-50' : ''}`}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{activity.timestamp}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{activity.user}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{activity.action}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{activity.table}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{activity.details || '-'}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 text-xs font-medium rounded ${
-                    activity.type === 'alert' ? 'bg-red-100 text-red-700' :
-                    activity.type === 'auth' ? 'bg-purple-100 text-purple-700' :
-                    'bg-blue-100 text-blue-700'
-                  }`}>
-                    {activity.type}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <button className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
-                    <Eye className="h-4 w-4" />
-                    View
-                  </button>
-                </td>
+        {loading ? (
+          <div className="p-8 text-center text-gray-500">Loading activity logs...</div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Table</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {filteredLogs.map((log) => {
+                const userProfile = (log as any).profiles;
+                return (
+                  <tr key={log.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {new Date(log.created_at).toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {userProfile?.full_name || 'Unknown'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 text-xs font-medium rounded ${getActionColor(log.action)}`}>
+                        {log.action}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {log.table_name || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {log.ip_address || '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <button
+                        onClick={() => handleViewDetails(log)}
+                        className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                      >
+                        <Eye className="h-4 w-4" />
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+              {filteredLogs.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">No activity logs found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
+
+      {/* Detail Modal */}
+      {showDetailModal && selectedLog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">Activity Details</h2>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Timestamp</p>
+                  <p className="text-gray-900">{new Date(selectedLog.created_at).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">User</p>
+                  <p className="text-gray-900">{(selectedLog as any).profiles?.full_name || 'Unknown'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Action</p>
+                  <p className="text-gray-900">{selectedLog.action}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Table</p>
+                  <p className="text-gray-900">{selectedLog.table_name || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Record ID</p>
+                  <p className="text-gray-900">{selectedLog.record_id || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">IP Address</p>
+                  <p className="text-gray-900">{selectedLog.ip_address || '-'}</p>
+                </div>
+              </div>
+              {selectedLog.old_values && (
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Old Values</p>
+                  <pre className="bg-gray-50 p-3 rounded text-xs overflow-auto max-h-32">
+                    {JSON.stringify(selectedLog.old_values, null, 2)}
+                  </pre>
+                </div>
+              )}
+              {selectedLog.new_values && (
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">New Values</p>
+                  <pre className="bg-gray-50 p-3 rounded text-xs overflow-auto max-h-32">
+                    {JSON.stringify(selectedLog.new_values, null, 2)}
+                  </pre>
+                </div>
+              )}
+              <div className="flex justify-end pt-4">
+                <button
+                  onClick={() => setShowDetailModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

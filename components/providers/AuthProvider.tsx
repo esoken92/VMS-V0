@@ -30,6 +30,7 @@ interface AuthContextType {
   exitImpersonation: () => { success: boolean; error?: string };
   hasRole: (requiredRoles: string | string[]) => boolean;
   setError: (error: string | null) => void;
+  ensureProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -55,7 +56,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (session?.user) {
           setUser(session.user);
-          await fetchUserProfile(session.user.id);
+          // Don't fetch profile on init - fetch lazily when needed
+          // This speeds up initial load
         } else {
           setUser(null);
           setProfile(null);
@@ -76,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange(async (_event: any, session: any) => {
       if (session?.user) {
         setUser(session.user);
-        await fetchUserProfile(session.user.id);
+        // Don't fetch profile on auth change - fetch lazily
       } else {
         setUser(null);
         setProfile(null);
@@ -107,6 +109,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Ensure profile is loaded (lazy loading)
+  const ensureProfile = async () => {
+    if (user && !profile) {
+      await fetchUserProfile(user.id);
+    }
+  };
+
   // Login with email and password
   const login = async (email: string, password: string) => {
     try {
@@ -122,7 +131,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (data.user) {
         setUser(data.user);
-        await fetchUserProfile(data.user.id);
+        // Don't fetch profile here - let the dashboard handle it
+        // This avoids double-fetching and speeds up login
 
         // Redirect to dashboard after successful login
         router.push('/dashboard');
@@ -352,6 +362,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Utilities
     setError,
+    ensureProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

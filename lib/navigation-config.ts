@@ -47,6 +47,12 @@ export const navigationConfig: NavigationItem[] = [
     icon: '📍',
     description: 'Warehouse locations',
   },
+  {
+    label: 'Zone Map',
+    href: '/dashboard/zone-map',
+    icon: '🗺️',
+    description: 'Visual warehouse layout',
+  },
 ];
 
 export const adminOnlyNavigation: NavigationItem[] = [

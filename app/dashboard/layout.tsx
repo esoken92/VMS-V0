@@ -1,18 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from '@/components/dashboard/Sidebar';
 import TopBar from '@/components/dashboard/TopBar';
-import { useAuth } from '@/components/providers/AuthProvider';
+import { AuthProvider, useAuth } from '@/components/providers/AuthProvider';
 import { Shield, LogOut } from 'lucide-react';
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+function DashboardContent({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isImpersonating, impersonatedByUser, exitImpersonation } = useAuth();
+  const { isImpersonating, impersonatedByUser, exitImpersonation, ensureProfile } = useAuth();
+
+  // Load profile lazily when dashboard is accessed
+  useEffect(() => {
+    ensureProfile();
+  }, [ensureProfile]);
 
   const handleExitImpersonation = () => {
     const result = exitImpersonation();
@@ -77,5 +78,17 @@ export default function DashboardLayout({
         </main>
       </div>
     </div>
+  );
+}
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <AuthProvider>
+      <DashboardContent>{children}</DashboardContent>
+    </AuthProvider>
   );
 }

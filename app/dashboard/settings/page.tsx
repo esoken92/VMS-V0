@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { Settings, Save, CheckCircle, AlertCircle, Building, Bell, Package, Shield } from 'lucide-react';
+import { Settings, Save, CheckCircle, AlertCircle, Building, Bell, Package, Shield, Upload, X } from 'lucide-react';
 
 export default function SettingsPage() {
   const { profile, hasRole } = useAuth();
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string>('');
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
   // Check if user is super_admin
   const isSuperAdmin = hasRole('super_admin');
@@ -29,13 +32,90 @@ export default function SettingsPage() {
 
       const settingsMap: Record<string, string> = {};
       if (data) {
+        // @ts-ignore - Supabase type issue
         data.forEach((setting: any) => {
           settingsMap[setting.key] = setting.value;
         });
       }
       setSettings(settingsMap);
+      
+      // Set logo preview if exists
+      if (settingsMap.logo_url) {
+        setLogoPreview(settingsMap.logo_url);
+      }
     } catch (err: any) {
       console.error('Failed to fetch settings:', err);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setMessage({ type: 'error', text: 'Please select an image file' });
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setMessage({ type: 'error', text: 'File size must be less than 2MB' });
+      return;
+    }
+
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
+  };
+
+  const handleLogoRemove = () => {
+    setLogoFile(null);
+    setLogoPreview('');
+    setSettings({ ...settings, logo_url: '' });
+  };
+
+  const handleLogoSave = async () => {
+    if (!logoFile) return;
+
+    setIsUploadingLogo(true);
+    setMessage(null);
+
+    try {
+      const supabase = (await import('@/lib/supabase/client')).createClient();
+
+      // Upload to Supabase Storage
+      const fileName = `logo-${Date.now()}-${logoFile.name}`;
+      // @ts-ignore - Supabase type issue
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('company-assets')
+        .upload(fileName, logoFile);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      // @ts-ignore - Supabase type issue
+      const { data: urlData } = supabase.storage
+        .from('company-assets')
+        .getPublicUrl(fileName);
+
+      const logoUrl = urlData.publicUrl;
+
+      // Update settings
+      // @ts-ignore - Supabase type issue
+      const { error: updateError } = await supabase.rpc('update_system_setting', {
+        p_key: 'logo_url',
+        p_value: logoUrl
+      } as any);
+
+      if (updateError) throw updateError;
+
+      setSettings({ ...settings, logo_url: logoUrl });
+      setMessage({ type: 'success', text: 'Logo uploaded successfully' });
+      setLogoFile(null);
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message || 'Failed to upload logo' });
+    } finally {
+      setIsUploadingLogo(false);
     }
   };
 
@@ -123,14 +203,48 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL</label>
-              <input
-                type="text"
-                value={settings.logo_url || ''}
-                onChange={(e) => setSettings({ ...settings, logo_url: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="https://example.com/logo.png"
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Company Logo</label>
+              <div className="space-y-3">
+                {logoPreview && (
+                  <div className="relative inline-block">
+                    <img
+                      src={logoPreview}
+                      alt="Company Logo"
+                      className="h-20 w-auto object-contain border border-gray-200 rounded-lg p-2"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleLogoRemove}
+                      className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                    <Upload className="h-4 w-4 text-gray-600" />
+                    <span className="text-sm text-gray-700">Choose Image</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  {logoFile && (
+                    <button
+                      type="button"
+                      onClick={handleLogoSave}
+                      disabled={isUploadingLogo}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors text-sm"
+                    >
+                      {isUploadingLogo ? 'Uploading...' : 'Save Logo'}
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500">PNG, JPG, or GIF (max 2MB)</p>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Timezone</label>

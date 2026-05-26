@@ -2,16 +2,20 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { User, Mail, Lock, Save, CheckCircle, AlertCircle } from 'lucide-react';
+import { User, Mail, Lock, Save, CheckCircle, AlertCircle, Bell } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, profile, updatePassword, resetPassword, setError } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ full_name: profile?.full_name || '' });
+  const [editForm, setEditForm] = useState<{ full_name: string }>({ full_name: profile?.full_name || '' });
   const [passwordForm, setPasswordForm] = useState({
     oldPassword: '',
     newPassword: '',
     confirmPassword: ''
+  });
+  const [alertPreferences, setAlertPreferences] = useState({
+    alert_low_stock: (profile as any)?.alert_low_stock ?? true,
+    alert_overdue_tools: (profile as any)?.alert_overdue_tools ?? true,
   });
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -25,7 +29,7 @@ export default function ProfilePage() {
     try {
       const supabase = (await import('@/lib/supabase/client')).createClient();
       // @ts-ignore - Supabase type issue with update
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({ full_name: editForm.full_name })
         .eq('user_id', user?.id);
@@ -38,6 +42,31 @@ export default function ProfilePage() {
       window.location.reload();
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message || 'Failed to update profile' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleAlertPreferencesSave = async () => {
+    setIsSubmitting(true);
+    setMessage(null);
+
+    try {
+      const supabase = (await import('@/lib/supabase/client')).createClient();
+      // @ts-ignore - Supabase type issue with update
+      const { error } = await (supabase as any)
+        .from('profiles')
+        .update({
+          alert_low_stock: alertPreferences.alert_low_stock,
+          alert_overdue_tools: alertPreferences.alert_overdue_tools,
+        })
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+
+      setMessage({ type: 'success', text: 'Alert preferences saved successfully' });
+    } catch (err: any) {
+      setMessage({ type: 'error', text: err.message || 'Failed to save alert preferences' });
     } finally {
       setIsSubmitting(false);
     }
@@ -193,6 +222,58 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Alert Preferences */}
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Bell className="h-5 w-5 text-blue-600" />
+          </div>
+          <h2 className="text-lg font-semibold text-gray-900">Alert Preferences</h2>
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-gray-900">Low Stock Alerts</p>
+              <p className="text-sm text-gray-600">Receive notifications when items are below minimum threshold</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={alertPreferences.alert_low_stock}
+                onChange={(e) => setAlertPreferences({ ...alertPreferences, alert_low_stock: e.target.checked })}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-gray-900">Overdue Tool Alerts</p>
+              <p className="text-sm text-gray-600">Receive notifications for overdue tool loans</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={alertPreferences.alert_overdue_tools}
+                onChange={(e) => setAlertPreferences({ ...alertPreferences, alert_overdue_tools: e.target.checked })}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+          </div>
+        </div>
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={handleAlertPreferencesSave}
+            disabled={isSubmitting}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+          >
+            <Save className="h-4 w-4" />
+            {isSubmitting ? 'Saving...' : 'Save Preferences'}
+          </button>
+        </div>
       </div>
 
       {/* Password Management */}

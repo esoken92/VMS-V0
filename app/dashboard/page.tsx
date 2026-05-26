@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/components/providers/AuthProvider';
 import { Package, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
 
 export default function DashboardPage() {
   const { profile } = useAuth();
@@ -20,7 +21,7 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+        <Link href="/dashboard/inventory" className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Products</p>
@@ -31,9 +32,9 @@ export default function DashboardPage() {
             </div>
           </div>
           <p className="text-xs text-green-600 mt-2">+12% from last month</p>
-        </div>
+        </Link>
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+        <Link href="/dashboard/stock-movements" className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-green-300 transition-all cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Stock Movements</p>
@@ -44,9 +45,9 @@ export default function DashboardPage() {
             </div>
           </div>
           <p className="text-xs text-green-600 mt-2">+8% from last week</p>
-        </div>
+        </Link>
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+        <Link href="/dashboard/inventory" className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-yellow-300 transition-all cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Low Stock Alerts</p>
@@ -57,9 +58,9 @@ export default function DashboardPage() {
             </div>
           </div>
           <p className="text-xs text-red-600 mt-2">+5 from yesterday</p>
-        </div>
+        </Link>
 
-        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+        <Link href="/dashboard/tool-loans" className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-purple-300 transition-all cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Active Tool Loans</p>
@@ -70,28 +71,28 @@ export default function DashboardPage() {
             </div>
           </div>
           <p className="text-xs text-gray-600 mt-2">2 overdue</p>
-        </div>
+        </Link>
       </div>
 
       {/* Quick Actions */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+          <Link href="/dashboard/stock-movements" className="p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors text-left">
             <div className="text-2xl mb-2">📦</div>
             <p className="font-medium text-gray-900">Record Stock Movement</p>
             <p className="text-sm text-gray-600">Add inbound or outbound stock</p>
-          </button>
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+          </Link>
+          <Link href="/dashboard/tool-loans" className="p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors text-left">
             <div className="text-2xl mb-2">🔧</div>
             <p className="font-medium text-gray-900">Tool Check-Out</p>
             <p className="text-sm text-gray-600">Assign tool to staff member</p>
-          </button>
-          <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+          </Link>
+          <Link href="/dashboard/stock-takes" className="p-4 border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors text-left">
             <div className="text-2xl mb-2">📋</div>
             <p className="font-medium text-gray-900">Start Stock Take</p>
             <p className="text-sm text-gray-600">Begin blind inventory count</p>
-          </button>
+          </Link>
         </div>
       </div>
 
