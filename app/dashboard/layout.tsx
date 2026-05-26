@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Sidebar from '@/components/dashboard/Sidebar';
 import TopBar from '@/components/dashboard/TopBar';
+import { useAuth } from '@/components/providers/AuthProvider';
+import { Shield, LogOut } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -10,6 +12,14 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isImpersonating, impersonatedByUser, exitImpersonation } = useAuth();
+
+  const handleExitImpersonation = () => {
+    const result = exitImpersonation();
+    if (result.success) {
+      window.location.reload();
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -39,6 +49,27 @@ export default function DashboardLayout({
       <div className="flex-1 flex flex-col md:ml-64">
         {/* TopBar */}
         <TopBar onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} />
+
+        {/* Impersonation Banner */}
+        {isImpersonating && (
+          <div className="bg-yellow-50 border-b border-yellow-200 px-6 py-3">
+            <div className="flex items-center justify-between max-w-7xl mx-auto">
+              <div className="flex items-center gap-3">
+                <Shield className="h-5 w-5 text-yellow-600" />
+                <p className="text-sm text-yellow-900">
+                  Viewing as <strong>{impersonatedByUser?.full_name || 'Unknown'}</strong> (Impersonation Mode)
+                </p>
+              </div>
+              <button
+                onClick={handleExitImpersonation}
+                className="flex items-center gap-2 px-3 py-1.5 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm"
+              >
+                <LogOut className="h-4 w-4" />
+                Exit
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Page Content */}
         <main className="flex-1 p-6">
