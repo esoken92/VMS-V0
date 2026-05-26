@@ -26,7 +26,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string; message?: string }>;
   updatePassword: (newPassword: string) => Promise<{ success: boolean; error?: string; message?: string }>;
-  impersonateUser: (targetUserId: string) => Promise<{ success: boolean; error?: string }>;
+  impersonateUser: (targetUserId: string, reason?: string) => Promise<{ success: boolean; error?: string }>;
   exitImpersonation: () => { success: boolean; error?: string };
   hasRole: (requiredRoles: string | string[]) => boolean;
   setError: (error: string | null) => void;
@@ -255,7 +255,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Super admin "View As" impersonation
-  const impersonateUser = async (targetUserId: string) => {
+  const impersonateUser = async (targetUserId: string, reason?: string) => {
     try {
       setError(null);
 
@@ -271,6 +271,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) throw error;
+
+      // Create impersonation session in database
+      // @ts-ignore - Supabase type issue
+      const { error: sessionError } = await supabase.rpc('start_impersonation', {
+        p_target_user_id: targetUserId,
+        p_reason: reason || 'No reason provided'
+      } as any);
+
+      if (sessionError) throw sessionError;
 
       // Set impersonation context
       setIsImpersonating(true);
