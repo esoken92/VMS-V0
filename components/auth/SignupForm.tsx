@@ -64,6 +64,17 @@ export default function SignupForm() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const isFormValid = () => {
+    return formData.fullName.trim().length >= 2 &&
+           formData.email &&
+           /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
+           formData.password.length >= 8 &&
+           /[A-Z]/.test(formData.password) &&
+           /[0-9]/.test(formData.password) &&
+           formData.confirmPassword === formData.password &&
+           agreedToTerms;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -322,8 +333,8 @@ export default function SignupForm() {
 
         <button
           type="submit"
-          disabled={isSubmitting || loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+          disabled={isSubmitting || loading || !isFormValid()}
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
         >
           {isSubmitting || loading ? (
             <>

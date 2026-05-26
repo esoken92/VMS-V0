@@ -231,64 +231,69 @@ ALTER TABLE activity_logs ENABLE ROW LEVEL SECURITY;
 -- PROFILES RLS POLICIES
 -- ============================================================================
 
--- Super Admin: Full access
+-- Allow users to insert their own profile (for signup)
+CREATE POLICY "Users can insert own profile"
+  ON profiles FOR INSERT
+  TO authenticated
+  WITH CHECK (
+    user_id = auth.uid()
+  );
+
+-- Allow users to view their own profile
+CREATE POLICY "Users can view own profile"
+  ON profiles FOR SELECT
+  TO authenticated
+  USING (
+    id = auth.uid()
+  );
+
+-- Allow users to update their own profile (except role)
+CREATE POLICY "Users can update own profile"
+  ON profiles FOR UPDATE
+  TO authenticated
+  USING (
+    id = auth.uid()
+  )
+  WITH CHECK (
+    id = auth.uid()
+    AND role = (SELECT role FROM profiles WHERE id = auth.uid())
+  );
+
+-- Super Admin: Full access to all profiles
 CREATE POLICY "Super admin full access on profiles"
   ON profiles FOR ALL
   TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE profiles.id = auth.uid()
-      AND profiles.role = 'super_admin'
-    )
+    id = auth.uid()
+    AND role = 'super_admin'
+  )
+  WITH CHECK (
+    id = auth.uid()
+    AND role = 'super_admin'
   );
 
--- Admin: Can view and update profiles (but not delete or change roles to super_admin)
-CREATE POLICY "Admin can view profiles"
+-- Admin: Can view all profiles
+CREATE POLICY "Admin can view all profiles"
   ON profiles FOR SELECT
   TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE profiles.id = auth.uid()
-      AND profiles.role IN ('admin', 'super_admin')
-    )
+    id = auth.uid()
+    AND role IN ('admin', 'super_admin')
   );
 
-CREATE POLICY "Admin can update profiles (except role changes)"
+-- Admin: Can update profiles (except changing to super_admin)
+CREATE POLICY "Admin can update profiles"
   ON profiles FOR UPDATE
   TO authenticated
   USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE profiles.id = auth.uid()
-      AND profiles.role = 'admin'
-    )
+    id = auth.uid()
+    AND role = 'admin'
+  )
+  WITH CHECK (
+    id = auth.uid()
+    AND role = 'admin'
+    AND (SELECT role FROM profiles WHERE id = auth.uid()) = 'admin'
     AND role != 'super_admin'
-  );
-
--- Fleet Dispatch: Can view own profile only
-CREATE POLICY "Fleet dispatch can view own profile"
-  ON profiles FOR SELECT
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE profiles.id = auth.uid()
-      AND profiles.role = 'fleet_dispatch'
-    )
-  );
-
--- Staff: Can view own profile only
-CREATE POLICY "Staff can view own profile"
-  ON profiles FOR SELECT
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE profiles.id = auth.uid()
-      AND profiles.role = 'staff'
-    )
   );
 
 -- ============================================================================

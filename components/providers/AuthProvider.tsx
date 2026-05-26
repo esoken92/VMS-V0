@@ -124,13 +124,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(data.user);
         await fetchUserProfile(data.user.id);
 
-        // Redirect based on role
-        if (profile?.role) {
-          router.push('/dashboard');
-        }
+        // Redirect to dashboard after successful login
+        router.push('/dashboard');
         return { success: true };
       }
-      
+
       return { success: false, error: 'Login failed' };
     } catch (err: any) {
       const errorMessage =

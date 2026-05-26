@@ -40,12 +40,20 @@ export default function LoginForm() {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-    if (!formData.station) {
-      newErrors.station = 'Station selection is required';
-    }
+    // Station is optional for now
+    // if (!formData.station) {
+    //   newErrors.station = 'Station selection is required';
+    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const isFormValid = () => {
+    return formData.email && 
+           formData.password && 
+           formData.password.length >= 6 &&
+           /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -215,8 +223,8 @@ export default function LoginForm() {
         {/* Submit Button */}
         <button
           type="submit"
-          disabled={isSubmitting || loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+          disabled={isSubmitting || loading || !isFormValid()}
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
         >
           {isSubmitting || loading ? (
             <>
