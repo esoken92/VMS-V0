@@ -248,14 +248,29 @@ export default function LoginForm() {
         </Link>
       </p>
 
-      {/* Demo Credentials (Development Only) */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-xs font-medium text-blue-900 mb-2">Demo Credentials:</p>
-          <p className="text-xs text-blue-800">Email: demo@warehouse.local</p>
-          <p className="text-xs text-blue-800">Password: Demo@123</p>
+      {/* Demo Credentials */}
+      <div className="mt-8 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+        <p className="text-sm font-medium text-purple-900 mb-3">🎯 Demo Credentials</p>
+        <div className="space-y-2 text-xs">
+          <div className="flex justify-between items-center">
+            <span className="text-purple-800 font-medium">Admin:</span>
+            <span className="text-purple-700">demo.admin@vms-demo.com / DemoAdmin123!</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-purple-800 font-medium">Manager:</span>
+            <span className="text-purple-700">demo.manager@vms-demo.com / DemoManager123!</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-purple-800 font-medium">Fleet:</span>
+            <span className="text-purple-700">demo.fleet@vms-demo.com / DemoFleet123!</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-purple-800 font-medium">Worker:</span>
+            <span className="text-purple-700">demo.worker@vms-demo.com / DemoWorker123!</span>
+          </div>
         </div>
-      )}
+        <p className="text-xs text-purple-600 mt-3 italic">For demonstration purposes only</p>
+      </div>
     </div>
   );
 }

@@ -167,16 +167,14 @@ export default function InventoryPage() {
       };
 
       if (editingProduct) {
-        // @ts-ignore - Supabase type issue
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('products')
           .update(productData)
           .eq('id', editingProduct.id);
         if (error) throw error;
         setMessage({ type: 'success', text: 'Product updated successfully' });
       } else {
-        // @ts-ignore - Supabase type issue
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('products')
           .insert(productData);
         if (error) throw error;
