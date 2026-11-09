@@ -1058,6 +1058,62 @@ requirements, M/S/N priority-tagged).*
 
 ---
 
+## PHASE 2n — GUIDED PROVISIONING (setup wizard)
+
+*The killer UX: all functionality ships in the box, but the user never
+sees what they don't need. First-run wizard asks what kind of operation
+this is and provisions menus, fields, workflows, and policies
+accordingly. This is how Odoo/ERPNext ask "company type" — done properly
+it makes a 340-item system feel like a 40-item one.*
+
+372. **Setup wizard (first-run, re-runnable)** — step flow: org basics →
+    industry/vertical select → product types handled → stock policies →
+    locations/storerooms → users/roles → review+provision. Skippable to
+    demo mode; re-runnable from settings (answers editable later)
+373. **Industry/vertical selector** — pick from the 12 packs (360–371)
+    + "general inventory" default; multi-select allowed (e.g. pharmacy
+    that also does equipment loans); drives which packs activate
+374. **Product-type declaration** — user checks what they stock:
+    perishable/expiry goods, serialized items, chemicals/hazmat,
+    regulated (pharma/medical), tools/equipment, vehicles/parts,
+    consumables — each toggles relevant fields+workflows
+375. **Picking/issue strategy select** — FIFO / LIFO / FEFO / specific-
+    gravity-none; per-instance default + per-category override; drives
+    pick suggestions AND enforcement level (suggest/warn/block)
+376. **Valuation method select** — weighted average (default), FIFO
+    layers, LIFO, standard cost; per-instance + per-category override;
+    drives cost fields, reports, ledger valuation columns
+377. **Expiry policy select** — none / track-only / enforce-FEFO /
+    enforce+quarantine; feeds item 145–147 + cold-chain pack
+378. **Dynamic menu provisioning** — nav built from enabled packs +
+    config answers: a food distributor never sees "tool loans", a tool
+    library never sees "expiry dashboards"; menus regenerate on config
+    change; deep links to disabled features show "not enabled for your
+    setup" not 404
+379. **Field-level provisioning** — pack/product-type answers add or
+    hide columns/fields/forms (e.g. serial# field appears only if
+    serialized items declared; temp fields only if cold-chain pack on)
+380. **Workflow provisioning** — approval chains, quarantine gates,
+    receiving checklists activate per answers; a "simple" setup gets
+    receive→stock→issue with zero ceremony
+381. **Report provisioning** — report catalog filtered to enabled
+    features; industry packs add their compliance reports automatically
+382. **Config change management** — wizard answers stored as versioned
+    `instance_config`; changes apply additively (new fields/workflows
+    appear, disabled features hide data NOT delete it); change log +
+    "what changed" summary
+383. **Preset templates** — named presets beyond wizard: "Pharmacy",
+    "Tool Library", "Fleet Parts", "Cold Storage", "School", "General"
+    — one-click full provisioning incl. demo-ish starter data shape
+384. **Setup completeness score** — checklist widget: % of recommended
+    config done (locations mapped? thresholds set? labels printed?
+    users invited?) — gamifies onboarding (extends item 197)
+385. **Provisioning preview** — before applying, show exactly what will
+    change: "This enables: expiry tracking, FEFO picking, 3 new menus,
+    2 reports. This hides: tool-loan screens." — no surprises
+
+---
+
 ## SUBAGENT ALLOCATION PLAN
 
 Research agents are DONE (reports merged above). Suggested build-time split
@@ -1081,7 +1137,8 @@ Research agents are DONE (reports merged above). Suggested build-time split
   case-scan, transfer lifecycle, sub-location persistence, booking
   calendar, custody axes, lending lifecycle, kits, WO linkage, PM,
   depreciation, forecasting, pick paths, RFID, inter-warehouse, cert
-  gating, LOTO, telematics, connector health, pack framework)
+  gating, LOTO, telematics, connector health, pack framework,
+  provisioning wizard items 372–385)
 
 Phase 2a (tech debt) runs FIRST solo — it touches files everyone else uses.
 Phase 2i scan-security items (100–111) and 2k permission matrix (224–233)
