@@ -236,35 +236,332 @@ can run immediately with a world-class public presentation.
 82. Data-retention + audit-log archiving settings
 83. SSO/OIDC documented as roadmap (hook points only, don't build)
 
+### 2i. Storerooms, environmental monitoring & hardened scanning
+
+*Users can create storerooms of any type — cold room, dry store, IT closet,
+frozen goods, secure cage, vehicle bay, hazmat cabinet — each fully
+configurable. Rooms can connect to remote monitoring (sensors, building
+automation) and scanning inputs are hardened against theft, cloning, replay,
+and bypass.*
+
+**Storeroom types & configuration:**
+
+84. `storerooms` table — name, type, parent zone, capacity, access_level,
+    feature_flags JSONB, sensor_bindings
+85. Storeroom type presets: Cold Storage, Frozen, Dry Goods, IT/Computer,
+    Vehicle Parts Bay, Secure/Cage, Hazmat, General — each seeds sane defaults
+86. Per-room feature toggles — admin can enable/disable per room: climate
+    monitoring, expiry enforcement, access control, photo-on-receipt,
+    two-person rule, quarantine mode, pick restrictions
+87. Per-room item-type allowlist — frozen room rejects non-cold-chain items
+88. Per-room constraints — temp range, max capacity, allowed roles, badge/QR
+    door access flag
+89. Storeroom dashboard view — occupancy, climate status, alerts, contents
+    tree per room
+90. Room transfer workflow — move stock between rooms with chain-of-custody
+    log entry
+
+**Environmental monitoring (IoT-ready):**
+
+91. `sensor_readings` table — room_id, metric (temp/humidity/door/vibration/
+    power), value, unit, recorded_at, source, quality flag
+92. Sensor ingestion API — authenticated POST endpoint for MQTT bridges,
+    vendor webhooks, or edge agents; idempotent, rate-limited, schema-validated
+93. Threshold rules engine — per-room min/max per metric; breach → alert event
+94. Alert lifecycle — active / acknowledged / resolved, with escalation
+    (unacked after N min → notify manager)
+95. Climate timeline chart per room (Recharts) + excursion report (PDF via Typst)
+96. Door-open events logged as stock-relevant audit entries
+97. Sensor health monitoring — stale-reading detection (no data > X min → alert)
+98. Dry-run/demo sensor simulator — generates realistic temp/humidity/door
+    data so the feature demos without hardware
+99. Vendor-agnostic connector docs — how to wire common sensors (ESP32/MQTT,
+    off-the-shelf IoT gateways, building-management webhooks)
+
+**Hardened barcode & RFID scanning:**
+
+100. Dual input support — USB/Bluetooth HID scanners, camera (ZXing), AND
+     RFID (UHF via WebUSB/WebSerial readers + NFC via Web NFC where available)
+101. `scan_events` audit table — every scan logged: input_type, credential,
+     timestamp, geo/room context, result, payload hash — feeds anomaly engine
+102. Scan-token signing — labels carry HMAC-signed payloads; server verifies
+     signature + expiry before accepting; cloned/forged labels rejected
+103. Replay protection — nonce + timestamp window on scan tokens; duplicate
+     scans within window flagged, not silently accepted
+104. Scan anomaly detection — impossible-velocity (same tag scanned at two
+     rooms < travel time), scan-without-presence, off-hours scanning,
+     bulk-scan bursts → flagged for review, optional auto-lock
+105. Tamper-evident labels — destructive vinyl stock noted in label profiles;
+     scan records label integrity state where detectable
+106. RFID-specific: tag TID vs EPC distinction, kill-password support notes,
+     anti-clone detection (same EPC on two TIDs = clone alert)
+107. Scan authorization matrix — which roles may scan which actions in which
+     rooms (staff can count, only managers can adjust/write-off)
+108. Signed scan receipts — every mutation via scan produces a verifiable
+     receipt record (who/what/when/where/before-after qty) shown in audit log
+109. Rate limiting + CAPTCHA-equivalent friction on manual entry fallback
+     (manual entry is the bypass vector — throttle + require reason)
+110. Input fuzzing hardening — all scan payloads Zod-validated, length-capped,
+     control-char stripped, treated as untrusted
+111. Scanner pairing flow — admin pairs specific hardware IDs to roles/rooms;
+     unpaired devices get read-only or rejected
+
+### 2j. Industry pain-point features (white-paper/research driven)
+
+*Evidence base: WHO/IQvia cold-chain review, FDA FSMA 204 pilots, WERC DC
+metrics, NRF shrink data, APQC, Kardex/Blue Star surveys, NIST SP 800-98,
+RFIDSec taxonomy, Snipe-IT/ServiceNow ITAM studies, fleet-parts literature.
+Every item below maps to a documented, quantified industry problem.*
+
+**Cold-chain, expiry & compliance:**
+
+126. Per-zone temp threshold rules — min/max per room, product-class ranges
+    (2–8°C pharma, −18°C frozen, ambient), severity per rule
+127. Sustained-breach excursion engine — alert only after configured dwell
+    (e.g. 15 min); kills door-open nuisance alarms
+128. Door-aware monitoring mode — extend tolerance while door open, alert on
+    open-duration > limit, log every door event
+129. Hard-limit immediate trip — extreme breach alerts instantly, bypasses dwell
+130. Monitoring-gap alerts — no reading within N× interval or sensor offline
+    raises incident (silent sensor = excursion risk)
+131. Excursion incident object — auto-created w/ temp timeline, door events,
+    affected SKUs/lots, workflow (open→quarantined→investigated→released),
+    Typst PDF export for claims/audits
+132. Auto-quarantine on excursion — zone stock blocked from pick/sale until
+    disposition recorded
+133. Product stability profiles — per-SKU acceptable excursion magnitude/
+    duration; auto-classify excursion as acceptable/review/reject
+134. Per-zone climate dashboard — live min/max/mean, sparkline, staleness
+    indicator per room
+135. Auto-generated digital temp logs — per zone per day, PDF/CSV export
+    (HACCP evidence; inspectors want live data not paper archives)
+136. Goods-in temp gate — receiving requires product temp + packaging
+    condition before stock posts; blocks putaway until captured
+137. Cleaning/sanitation scheduler — checklist tasks, due dates, photo
+    evidence, completion timestamps
+138. Pest/facility inspection checklists — recurring, sign-off required
+139. Zone segregation enforcement — allergen-free/quarantine/controlled-
+    ambient tags block incompatible co-location
+140. One-click audit pack — monitoring logs + deviations + corrective actions
+    + task completions for an inspector-defined window
+141. Lot/batch genealogy — every unit carries lot + supplier + received/
+    expiry dates; every movement in append-only log (extends items 8/26)
+142. Bidirectional recall trace — input lot → forward (all locations reached)
+    + backward (supplier, co-located batches); sortable CSV inside 24h window
+143. Recall impact dashboard — affected units by customer/location/value +
+    generated quarantine + notification lists
+144. FEFO pick enforcement — earliest-expiry first; warn/block later-expiry
+    picks while earlier-expiry stock remains (configurable per class)
+145. Expiry required at receiving for perishable SKUs
+146. Expiry-risk dashboard — stock expiring 7/30/90d by value + location;
+    disposition workflow (markdown/transfer/donate/disposal) w/ value-at-risk
+147. Returns quarantine — customer returns can't re-enter sellable stock
+    without override + reason code
+148. Door-open analytics — open count/duration by shift per door; correlates
+    excursions + energy
+149. Dock appointment scheduling — stagger arrivals, minimize simultaneous
+    door-open + staging dwell
+150. Staging dwell timer — arrival→dock→putaway-complete; flag >X min
+151. Cold-chain handoff check — record trailer/reefer temp at arrival; warn/
+    block unloading into warm trailer
+152. Energy proxy report — door-open minutes + zone runtime vs kWh where
+    meter data exists
+
+**Inventory accuracy & receiving:**
+
+153. ABC-tiered cycle count schedules — A monthly / B quarterly / C annually,
+    auto-generated count tasks, optional blind mode
+154. Variance approval workflow — counter records, manager approves before
+    ledger updates; repeated-variance SKUs auto-flagged for recount
+155. Auto-recount — variance beyond class tolerance triggers recount by a
+    DIFFERENT counter before adjustment posts
+156. Variance root-cause codes — receiving error / mis-slot / damage /
+    theft / count error; Inventory Record Accuracy % analytics by
+    location/counter/month
+157. Location discipline — bin required at putaway; mis-slot reports when
+    stock found outside assigned location
+158. Adjustment approval gates — count adjustments above threshold need
+    manager sign-off
+159. Dock-to-stock timer — receipt→putaway→system-entry per shipment;
+    benchmark vs WERC 3.5h best-in-class
+160. Receiving line-level checklist — qty/condition/lot/expiry/temp per PO
+    line; discrepancies logged per line not per order
+161. ASN matching — supplier ASN vs physical receipt; mismatches flagged
+    before putaway
+162. Supplier scorecards — damage-free %, receipt-line accuracy per vendor
+    (targets WERC "correct documents" metric)
+163. Scan-to-bin putaway verification — actual vs suggested location
+    recorded; mis-slots tracked
+164. Damage/shortage claims — photo + reason at receiving → auto-generated
+    supplier claim doc
+
+**Fleet-parts & IT-asset specifics:**
+
+165. Mandatory work-order/job reference on every issue — kills cost-
+    attribution loss, enables per-vehicle cost-per-mile
+166. Core charge ledger — expected return-by + charge amount per core-
+    bearing part; unreturned cores auto-escalate to visible cost
+167. Warranty/expected-life flag on issue — auto-detect replacement within
+    warranty window → claim-ready record
+168. Obsolescence review report — zero-movement 12–24mo parts flagged for
+    write-off/supplier-return/buy-back
+169. Job staging vs available stock — picked-for-job parts sit in staging
+    qty, not sellable stock; prevents double-issue
+170. Backorder + promised-date per PO line — work orders show part-risk
+    before job starts
+171. Cross-location "who has it" search — check other bins/depots/loaners
+    before ordering (avoids duplicate purchase)
+172. Pre-close invoice match — work-order close compares installed vs
+    billed parts/cores/freight; flags unbilled installs
+173. Fitment validation on issue — warn/block part↔vehicle spec mismatch
+    (tyre size/load/speed rating); wrong-part is #1 shop error class
+174. Intermittent-demand flags — days-since-last-sale + demand history per
+    slow SKU → reorder-vs-retire calls (85% of auto SKUs sell ≤10×/yr)
+175. Serialized asset identity — unique serial/barcode per unit for
+    high-value SKUs; qty-level tracking insufficient for theft-prone stock
+176. Offboarding return queue — removing client/employee auto-generates
+    expected-returns list; overdue escalates ("offboarding black hole")
+177. Swap-out reconciliation — repair/warranty exchanges as linked pairs
+    (out-for-repair ⇄ replacement-in), auto-prompted to close both legs
+178. Loaner board with aging — devices on loan >N days flagged
+179. Warranty/service contract fields on asset — vendor, contract ref,
+    expiry; repair routing auto-fills vendor contact
+180. Lifecycle status machine — in-service→repair→warranty-return→EOL→
+    refresh-queue; proactive refresh planning
+181. Ghost-asset sweep — scheduled audit mode: scan shelf, diff expected
+    vs found; missing → exception list
+182. License/seat register per machine — software titles, seats, renewal
+    dates; export shaped for vendor-audit response
+183. Immutable move ledger extended to assets/loans — append-only events,
+    corrections are new events never edits
+
+**UX & productivity:**
+
+184. ⌘K command palette — grouped ranked results, scoped prefixes (p:/s:/l:),
+    recent-first, two-key nav chords
+185. Scan-first one-loop flows — app says what's next (receive→putaway→
+    pick→count queue), search is deliberate fallback
+186. Scan location BEFORE items when counting — prevents "correctly counting
+    the wrong place"; shows expected SKU + last-known qty
+187. Multi-scan AR checkmark counting — camera counts tens of items w/
+    overlay confirmation + progress bar (Scandit MatrixScan pattern)
+188. Gamification — XP/streaks/badges/leaderboards, kiosk PIN terminals for
+    workers w/o email, optional TV wall displays
+189. Voice stocktake entry — "item 4412, eighteen units, rack B3" → row
+190. Voice-directed picking — finite vocabulary (<100 prompts), grouped
+    location digits, repeat-back confirm, barcode safety net at pick face
+191. Industrial mobile baseline — 48–56px targets, high contrast, one-hand
+    thumb zones, glove-friendly, audio+haptic scan feedback, sub-100ms scan
+192. Offline-first honest sync — local commit first, "Offline · cached HH:MM"
+    banner + unsynced count always visible, mutations fail loudly never
+    silently queue
+193. Undo-last-scan + line reversal — reverse last action pre-sync, [-]/[+]
+    tri-control on completed lines
+194. Dashboards where every number deep-links to the screen where you act;
+    "Needs attention" exception list above metrics
+195. Guided wizards for irreversible flows — progressive disclosure +
+    confirmation before destructive actions
+196. Two-path first screen — "Set up" vs "Explore with sample data";
+    demo dataset manifest-owned, banner-marked, one-click verified removal,
+    demo activity never fires alerts/webhooks
+197. Server-side setup checklist — only real actions tick it (create site →
+    location → item → print label → invite teammate)
+198. Location labels as onboarding step — print+mount QR labels during
+    setup; a scan answers "what AND where" on day one
+199. Unlock-gated import wizard — steps unlock sequentially; inline grid
+    edit; downloadable sample-format file; duplicate-SKU flagging
+200. Receiving flow ends in label creation — scan supplier# → qty → location
+    → print permanent QR identity; edits never invalidate the code
+201. Onboard by doing a real task — guided first receive/pick, not slides
+
+**Alerting that doesn't fatigue:**
+
+202. 3-tier severity — P0 (phone+SMS, 15min SLA) / P1 (chat DM, 1hr) /
+    P2 (digest); rule: "if nobody responds in 15min, what happens?"
+203. Auto-escalation + disposition-required ack — unacked P1 → P0; ack
+    requires "on site / handed off / false alarm" not plain ack
+204. Threshold-with-duration + cooldown + zone-counting + stale-sensor
+    rules — "above 8°C for 15min" not "above 8°C"; one alert per zone
+    problem; no-reopen window kills flapping
+205. Alert once per threshold crossing — no "4,3,2,1" countdown noise
+206. Channel by urgency + role defaults + quiet hours — SMS/voice P0,
+    push task-exceptions, email KPIs; night-shift digests
+207. Four alert types w/ daily budget — FYI(digest)/Watch(prepare)/
+    Escalate(decide now, target 0–3/owner/day)/Automate; majority land
+    FYI/Watch
+208. Digest modes + per-item snooze — daily/weekly standing lists of
+    everything below threshold vs instant crossings; 7/30-day snooze
+209. Notification center "Needs action" tab — Unread/Needs action/All w/
+    live counts; read≠resolved; toasts for now, inbox for later;
+    every alert deep-links to the triggering record
+
+**AI/automation innovations:**
+
+210. In-app conversational AI copilot — plain-English Q&A w/ follow-ups +
+    direct action links (extends item 68)
+211. AI anomaly detection on transaction logs — pick-without-putaway,
+    impossible scan rates, unusual adjustments, system-vs-physical drift →
+    prioritized recount tasks
+212. Phone-camera CV shelf counting — wave phone across shelf, on-device
+    count (future; data model must anticipate)
+213. Robot/drone counting API hooks — REST endpoints for external counting
+    systems (Verity/Corvus pattern)
+214. Warehouse digital-twin data model — locations table + status colors +
+    event log so a visual twin can be layered later
+215. Shelf-intelligence layer — on-shelf availability %, prioritized
+    restock alerts
+216. Explainable reorder recommendations — "why this number" dialog shows
+    the math; guardrails for MOQ/lead-time/budget; one-click draft POs
+    grouped by supplier
+217. Continuous audit / inventory-health monitoring — exception-only
+    human review
+218. Telemetry retention tiers — raw readings hot ~90d → hourly rollups
+    long-term (controls Supabase cost)
+
+**Extra scan-security (complements items 100–111):**
+
+219. Tamper-evident void-on-peel labels — physically compromised labels
+    visibly fail (EAS "active until deactivated" model)
+220. Issue-complete label deactivation — label marked "spent" on checkout;
+    returned-but-shouldn't-exist label at door raises alarm
+221. RFID Gen2 hardening notes — access/kill passwords, reserved bank
+    locking; 32-bit APwd brute-forceable → rely on backend anomaly
+    detection too
+222. Badge-pairing session governance — shared-device QR/NFC badge or
+    per-user PIN unlock, short-TTL sessions, forced re-auth on lock,
+    attempt limiting (SecureNode/Credenti pattern)
+223. Velocity caps per user/room — scans/min limits; bulk-scan spikes →
+    auto-hold for manager approval
+
 ---
 
 ## PHASE 3 — BRANDING & GO-LIVE PREP
 
-84. **Public landing page** (`app/page.tsx` rewrite): hero, screenshot tour,
+224. **Public landing page** (`app/page.tsx` rewrite): hero, screenshot tour,
     feature grid, "how it works" logic-chain diagram, comparison table vs
     spreadsheets/paper, footer.
-85. Footer footnotes: "Part of the ESO Industries ecosystem" →
+225. Footer footnotes: "Part of the ESO Industries ecosystem" →
     https://esoind.co.za + https://tyresync.co.za links;
     `mailto:esoken92@gmail.com` as primary contact/support.
-86. MCP setup page — copy-paste config snippet
+226. MCP setup page — copy-paste config snippet
     (`claude_desktop_config` / Cursor `mcpServers` entry) so visitors connect live.
-87. API playground page — try-it UI against REST API.
-88. **Demo-mode reset button** — one click reseeds demo data (critical for
+227. API playground page — try-it UI against REST API.
+228. **Demo-mode reset button** — one click reseeds demo data (critical for
     live demos/screenshots; admin-only, confirm-gated).
-89. `DEMO.md` presenter script — 5-minute flow: login → scan → stock take →
+229. `DEMO.md` presenter script — 5-minute flow: login → scan → stock take →
     MCP query → PDF report.
-90. Typst-generated architecture/system PDF (same pipeline) for "how it's built".
-91. Realistic seed story: tyre-shop inventory (tyres by size, fluids, tools,
+230. Typst-generated architecture/system PDF (same pipeline) for "how it's built".
+231. Realistic seed story: tyre-shop inventory (tyres by size, fluids, tools,
     consumables, vehicles-as-assets) so screenshots look alive.
-92. Roadmap page — public, signals active project.
-93. README final pass: screenshots embedded, badges, quickstart <5min,
+232. Roadmap page — public, signals active project.
+233. README final pass: screenshots embedded, badges, quickstart <5min,
     MCP/API highlights front-and-center, license block.
-94. `SETUP_DATABASE.md` + `.env.example` final consistency check.
-95. Final security re-review: secrets scan, RLS coverage, API auth on every
+234. `SETUP_DATABASE.md` + `.env.example` final consistency check.
+235. Final security re-review: secrets scan, RLS coverage, API auth on every
     route, Zod at every boundary, service-role server-only.
-96. Final verification: `npm ci` clean, tsc/lint/build green, `npm run dev`
+236. Final verification: `npm ci` clean, tsc/lint/build green, `npm run dev`
     smoke test of every route.
-97. Produce go-live checklist + hand back to owner for the visibility flip.
+237. Produce go-live checklist + hand back to owner for the visibility flip.
 
 ---
 
@@ -273,12 +570,16 @@ can run immediately with a world-class public presentation.
 Research agents are DONE (reports merged above). Suggested build-time split
 (max 3 concurrent, disjoint write scopes):
 
-- **Agent A — Data/API layer:** items 6–30, 63–66, 73 (migrations + API routes)
-- **Agent B — UI/UX:** items 31–44, 45–52, 84–87 (pages, components, landing)
-- **Agent C — Integrations/reports:** items 53–62, 67–72, 75, 90 (PDF, MCP,
-  AI, webhooks, email)
+- **Agent A — Data/API layer:** items 6–30, 63–66, 73, 84–99 (migrations,
+  storerooms, sensors, API routes)
+- **Agent B — UI/UX:** items 31–44, 100–111 scan UX, 112–121 (pages,
+  components, landing, scan hardening UI)
+- **Agent C — Integrations/reports:** items 53–62, 67–72, 75, 90, 92
+  (PDF, MCP, AI, webhooks, email, sensor simulator)
 
 Phase 2a (tech debt) runs FIRST solo — it touches files everyone else uses.
+Phase 2i scan-security items (100–111) land with 2b/2d schema work, not after —
+labels minted before hardening ships are forgeable.
 
 ## ACCEPTANCE CRITERIA
 
