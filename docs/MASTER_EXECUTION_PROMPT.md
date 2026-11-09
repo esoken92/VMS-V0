@@ -101,6 +101,28 @@ can run immediately with a world-class public presentation.
 
 ## PHASE 2 — CORE DEVELOPMENT
 
+### 0. CLEAN-SLATE REBOOT (owner directive — supersedes all Supabase/Auth.js-conflicting items below)
+
+- **Self-hosted first, local-only.** No Vercel, no Supabase Cloud — app
+  must run on the dev's PC now, later on client PCs incl. old hardware.
+- **New stack:** Postgres 16 (`docker-compose.yml`, single service) +
+  Auth.js v5 credentials (argon2id) + Drizzle ORM + app-layer
+  authorization (permission matrix replaces RLS — same rules, enforced
+  in server actions/API routes, NOT client-side).
+- `supabase/migrations/*.sql` = canonical init SQL mounted into the
+  container via `/docker-entrypoint-initdb.d`; drizzle-kit for future
+  (additive) migrations.
+- **Remove:** `@supabase/*` deps, `lib/supabase/*`, supabase-js call
+  sites (~20 files), `@vercel/analytics`, `@vercel/speed-insights`.
+- **Integrations = framework + docs only:** Resend, OpenAI-compatible,
+  MCP, object storage, Typst — env-gated adapters + `docs/INTEGRATIONS.md`
+  per-service wiring instructions for the end user. Unset env = feature
+  disables gracefully, never crashes. Supabase Cloud remains a documented
+  optional path for users who want hosted Postgres+auth.
+- Items 106–111 below rewritten accordingly: Auth.js+Postgres replaces
+  the `@supabase/ssr` migration; app-layer authz replaces RLS items;
+  argon2 seed users; drizzle schema/types replace `generate-types`.
+
 ### 2a. Technical debt (do FIRST — cheap, de-risks everything)
 
 1. Migrate auth from deprecated `@supabase/auth-helpers-nextjs` → `@supabase/ssr`
