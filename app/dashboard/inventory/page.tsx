@@ -526,7 +526,7 @@ export default function InventoryPage() {
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Delete Product</h2>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete "{deleteProduct.name}"? This action cannot be undone.
+              Are you sure you want to delete &quot;{deleteProduct.name}&quot;? This action cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
               <button

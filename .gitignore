@@ -1,8 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
-/.pnp
+# dependencies (any depth — also covers nested demo/prototype folders)
+node_modules/
+.pnp
 .pnp.js
 
 # testing
@@ -15,6 +15,14 @@
 # production
 /build
 
+# PWA generated service worker (next-pwa build output)
+/public/sw.js
+/public/workbox-*.js
+/public/worker-*.js
+/public/sw.js.map
+/public/workbox-*.js.map
+/public/worker-*.js.map
+
 # misc
 .DS_Store
 *.pem
@@ -25,8 +33,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
 .env
+.env*.local
 
 # vercel
 .vercel
@@ -35,7 +43,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# supabase
+# supabase local state
 .supabase
-
-.vercel
+supabase/.temp

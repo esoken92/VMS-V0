@@ -308,7 +308,7 @@ export default function BinLocationsPage() {
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Delete Bin Location</h2>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete "{deleteBin.zone}-{deleteBin.bin_location}"? This action cannot be undone.
+              Are you sure you want to delete &quot;{deleteBin.zone}-{deleteBin.bin_location}&quot;? This action cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
               <button

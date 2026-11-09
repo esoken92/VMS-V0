@@ -59,7 +59,7 @@ export default function ForgotPasswordForm() {
             Check Your Email
           </h2>
           <p className="text-gray-600 mb-6">
-            We've sent a password reset link to:
+            We&apos;ve sent a password reset link to:
           </p>
 
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">

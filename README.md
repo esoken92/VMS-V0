@@ -1,238 +1,185 @@
-# VMS Inventory Management System
+# VMS — Warehouse Inventory Management (Demo Template)
 
-A secure, mobile-optimized Progressive Web App (PWA) for Heavy-Duty Truck Parts Warehouse inventory management with offline capabilities, barcode scanning, and immutable audit trails.
+A mobile-optimized Progressive Web App for industrial warehouse inventory
+management: role-based access control, immutable audit trails, tool custody,
+blind stock-takes, and Supabase-backed real-time data.
 
----
+This repository is intended as a **starting template / working prototype** for
+teams evaluating or building an inventory management system. Fork it, point it
+at your own Supabase project, and adapt it internally.
 
-## 🔍 Overview
-
-This platform provides comprehensive inventory management for high-value tools, tires, hazardous liquids/oils, and mechanical consumables. It features role-based access control, real-time analytics, and industrial warehouse operations support.
-
----
-
-## � Key Features
-
-* **Role-Based Access Control (RBAC)** - Four distinct roles: Super Admin, Admin, Fleet Dispatch, and Warehouse Staff
-* **Immutable Audit Trail** - Database-level triggers capture all changes with impersonation tracking
-* **PWA with Offline Support** - IndexedDB queue syncs automatically when connection restores
-* **Barcode/QR Scanning** - Native device camera integration for mobile operations
-* **Blind Stock-Takes** - System quantities hidden during physical audits to prevent fraud
-* **Tool Custody Tracking** - High-value tool check-in/out with condition logging
-* **Directed Picking Routes** - Automatic zone/bin sorting for efficient warehouse navigation
-* **Core Charge Management** - Track manufacturer core charge returns
-* **Bin Weight Capacity Alerts** - Safety warnings for heavy bulk items
-* **Advanced Analytics** - Recharts dashboards for inventory trends, loss tracking, and tool status
+> **License**: [CC BY-NC-SA 4.0](LICENSE) — free to use, modify, and share for
+> **non-commercial** purposes, with attribution, under the same license.
+> Commercial use requires separate permission — see LICENSE.
 
 ---
 
-## 🔐 Security Features
+## Features
 
-* Row-Level Security (RLS) on all database tables
-* Immutable `activity_logs` table (UPDATE/DELETE blocked)
-* "View As" impersonation with audit trail
-* Photographic evidence required for scrap/damage logging
-* IP address and user agent tracking for all actions
+- **Role-Based Access Control** — five roles: `super_admin`, `admin`,
+  `manager`, `fleet_dispatch`, `staff`
+- **Immutable Audit Trail** — database triggers write every change to
+  `activity_logs` (UPDATE/DELETE blocked), with impersonation tracking
+- **Tool Custody** — check-in/check-out with condition logging and overdue
+  tracking
+- **Blind Stock-Takes** — physical counts recorded without revealing system
+  quantities
+- **Directed Bin Locations** — zone/bin model with weight capacity
+- **Unit Conversion Model** — stocking unit vs issuing unit
+  (e.g. drum → litre) with `DECIMAL(15,4)` precision
+- **Super Admin "View As"** — impersonation with a mandatory reason, logged
+  to `impersonation_sessions`
+- **PWA** — installable, service-worker precaching via `next-pwa`
+- **Row-Level Security** — every table is RLS-protected; data access runs
+  through the user's own JWT
 
----
+## Tech Stack
 
-## �️ Technology Stack
-
-* **Frontend**: Next.js 14 (App Router), React 18
-* **Styling**: Tailwind CSS, Shadcn UI components
-* **Icons**: Lucide React
-* **Database**: Supabase (PostgreSQL with RLS)
-* **Authentication**: Supabase Auth
-* **PWA**: Service workers with offline sync
-* **Scanning**: html5-qrcode for native camera access
-* **Offline Storage**: Dexie.js (IndexedDB wrapper)
-* **Visualization**: Recharts for analytics dashboards
-
----
-
-## 📦 Database Schema
-
-### Core Tables
-* `profiles` - User profiles with RBAC roles
-* `suppliers` - Supplier management
-* `bin_locations` - Warehouse zones with weight capacity
-* `unit_conversions` - Stocking unit to issuing unit rules
-* `products` - Inventory items with industrial fields
-* `tool_loans` - Reusable tool custody tracking
-* `receiving_documents` - Goods in workflow
-* `receiving_items` - Receiving line items
-* `stock_movements` - All inventory transactions
-* `stock_takes` - Audit sessions
-* `stock_take_items` - Blind count records
-* `activity_logs` - Immutable audit trail
+- **Next.js 14** (App Router) + **React 18** + **TypeScript**
+- **Supabase** (Postgres + Auth + Storage) via `@supabase/auth-helpers-nextjs`
+- **Tailwind CSS**, Lucide icons, Recharts
+- **next-pwa** service worker
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
-* Node.js 18+ installed
-* Supabase project created
-* Supabase CLI installed (optional, for type generation)
 
-### Installation
+- Node.js 18+
+- A Supabase project (free tier works)
 
-1. Install dependencies:
+### 1. Install
+
 ```bash
 npm install
 ```
 
-2. Configure environment variables:
+### 2. Configure environment
+
 ```bash
 cp .env.example .env
 ```
-Edit `.env` with your Supabase credentials:
-```
-NEXT_PUBLIC_SUPABASE_URL=your-project-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+Fill in your Supabase credentials (Dashboard → Project Settings → API):
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project-ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_NAME=VMS Inventory Management
 ```
 
-3. Run database migrations:
+### 3. Apply the schema
+
+**Option A — Supabase CLI**
+
 ```bash
-# Using Supabase CLI
+supabase link --project-ref <your-project-ref>
 supabase db push
-
-# Or manually run the migration files in supabase/migrations/
 ```
 
-4. Generate TypeScript types (optional):
+**Option B — SQL Editor**
+
+Run each file in `supabase/migrations/` **in numeric order**
+(`001` → `009`) in the dashboard SQL Editor.
+
+### 4. (Optional) Seed demo data
+
+`supabase/seed.sql` creates four demo accounts and a full sample dataset
+(bin locations, suppliers, products, movements, tool loans, stock takes).
+
 ```bash
-npm run supabase:generate-types
+supabase db reset      # local dev — migrations + seed
+# or paste supabase/seed.sql into the SQL Editor on a hosted project
 ```
 
-5. Start development server:
+> ⚠️ The seed creates **well-known public credentials**. Only use it for
+> demos and local development — never on data you care about.
+
+| Role            | Email                        | Password         |
+|-----------------|------------------------------|------------------|
+| Super Admin     | `demo.admin@vms-demo.com`    | `DemoAdmin123!`  |
+| Manager         | `demo.manager@vms-demo.com`  | `DemoManager123!`|
+| Fleet Dispatch  | `demo.fleet@vms-demo.com`    | `DemoFleet123!`  |
+| Warehouse Staff | `demo.worker@vms-demo.com`   | `DemoWorker123!` |
+
+### 5. Run
+
 ```bash
 npm run dev
 ```
 
-6. Open http://localhost:3000
+Open <http://localhost:3000> and sign in with a demo account (or sign up —
+new sign-ups get the `staff` role; promote yourself via the SQL in
+`docs/`/`SETUP_DATABASE.md` or the Users page as a super admin).
 
 ---
 
-## � Project Structure
+## Project Structure
 
 ```
-vms-inventory/
-├── app/                      # Next.js App Router
-│   ├── (auth)/              # Authentication routes
-│   ├── (dashboard)/         # Dashboard routes by role
-│   ├── api/                 # API routes
-│   ├── layout.tsx           # Root layout
-│   └── page.tsx             # Home page
-├── components/              # React components
-│   ├── ui/                  # Shadcn UI components
-│   ├── inventory/           # Inventory components
-│   ├── scanning/            # Barcode scanning components
-│   ├── charts/              # Recharts visualization components
-│   └── mobile/              # Mobile-optimized components
-├── lib/                     # Core libraries
-│   ├── supabase/            # Supabase clients and queries
-│   ├── offline/             # IndexedDB and sync logic
-│   ├── hooks/               # Custom React hooks
-│   └── utils/               # Utility functions
-├── public/                  # Static assets
-│   ├── manifest.json        # PWA manifest
-│   ├── sw.js                # Service worker
-│   └── icons/               # App icons
-└── supabase/                # Database migrations
-    └── migrations/          # SQL migration files
+├── app/
+│   ├── auth/                 # login, signup, password reset
+│   ├── dashboard/            # protected pages (one per feature area)
+│   ├── scan/                 # public barcode-scan placeholder page
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx              # landing page
+├── components/
+│   ├── auth/                 # login / signup / reset forms
+│   ├── dashboard/            # Sidebar, TopBar, UserMenu
+│   └── providers/            # AuthProvider (session, role, impersonation)
+├── lib/
+│   ├── supabase/             # client, server, generated types
+│   └── navigation-config.ts  # role-scoped sidebar items
+├── middleware.ts             # auth + role route gating (edge)
+├── docs/                     # PROJECT_BRIEF.txt (original requirements)
+├── public/                   # PWA manifest + icons
+└── supabase/
+    ├── migrations/           # 001–009 schema migrations (ordered)
+    └── seed.sql              # optional demo users + sample data
 ```
 
----
+## How Authorization Works (defense in depth)
 
-## 🔧 Available Scripts
+1. **`middleware.ts`** redirects unauthenticated users to `/auth/login` and
+   gates admin/super-admin routes by role.
+2. **RLS policies** (migrations `001`/`006`) scope every table read/write to
+   the caller's role — the real enforcement layer.
+3. **`SECURITY DEFINER` RPCs** (`005`/`007`) perform their own role checks
+   and set actor columns from `auth.uid()` — never from caller input.
+   Privileged user-management functions require admin/super_admin;
+   `super_admin` grants/deletes are super-admin only.
 
-* `npm run dev` - Start development server
-* `npm run build` - Build for production
-* `npm start` - Start production server
-* `npm run lint` - Run ESLint
-* `npm run type-check` - Run TypeScript type checking
-* `npm run supabase:generate-types` - Generate TypeScript types from Supabase schema
+Sign convention used across schema, policies, and app: a profile's primary
+key **is** the auth user id (`profiles.id = auth.users.id`, `user_id` is
+kept for joins/FKs).
 
----
+## Available Scripts
 
-## 📱 PWA Features
+- `npm run dev` — dev server
+- `npm run build` — production build (generates the service worker)
+- `npm start` — serve the production build
+- `npm run lint` — ESLint
+- `npm run type-check` — `tsc --noEmit`
+- `npm run supabase:generate-types` — regenerate `lib/supabase/types.ts`
+  from your linked project
 
-* **Add to Home Screen** - Install as native app on mobile devices
-* **Offline Mode** - Continue working without internet connection
-* **Background Sync** - Automatically sync when connection restores
-* **Push Notifications** - (Future) Alerts for low stock and overdue tools
+## Notes & Caveats
 
----
+- `@supabase/auth-helpers-nextjs` is deprecated upstream — it works here,
+  but a production fork should migrate to `@supabase/ssr`.
+- `app/scan` is a UI placeholder; `html5-qrcode` is wired as a dependency
+  for you to build real camera scanning.
+- Push notifications and background-sync queues are intentionally not
+  included — the surface that exists is the surface that works.
+- The audit trigger logs `auth.uid()`; API context (IP, user agent) fields
+  exist on `activity_logs` for you to populate.
 
-## 🎯 User Roles
+## Contact
 
-### Super Admin / Owner
-* Full system administration
-* User management and impersonation
-* Financial/scrap/fraud reports
-* Raw activity ledger access
+**Kurt Jonathan** — [esoken92@gmail.com](mailto:esoken92@gmail.com)
 
-### Admin / Parts Manager
-* Full inventory control
-* Restock approvals
-* Scrap/waste authorization
-* Supplier purchase order management
-* Tool custody audit review
-
-### Fleet Dispatch / Mechanic
-* Mobile-optimized interface
-* Tool check-in/out
-* Parts logging against work orders
-* Current stock level viewing
-
-### Warehouse Picker / Staff
-* Mobile-optimized interface
-* Barcode scanning for receiving
-* Sequential picking by location
-* Physical blind stock-takes
-
----
-
-## 📊 Industrial Features
-
-### Unit Conversion
-* Supports DECIMAL(15,4) for precise fluid volumes
-* Distinguishes between stocking unit (Drum/Bulk) and issuing unit (Liter/Quart)
-* Conversion rules stored in database
-
-### Tool Custody
-* High-value tool tracking
-* Check-out/in with condition logging
-* Overdue tool alerts
-- Expected return date tracking
-
-### Directed Picking
-* Automatic sorting by zone and bin_location
-* Prevents warehouse floor zigzagging
-* Optimized pick list generation
-
-### Core Charge Returns
-* Flags parts with manufacturer core charges
-- Tracks return status for credit recovery
-
-### Bin Weight Capacity
-* Maximum weight threshold per bin
-* Safety warnings for heavy bulk items
-* Prevents over-weight routing
-
-### Goods In Workflow
-* Scan against supplier inventory notes
-* Record short-shipments and overages
-* Capture damage reports on arrival
-
----
-
-## 📫 Contact
-
-**Kurt Jonathan**
-📧 [esoken92@gmail.com](mailto:esoken92@gmail.com)
-
----
-
-© 2026 VMS Inventory Management. All rights reserved.
+© 2026 ESO Industries. Licensed under CC BY-NC-SA 4.0.

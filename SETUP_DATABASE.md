@@ -2,61 +2,60 @@
 
 ## Step 1: Apply Migrations to Supabase
 
-1. Go to your Supabase project dashboard: https://supabase.com/dashboard/project/ilywbbeptdjhgwqrbuuf
+1. Go to your Supabase project dashboard: https://supabase.com/dashboard/project/YOUR_PROJECT_REF
 2. Navigate to **SQL Editor** in the left sidebar
 3. Click **New Query**
-4. Copy the contents of `supabase/migrations/001_initial_schema.sql` and paste it into the SQL editor
-5. Click **Run** to execute the migration
-6. Copy the contents of `supabase/migrations/002_audit_triggers.sql` and paste it into a new query
-7. Click **Run** to execute the audit triggers
+4. Copy the contents of each file in `supabase/migrations/` and run them
+   **in numeric order** (`001_initial_schema.sql` → `009_user_alert_preferences.sql`)
 
-## Step 2: Create Test User Account
+Or with the CLI:
 
-After migrations are applied, run this SQL in the SQL Editor to create a test user:
+```bash
+supabase link --project-ref YOUR_PROJECT_REF
+supabase db push
+```
+
+## Step 2: (Optional) Seed Demo Data
+
+To get four demo accounts (one per role) plus sample inventory:
+
+```bash
+# hosted project: paste the file into the SQL Editor, or
+psql "$SUPABASE_DB_URL" -f supabase/seed.sql
+
+# local supabase dev:
+supabase db reset   # runs migrations + seed.sql
+```
+
+Demo logins — see the table in README.md. Only seed demo credentials into
+environments you don't mind being public.
+
+## Step 3: Create Your Own Admin Account
+
+Sign up through the app (`/auth/signup`) — new sign-ups get the `staff`
+role. Then promote yourself in the SQL Editor:
 
 ```sql
--- Create a test user (this creates the auth user)
--- You'll need to do this through the Supabase Dashboard Authentication section
--- or use the signup form in the app
-
--- After creating a user through the app signup form, run this to set their role:
-UPDATE profiles 
+UPDATE profiles
 SET role = 'super_admin'
 WHERE user_id = 'YOUR_USER_ID_HERE';
 
--- To find your user_id, run:
+-- To find your user_id:
 SELECT id, email, full_name, role FROM profiles;
 ```
 
-## Alternative: Quick Test User Creation
-
-If you want to quickly create a test user with super_admin role, you can:
-
-1. Open the app at http://localhost:3000
-2. Click "Get Started" or navigate to /auth/signup
-3. Sign up with a test email (e.g., admin@test.com) and password
-4. After signup, go to the Supabase SQL Editor and run:
+## Step 4: Verify Setup
 
 ```sql
-UPDATE profiles 
-SET role = 'super_admin'
-WHERE user_id = auth.uid();
-```
-
-This will set the currently logged-in user as a super_admin.
-
-## Step 3: Verify Setup
-
-Check that tables were created by running:
-```sql
-SELECT table_name FROM information_schema.tables 
-WHERE table_schema = 'public' 
+SELECT table_name FROM information_schema.tables
+WHERE table_schema = 'public'
 ORDER BY table_name;
 ```
 
-You should see these tables:
+Expected tables:
 - activity_logs
 - bin_locations
+- impersonation_sessions
 - products
 - profiles
 - receiving_documents
@@ -65,13 +64,12 @@ You should see these tables:
 - stock_take_items
 - stock_takes
 - suppliers
+- system_settings
 - tool_loans
 - unit_conversions
 
-## Step 4: Test the App
+## Step 5: Test the App
 
 1. Go to http://localhost:3000
-2. Click "Get Started" to sign up
-3. After signing up, update your role to super_admin using the SQL above
-4. Log out and log back in
-5. You should now have full access to the dashboard and all features
+2. Sign in with a demo account or your own account
+3. You should now have full access matching your role

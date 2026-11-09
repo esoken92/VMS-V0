@@ -8,7 +8,7 @@ interface User {
   id: string;
   email: string;
   full_name: string;
-  role: 'super_admin' | 'admin' | 'fleet_dispatch' | 'staff';
+  role: 'super_admin' | 'admin' | 'manager' | 'fleet_dispatch' | 'staff';
   created_at: string;
   last_sign_in_at: string | null;
 }
@@ -35,17 +35,18 @@ export default function UsersPage() {
 
   const [editForm, setEditForm] = useState({
     full_name: '',
-    role: 'staff' as 'super_admin' | 'admin' | 'fleet_dispatch' | 'staff'
+    role: 'staff' as 'super_admin' | 'admin' | 'manager' | 'fleet_dispatch' | 'staff'
   });
 
-  // Check if user is super_admin
+  // Admins can manage users; only super_admin can delete or grant super_admin
+  const canManageUsers = hasRole(['admin', 'super_admin']);
   const isSuperAdmin = hasRole('super_admin');
 
   useEffect(() => {
-    if (isSuperAdmin) {
+    if (canManageUsers) {
       fetchUsers();
     }
-  }, [isSuperAdmin]);
+  }, [canManageUsers]);
 
   const fetchUsers = async () => {
     try {
@@ -175,7 +176,7 @@ export default function UsersPage() {
     return matchesSearch && matchesRole;
   });
 
-  if (!isSuperAdmin) {
+  if (!canManageUsers) {
     return (
       <div className="space-y-6">
         <div>
@@ -183,7 +184,7 @@ export default function UsersPage() {
           <p className="text-gray-600 mt-1">Manage user accounts and roles</p>
         </div>
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <p className="text-red-800">Access denied. Only super admins can manage users.</p>
+          <p className="text-red-800">Access denied. Only admins can manage users.</p>
         </div>
       </div>
     );
@@ -241,6 +242,7 @@ export default function UsersPage() {
             <option value="all">All Roles</option>
             <option value="super_admin">Super Admin</option>
             <option value="admin">Admin</option>
+            <option value="manager">Manager</option>
             <option value="fleet_dispatch">Fleet Dispatch</option>
             <option value="staff">Staff</option>
           </select>
@@ -277,6 +279,7 @@ export default function UsersPage() {
                       <span className={`px-2 py-1 text-xs font-medium rounded capitalize ${
                         user.role === 'super_admin' ? 'bg-purple-100 text-purple-700' :
                         user.role === 'admin' ? 'bg-blue-100 text-blue-700' :
+                        user.role === 'manager' ? 'bg-indigo-100 text-indigo-700' :
                         user.role === 'fleet_dispatch' ? 'bg-green-100 text-green-700' :
                         'bg-gray-100 text-gray-700'
                       }`}>
@@ -298,13 +301,15 @@ export default function UsersPage() {
                         >
                           <Edit className="h-4 w-4 text-gray-600" />
                         </button>
-                        <button
-                          onClick={() => openDeleteModal(user)}
-                          className="p-1 hover:bg-red-50 rounded"
-                          title="Delete"
-                        >
-                          <Trash2 className="h-4 w-4 text-red-600" />
-                        </button>
+                        {isSuperAdmin && (
+                          <button
+                            onClick={() => openDeleteModal(user)}
+                            className="p-1 hover:bg-red-50 rounded"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -361,8 +366,9 @@ export default function UsersPage() {
                 >
                   <option value="staff">Staff</option>
                   <option value="fleet_dispatch">Fleet Dispatch</option>
+                  <option value="manager">Manager</option>
                   <option value="admin">Admin</option>
-                  <option value="super_admin">Super Admin</option>
+                  {isSuperAdmin && <option value="super_admin">Super Admin</option>}
                 </select>
               </div>
               <div className="flex gap-3 justify-end pt-4">
@@ -423,8 +429,9 @@ export default function UsersPage() {
                 >
                   <option value="staff">Staff</option>
                   <option value="fleet_dispatch">Fleet Dispatch</option>
+                  <option value="manager">Manager</option>
                   <option value="admin">Admin</option>
-                  <option value="super_admin">Super Admin</option>
+                  {isSuperAdmin && <option value="super_admin">Super Admin</option>}
                 </select>
               </div>
               <div className="flex gap-3 justify-end pt-4">
