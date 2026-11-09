@@ -760,6 +760,31 @@ afterthought; the PWA should feel like a native app without an app store.*
     device checklist (iPhone SE, budget Samsung, tablet); smoke tests
     cover mobile flows; documented in TESTING.md
 
+**Local playtest & UI sanity pass (manual, before every demo AND go-live):**
+
+295. **Full click-through playtest** — run `npm run dev` locally and
+    manually click EVERY route and flow as each demo role: landing →
+    signup/login/reset → dashboard → inventory CRUD → stock movement →
+    stock take → tool loans → suppliers → bin locations → zone map →
+    reports → audit log → users → settings → profile → scan → MCP/API
+    docs. Log every dead end, console error, broken state
+296. **Toggle/switch styling audit** — every toggle/switch/checkbox must
+    render as a proper control (pill switch or square checkbox) at ALL
+    breakpoints and themes — specifically check for the "weird oval"
+    bug (unconstrained aspect-ratio/width stretching the control into an
+    ellipse). Audit: settings toggles, notification prefs, feature flags,
+    dark-mode switch, any shadcn/Radix switch. Fix via explicit
+    `h-* w-*` + `rounded-full` constraints, never rely on parent flex
+297. **Form & dialog behavior pass** — every dialog opens/closes,
+    validates, submits, shows error+success states; no double-submit;
+    Escape/backdrop dismiss works; focus trap sane
+298. **Empty/loading/error states** — every list page renders correctly
+    with zero rows, slow load (skeleton), and query failure (error +
+    retry) — no white screens or infinite spinners
+299. **Playtest sign-off checklist** — `docs/PLAYTEST.md` records date,
+    routes covered, bugs found/fixed, console-error count; required
+    before demo + before public flip
+
 ---
 
 ## SUBAGENT ALLOCATION PLAN
@@ -771,7 +796,8 @@ Research agents are DONE (reports merged above). Suggested build-time split
   255–261, 266–268 (migrations, storerooms, sensors, permission matrix,
   API routes, deploy/DB plumbing)
 - **Agent B — UI/UX + mobile:** items 31–44, 100–111 scan UX, 234–240
-  RBAC admin UI, 241–250, 277–295 (pages, components, landing, mobile/PWA)
+  RBAC admin UI, 241–250, 276–299 (pages, components, landing, mobile/PWA,
+  toggle audit, playtest pass)
 - **Agent C — Integrations/reports:** items 53–62, 67–72, 75, 90, 92,
   262–265, 269–276 (PDF, MCP, AI, webhooks, email, sensor simulator,
   monitoring console, demo kit)
