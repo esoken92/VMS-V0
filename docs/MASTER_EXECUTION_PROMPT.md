@@ -855,6 +855,209 @@ run the core floor workflows standalone on a single PC.*
 
 ---
 
+## PHASE 2l — MARKET FIT: complaints, buyer wants & gap closure
+
+*Evidence: 2,603-review sync-app study, inFlow State of Inventory 2026
+(n=400), TechnBrains 75-record coding, G2/Capterra/Trustpilot/Reddit/
+app-store mining across Zoho, inFlow, Fishbowl, Cin7, Sortly, AssetTiger,
+UpKeep, MaintainX, EZOffice, Cheqroom, Finale, Katana, Odoo, ERPNext,
+Snipe-IT. Top complaint themes: silent sync corruption, counts≠reality,
+accounting drift, mobile-is-a-toy, no real offline, rigid reports,
+two-tier permissions, painful multi-location, mangled imports, weeks-
+long onboarding, lock-in/hostage data, pricing surprises, absent
+support.*
+
+**Anti-complaint product principles (commitments, not features):**
+
+314. **No per-seat/per-order/per-asset pricing ever** — free product;
+    unlimited users is a feature (AssetTiger/Wasp buyers literally cite
+    this). Scanner-only floor workers never count as seats
+315. **No feature paywalls** — lot/serial/expiry, bin locations, labels,
+    API, MCP, reports: ALL in base. Katana's "$199/mo for batch
+    tracking" is the canonical resentment — never do it
+316. **Full data portability, forever** — one-click export of EVERYTHING
+    incl. history (CSV + JSON + API dump); works offline; no
+    deletion windows; "your data is yours" stated in README
+317. **No silent failures** — every sync/import/report error lands in a
+    plain-language error queue with resolution steps; "it said
+    connected but wasn't" is banned behavior
+318. **Mobile at parity** — anything doable on web is doable on mobile
+    (inFlow/Cheqroom "mobile is a subset" is a top complaint)
+319. **Sub-day onboarding** — signup → first real scan in <30 min;
+    import wizard validates BEFORE commit (item 199 strengthened)
+
+**Gap-closure features:**
+
+320. **Kardex / stock-ledger report** — opening + movements = closing,
+    per product/location/period; the report Odoo users say is missing;
+    procurement's #1 reconciliation artifact
+321. **BOM/kit cascade** — assemblies deduct components correctly,
+    multi-level BOMs, circular-reference rejection, build/disassembly;
+    Zoho's "components don't decrement" is documented inventory
+    corruption — ours must be correct by construction (transactional)
+322. **Case/pack-level scanning** — scan a case → expand to unit
+    quantities; pack-size conversions on scan
+323. **Transfer lifecycle hardening** — in-transit state visible to
+    BOTH sides; partial receipt; damage/loss disposition per line;
+    transfers can't silently orphan stock (Cin7/Epicor "stuck in
+    transit" is a top complaint)
+324. **Sub-location survives zero qty** — bin rows persist at qty=0
+    (inFlow deletes them → re-entry hell); history stays attached
+325. **Reservation/booking calendar** — asset/equipment reservations
+    with date windows, holiday/closed-day rules, per-slot limits,
+    calendar + list views (Cheqroom gap)
+326. **Request-and-approve checkout** — users request gear/items,
+    approver grants with due date + condition photos both ends
+    (extends item 26 to asset custody)
+327. **Bulk "move all" transfers** — relocate entire bins/locations/
+    categories in one op; preserves history (Sortly's "move loses
+    history" complaint)
+328. **Scheduled report exports** — saved reports → CSV/PDF emailed on
+    schedule (daily/weekly/monthly); custom date ranges; zero-stock
+    filter toggle (MaintainX "40% want automated reporting")
+329. **Report performance budget** — saved/custom reports load
+    sub-second at 100k+ movement rows; indexed queries; pagination +
+    server-side aggregation; report SPEED is the complaint, not report
+    existence
+330. **Fuzzy instant search** — typo-tolerant, prefix, SKU/barcode/
+    name/location all in one box; Homebox's "capital letter = zero
+    results" failure mode banned
+331. **"Due today" proactive alerts** — notify BEFORE overdue (MaintainX
+    users beg for this); lead-time alerts per category
+332. **Multi-UOM decimals** — case/each/pound/meter conversions;
+    fractional quantities for length-measured stock
+333. **Project/job costing dimension** — optional project_code on
+    movements/issues → per-project parts cost rollup (construction/
+    trades ask; extends item 165)
+334. **Grant/funding codes** — optional funding source on receipts/
+    issues for nonprofit/education/gov (AssetTiger "unlimited users +
+    grants" pattern)
+335. **QuickBooks/Xero connector (CSV-first)** — two-way-ish via
+    scheduled CSV export/import initially; journal-entry-shaped
+    exports; documented mapping; API connector later. Accounting sync
+    is the #1 integration ask and Fishbowl/QB drift is legendary —
+    ours must reconcile to the cent or explain why not
+336. **E-commerce stock feeds** — Shopify/Amazon/WooCommerce CSV/API
+    stock-level feeds (read-only push first); oversell protection via
+    atomic reservation (item 9 allocation model); channel-map table
+337. **Shipping/carrier basics** — shipment records w/ carrier, tracking
+    #, cost; carrier-rate lookup later; packing-list PDF via Typst
+338. **Sync error queue** — failed channel/accounting syncs surface as
+    actionable items (retry / skip / fix-mapping), never silent;
+    visible in notification center
+339. **Import pre-commit validation report** — dry-run mode shows
+    EVERY row error (leading zeros dropped, date misreads, dupes,
+    bad enums) before anything writes; fix-in-place then commit
+340. **POS/marketplace connector hooks** — Square/TikTok/niche
+    marketplaces via the same feed mechanism as 336; native > middleware
+
+---
+
+## PHASE 2m — OSS sweep round 2 + industry packs
+
+Evidence base lives in `docs/research/`: `01-buyer-wants.md`,
+`02-customer-complaints.md`, `03-github-sweep-2.md`, `04-industry-verticals.md`.
+
+*Evidence: docs/research/03-github-sweep-2.md (34 repos: traccar, dolibarr,
+glpi, fleetbase, shelf.nu, lubelog, ModernWMS, tracktor, iTop, Atlas CMMS,
+openwms, frePPLe, leihs, hmis, isle, circulate, Inventoros, carcareco,
+sentry-wms, fleetms, RepairOS, supplyseer…) and
+docs/research/04-industry-verticals.md (pharma/healthcare/education/gov/
+construction/mfg/retail/labs/hospitality/cannabis/wine/MRO/scrap/blood-bank
+requirements, M/S/N priority-tagged).*
+
+**Round-2 OSS gaps:**
+
+341. **Booking/reservation layer** — advance reservations w/ conflict
+    prevention, checkout/return windows, calendar sync (shelf.nu/
+    circulate pattern; extends item 325)
+342. **Custody vs location as separate axes** — who-has-it AND
+    where-it-lives independently; checkout TO a room/location/vehicle,
+    not just a person (isle pattern)
+343. **Lending lifecycle** — request→approve→loan→renew→return→fine,
+    holds/waitlists (leihs/circulate)
+344. **Condition-graded returns** — OK/Damaged grading + photo evidence
+    at checkout AND return; immutable scan history (SpaceWorks/circulate)
+345. **Kits/bundles** — kit checkout deducts components via BOM explosion
+    (pairs w/ item 321)
+346. **Work-order linkage** — issues tied to WOs; labor+parts on one
+    doc; WO close auto-posts consumption (Atlas CMMS/carcareco)
+347. **Preventive maintenance scheduling** — calendar + runtime-hours +
+    cycle/meter triggers; inspection form builder; cert renewals
+    (insurance/fitness/registration expiry tracking)
+348. **Depreciation & TCO** — straight-line/degressive schedules
+    auto-posted to ledger, residual value, renewal planning (Dolibarr —
+    unique in OSS)
+349. **Demand forecasting → auto-reorder** — EOQ + safety stock +
+    reorder point from history; auto-PO draft; confidence scoring
+    (frePPLe/supplyseer/ai_inventory)
+350. **Perpetual-inventory time travel** — reconstruct stock at ANY
+    timestamp from the append-only ledger (qbit-wms/autotraq pattern)
+351. **Pick-path optimization** — serpentine multi-order pick walks,
+    pack-station scan verification, cartonization (sentry-wms)
+352. **True UHF-RFID** — UART/BT reader pairing, bulk tag scanning,
+    offline-first sync (zetavg pattern; extends item 100)
+353. **Inter-warehouse transfers** — transit state visible both sides,
+    per-warehouse reorder points/capacity, warehouse-scoped user ACL
+    (Inventoros)
+354. **Certification gating** — must hold asset certification before
+    booking/checkout (makerspace/SpaceWorks pattern)
+355. **LOTO/incident log** — lockout-tagout records + incident severity
+    linked to assets
+356. **Vehicle telematics hook** — odometer/mileage-driven maintenance
+    triggers, optional GPS device ingestion (traccar companion)
+357. **Multi-currency + tax per region** — cross-border stock valuation
+358. **Connector health dashboard** — sync-health per integration:
+    last-success, failure count, circuit-breaker state (sentry-wms
+    pattern; pairs w/ item 338)
+
+**Industry packs (vertical modules on shared core):**
+
+359. **Pack framework** — `industry_packs` table + per-pack feature
+    flags + per-pack schema additions via additive migrations; a pack
+    enables/disables UI sections, fields, workflows, and reports. Core
+    platform stays universal (audit, e-sig, roles, lot/serial, quarantine,
+    scanning, locations, checkout lifecycle lift all boats)
+360. **Pharma pack** — e-signatures w/ non-repudiation (re-auth on
+    release/disposal/adjust), DSCSA serial+TI/TS capture, quarantine→
+    release gating, stability-condition storage bands, CAPA linkage,
+    approved-supplier gating, recall trace (docs/research/04 §1)
+361. **Healthcare pack** — loaner/consignment kits w/ procedure links,
+    UDI/GUDID fields, FDA recall ingestion (openFDA API), PM scheduling,
+    vaccine cold-chain, HIPAA-conscious (no PHI on assets)
+362. **Education pack** — member borrow rules (limits/periods/grace),
+    fines→fee ledger, no-dues enforcement, grant/funding tagging,
+    condition states, audit count mode
+363. **Government/defense pack** — property book (custodian+location),
+    AA&E handling flags, statistical-sample counts, ITAR/EAR export-
+    control fields gating issue/transfer, chain-of-custody signer
+    capture, OFAC screening hooks
+364. **Construction pack** — job/site allocation w/ live variance,
+    van/truck as location nodes, field requests from mobile, tool
+    custody w/ condition photos, rental returns
+365. **Manufacturing/MRO pack** — where-used BOM, WO lifecycle
+    (request→approve→dispatch→issue→close), PM by hours/cycles,
+    criticality classes, MRP-lite suggested POs, multi-crib stock
+366. **Retail pack** — absolute-qty channel push (no deltas), variant
+    model, RMA workflow, channel-native identifiers, per-channel price
+    floors
+367. **Labs pack** — lot lifecycle w/ COA/QC, sample chain-of-custody
+    w/ visual freezer map, storage-class enforcement, freeze/thaw
+    counter, SDS/hazard docs, GLP audit export
+368. **Hospitality/food pack** — receiving temp verification, approved-
+    supplier records, HACCP CCP logs w/ corrective actions, par-stock
+    per shift, allergen flags
+369. **Cannabis pack** — Metrc/BioTrack connector framework, transfer
+    manifests, same-day counts (where legal — jurisdiction-gated)
+370. **Aviation MRO pack** — serialized rotable (TSO/hours-since-
+    overhaul/LLP limits), core-exchange obligations, release certs,
+    unserviceable-state enforcement
+371. **Extensibility hooks for remaining verticals** — scrap/weighbridge,
+    wine vessel/bonded depletion, blood-bank ISBT-128: designed-for via
+    pack framework, built only on demand
+
+---
+
 ## SUBAGENT ALLOCATION PLAN
 
 Research agents are DONE (reports merged above). Suggested build-time split
@@ -867,11 +1070,18 @@ Research agents are DONE (reports merged above). Suggested build-time split
   RBAC admin UI, 241–250, 276–299 (pages, components, landing, mobile/PWA,
   toggle audit, playtest pass)
 - **Agent C — Integrations/reports:** items 53–62, 67–72, 75, 90, 92,
-  262–265, 269–276 (PDF, MCP, AI, webhooks, email, sensor simulator,
-  monitoring console, demo kit)
+  262–265, 269–276, 314–319, 328–330, 335–340 (PDF, MCP, AI, webhooks,
+  email, sensor simulator, monitoring console, demo kit, principles,
+  scheduled reports, connectors)
 - **Agent D (Phase 6, later wave) — Rust offline:** items 300–313
   (Tauri shell, Axum+SQLite backend, shared API contract, offline tiers,
   sync engine, installer, quality gates)
+- **Agent E (Phase 2l/2m data layer) — market-fit + packs schema:**
+  items 320–327, 331–334, 341–358, 359–371 (Kardex, BOM cascade,
+  case-scan, transfer lifecycle, sub-location persistence, booking
+  calendar, custody axes, lending lifecycle, kits, WO linkage, PM,
+  depreciation, forecasting, pick paths, RFID, inter-warehouse, cert
+  gating, LOTO, telematics, connector health, pack framework)
 
 Phase 2a (tech debt) runs FIRST solo — it touches files everyone else uses.
 Phase 2i scan-security items (100–111) and 2k permission matrix (224–233)
