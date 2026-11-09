@@ -1114,6 +1114,63 @@ it makes a 340-item system feel like a 40-item one.*
 
 ---
 
+## PHASE 2o — PERSONA MODES, AUDIT & REPORTING DEPTH
+
+*Two experience layers over one system: the BUILDER (admin) configures
+the warehouse and oversees everything technical+operational; the OPERATOR
+(worker) sees only the post-wizard warehouse — items, tasks, scanning —
+and does the actual warehousing. RBAC (2k) governs WHAT they can do;
+personas govern WHAT they see.*
+
+386. **Persona/experience modes** — "Builder" vs "Operator" UX layers
+    over the same app; mode derived from role + per-session "view as"
+    toggle for admins
+387. **Admin console surface** — builder sees EVERYTHING: setup wizard
+    re-run, pack manager, instance_config, storerooms+sensors, users/
+    roles/permission matrix, API keys, MCP config, integrations,
+    audit log, report builder, system health, backups
+388. **Worker surface** — operator sees ONLY the provisioned warehouse:
+    task dashboard, inventory browse/search, scan actions, stock takes,
+    tool loans, receive/issue, my loans, notifications. NO settings,
+    users, config, API keys, packs, audit-log admin, report builder —
+    enforced in nav + middleware + RLS, not just hidden CSS
+389. **Role→persona mapping** — super_admin/admin = builder; manager =
+    builder-lite (approvals, variance sign-off, counts oversight — no
+    full config); staff/fleet_dispatch = operator by default
+390. **"View as worker" toggle** — admin previews exact operator UX for
+    support/training (extends impersonation; read-only where possible)
+391. **First-login routing** — operator lands on task dashboard, never
+    sees wizard/settings; builder lands on admin console + setup
+    completeness checklist
+392. **Task-centric worker dashboard** — "what needs doing NOW": pending
+    receives, counts due, loans overdue, picks queued, alerts needing
+    ack — the operator's entire world on one screen
+393. **Audit log depth** — every mutation logged w/ actor, before/after
+    diff, room/location context; filterable by user/role/room/action/
+    date/entity; append-only enforced at DB level (no UPDATE/DELETE
+    grants); optional sensitive-view logging flag
+394. **Audit oversight views** — "who did what where when" timeline,
+    per-user activity report, per-room activity, variance→actor
+    traceability, export for auditors
+395. **Report builder** — pick entity + fields + filters + grouping +
+    date range → save/share/export (CSV + Typst PDF); per-pack template
+    library; scheduled delivery subscriptions (extends 328)
+396. **Report test suite** — golden-master tests: seed known fixture →
+    assert reconciliation (kardex opening+movements=closing, valuation
+    sums to ledger, variance math exact); CI-gated; a wrong report is a
+    release blocker
+397. **Report catalog verification** — every provisioned report renders
+    correctly against seed data for its pack; broken/empty-report
+    detection in CI
+398. **Report performance budget** — extends 329: 100k+ movement rows,
+    server-side aggregation, saved-report caching, sub-second common
+    queries
+399. **Report-level permissions** — field/report access follows 227
+    financial blurring: staff can't pull cost/valuation/supplier-spend
+    reports; per-report role matrix in permission model (224)
+
+---
+
 ## SUBAGENT ALLOCATION PLAN
 
 Research agents are DONE (reports merged above). Suggested build-time split
@@ -1138,7 +1195,8 @@ Research agents are DONE (reports merged above). Suggested build-time split
   calendar, custody axes, lending lifecycle, kits, WO linkage, PM,
   depreciation, forecasting, pick paths, RFID, inter-warehouse, cert
   gating, LOTO, telematics, connector health, pack framework,
-  provisioning wizard items 372–385)
+  provisioning wizard items 372–385, persona/audit/reporting items
+  386–399)
 
 Phase 2a (tech debt) runs FIRST solo — it touches files everyone else uses.
 Phase 2i scan-security items (100–111) and 2k permission matrix (224–233)
