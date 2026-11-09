@@ -107,8 +107,12 @@ can run immediately with a world-class public presentation.
   must run on the dev's PC now, later on client PCs incl. old hardware.
 - **New stack:** Postgres 16 (`docker-compose.yml`, single service) +
   Auth.js v5 credentials (argon2id) + Drizzle ORM + app-layer
-  authorization (permission matrix replaces RLS — same rules, enforced
-  in server actions/API routes, NOT client-side).
+  authorization (permission matrix primary; Postgres RLS optional
+  defense-in-depth behind it — never the primary check).
+- **Topology:** DB+app server on company server (target: entry-level
+  ~i5/8GB or Xeon/16GB — NOT ultra-low-end). "Old infrastructure" =
+  the CLIENT device (browser/PWA on old PCs, budget Android) → front-end
+  render/perf budgets apply client-side, not to the DB.
 - `supabase/migrations/*.sql` = canonical init SQL mounted into the
   container via `/docker-entrypoint-initdb.d`; drizzle-kit for future
   (additive) migrations.

@@ -9,6 +9,13 @@
   required service). Auth.js v5 credentials provider, argon2id hashing.
   No Supabase anywhere: remove `@supabase/*` deps, `lib/supabase/*`,
   middleware Supabase clients, supabase-js call sites.
+- **Deployment topology:** the DB+app server runs on a company server —
+  entry-level target is ~i5/8GB or Xeon/16GB, NOT a toaster. "Old PC"
+  refers to the *client* device (browser/PWA) — that's a front-end
+  performance constraint (low render budget, mobile parity), not a
+  database constraint. Postgres can additionally carry RLS as
+  defense-in-depth behind the app-layer permission matrix — optional
+  hardening, never the primary check.
 - **Drizzle ORM** — schema in `drizzle/schema.ts` generated from
   `supabase/migrations/*.sql` (kept as the canonical DB init via
   `/docker-entrypoint-initdb.d`). `drizzle-kit` for future migrations;
