@@ -627,16 +627,14 @@ remains one option; self-hosted is the differentiator.*
 
 **Deployment architecture:**
 
-255. **ADR: deployment options** — `docs/DEPLOYMENT.md` comparing:
-    (a) Vercel + Supabase Cloud (managed, easiest),
-    (b) Docker Compose self-host (Next standalone + self-hosted Supabase:
-    Postgres, GoTrue auth, PostgREST, Storage — the official Supabase
-    self-host path),
-    (c) Desktop wrapper (Tauri/Electron shell auto-starting local server —
-    "runs on the client's PC" feel),
-    (d) Embedded-DB single-process path (evaluate `@electric-sql/pglite`
-    WASM-Postgres or SQLite adapter — research before committing; Supabase
-    auth/RLS coupling makes this the risky option, document honestly)
+255. ~~ADR: deployment options~~ **DECIDED — dual artifacts:**
+    (a) **Web version** — proven stack: Next.js + Supabase, deploys to
+    Vercel+Supabase Cloud OR self-hosted Docker Compose (item 256). Full
+    feature set.
+    (b) **Offline version — Rust.** Tauri v2 shell (Rust core) bundling
+    the SAME Next.js frontend + a Rust backend (Axum + SQLx + SQLite)
+    implementing the core API surface. Single `.exe`/`.dmg`, zero
+    install, works with NO network. See Phase 6.
 256. **Docker Compose bundle** — `deploy/` dir: Next.js `output:'standalone'`
     build + supabase services + Caddy (auto-TLS) or nginx; `docker compose
     up` = whole system running; `.env` template with generated secrets
@@ -787,6 +785,76 @@ afterthought; the PWA should feel like a native app without an app store.*
 
 ---
 
+## PHASE 6 — RUST OFFLINE VERSION (dual artifact)
+
+*Decision (item 255): TWO artifacts from one codebase —
+(a) Web: Next.js + Supabase (cloud or self-hosted Docker), full features.
+(b) Offline: Rust desktop app for clients with NO usable server/network —
+factory floors, remote sites, broken infrastructure. The offline app must
+run the core floor workflows standalone on a single PC.*
+
+**Architecture:**
+
+300. **Tauri v2 shell** — Rust core wraps the SAME Next.js frontend
+    (served from bundled assets or localhost sidecar); Rust backend =
+    Axum + SQLx + SQLite (`rusqlite` acceptable for simpler queries).
+    One codebase, two shells — UI never forks
+301. **Shared API contract** — the OpenAPI spec (item 65) is the
+    contract BOTH backends implement: web = Supabase RPC/PostgREST,
+    offline = Rust handlers → SQLite. Same routes, same Zod-equivalent
+    validation (serde + validator crate), same response shapes — this is
+    what makes dual-backend feasible without a rewrite
+302. **SQLite schema** — mirror core tables: profiles, products,
+    stock_items, stock_movements, tool_loans, stock_takes(+items),
+    suppliers, bin_locations, storerooms, activity_logs; same column
+    names where possible; migration runner on startup
+303. **Offline auth** — local user table, argon2id password hashing,
+    same 5-role model + permission checks enforced in Rust query layer
+    (no RLS in SQLite — authorization lives in the handler layer, tested)
+304. **First-boot offline wizard** — create admin, org name, import or
+    seed demo data; everything local, zero network calls
+
+**Offline feature tiers:**
+
+305. **Tier-1 (must work fully offline):** login/roles, dashboard,
+    product/inventory browse+search, scan receive/issue/adjust, stock
+    takes (blind count), tool loans check-out/in, bin/storeroom views,
+    activity log, reports (basic), label/QR generation+print, CSV
+    import/export, settings
+306. **Tier-2 (offline-capable, sync later):** multi-user on one PC
+    (single-writer SQLite WAL), backup/restore to file, update via
+    installer
+307. **Excluded offline (documented):** Supabase Auth/MFA cloud flows,
+    MCP-over-network (MCP can run LOCAL in the Rust app later — Phase 2
+    item), AI features needing API keys, web push, cloud sync.
+    README states parity matrix honestly
+308. **Optional sync engine (Phase-2 of offline)** — when the site gets
+    network: sync SQLite ↔ Supabase via the REST API; conflict policy =
+    last-write-wins per row + append-only ledger merges cleanly
+    (movements are events, not updates — they sync without conflicts);
+    sync status UI shows pending/failed
+
+**Distribution & quality:**
+
+309. **Single-binary distribution** — Tauri bundler → `vms-setup.exe`
+    (Windows first — the client's actual fleet), `.dmg`/`.AppImage`
+    later; NSIS/Inno installer with desktop shortcut + uninstaller
+310. **Footprint budget** — installer <80MB, idle RAM <300MB, cold start
+    <3s on a 2015-era i5/4GB — measured, documented; SQLite file is the
+    only state (backup = copy one file)
+311. **Rust quality gates** — `cargo clippy -- -D warnings`,
+    `cargo test`, `cargo audit`/`cargo deny` in CI; same smoke suite
+    (item 274) extended to hit the offline binary's localhost API
+312. **Offline demo parity** — the 5-minute DEMO.md flow runs IDENTICALLY
+    on the .exe with network cable pulled; verified in the old-hardware
+    rehearsal (item 273 covers both artifacts)
+313. **License & repo layout** — `offline/` cargo workspace inside this
+    repo (or sibling `vms-offline` repo — decide in ADR addendum);
+    same CC BY-NC-SA license; shared types generated from the OpenAPI
+    spec where practical
+
+---
+
 ## SUBAGENT ALLOCATION PLAN
 
 Research agents are DONE (reports merged above). Suggested build-time split
@@ -801,6 +869,9 @@ Research agents are DONE (reports merged above). Suggested build-time split
 - **Agent C — Integrations/reports:** items 53–62, 67–72, 75, 90, 92,
   262–265, 269–276 (PDF, MCP, AI, webhooks, email, sensor simulator,
   monitoring console, demo kit)
+- **Agent D (Phase 6, later wave) — Rust offline:** items 300–313
+  (Tauri shell, Axum+SQLite backend, shared API contract, offline tiers,
+  sync engine, installer, quality gates)
 
 Phase 2a (tech debt) runs FIRST solo — it touches files everyone else uses.
 Phase 2i scan-security items (100–111) and 2k permission matrix (224–233)
@@ -821,8 +892,10 @@ ships are forgeable, and permissions must exist before features gate on them.
       receive, approve flows one-handed)
 - [ ] Self-hosted path verified: `docker compose up` (or documented
       fallback) runs full demo offline on LAN
+- [ ] Rust offline artifact: `vms-setup.exe` (or interim `cargo run`)
+      runs Tier-1 flows with network DISABLED; parity matrix documented
 - [ ] Full local demo rehearsed end-to-end on constrained/old hardware —
-      go-live gate
+      BOTH artifacts — go-live gate
 - [ ] Admin monitoring console working (health, users, sync, storage);
       NO telemetry/beacon of any kind — free open-use product, zero
       outbound phone-home
