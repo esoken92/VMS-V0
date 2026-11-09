@@ -46,3 +46,6 @@ next-env.d.ts
 # supabase local state
 .supabase
 supabase/.temp
+
+# local uploads (self-hosted storage replacement)
+uploads/
