@@ -533,35 +533,88 @@ Every item below maps to a documented, quantified industry problem.*
 223. Velocity caps per user/room — scans/min limits; bulk-scan spikes →
     auto-hold for manager approval
 
+### 2k. RBAC & access control (deep)
+
+*Foundation has 5 fixed roles + RLS + RPC checks. Serious systems go deeper:
+InvenTree ruleset×CRUD matrix, OpenBoxes per-location perms + financial
+blurring, NetBox object permissions, Part-DB allow/forbid/inherit tri-state,
+Grocy ~28 granular permissions, Snipe-IT permission groups.*
+
+224. **Permission matrix model** — `permissions` table: resource × action
+    (view/create/edit/delete/approve/export) × scope (global/room/location/
+    own-records); `role_permissions` join; evaluated server-side in RPCs
+    and API routes, never trusted from client
+225. **Custom roles** — clone-from-existing role editor; system roles
+    (super_admin etc.) locked, custom roles fully editable
+226. **Per-room/per-location scoping** — grant "manager of Cold Room A"
+    without global manager rights (OpenBoxes per-location pattern);
+    `user_room_grants` table + RLS helpers
+227. **Field-level permissions / financial blurring** — hide cost prices,
+    supplier spend, valuation from staff/fleet_dispatch roles; column-level
+    masking in queries + UI (OpenBoxes financial-user flag)
+228. **Permission groups/teams** — group users, assign perms to group,
+    user inherits union; department-shaped (receiving team, night shift)
+229. **Temporary elevated access** — time-boxed role grants with auto-expiry
+    + reason required; "cover for annual leave" pattern; all grants logged
+230. **Approval chains by role** — stock adjustments, write-offs, PO
+    approvals, variance sign-offs route to role-holders, not named users
+231. **API key scopes ↔ permissions** — keys carry permission subsets;
+    read-only key can't hit mutation endpoints even if role allows
+232. **MCP tool permissions** — MCP tools check caller's effective
+    permissions; read-only token → read tools only; per-tool scope map
+233. **"Effective permissions" inspector** — admin/debug page answering
+    "why can/can't user X do Y here?" — shows which grant/policy decided
+    (Part-DB/NetBox explainability pattern)
+234. **Permission-change audit** — every role/permission/grant change
+    writes to activity_logs w/ before/after diff; permission edits require
+    admin+ and are themselves audited
+235. **Break-glass emergency access** — super_admin-only elevated mode,
+    requires stated reason, auto-expires, loud audit entry + optional
+    notify-other-admins
+236. **Service accounts for integrations** — non-human actors (sensor
+    gateways, ERP sync, CI) get scoped machine identities, clearly
+    labelled in audit log vs human users
+237. **Kiosk/PIN mode** — shared floor device: user enters PIN per
+    transaction, session binds to that user for attribution; auto-lock
+    on idle (pairs with item 188 gamification/kiosk terminals)
+238. **Read-only auditor role option** — external accountant/auditor gets
+    view+export across stock/ledger/audit-log, zero mutation
+239. **Deny-overrides-allow evaluation** — explicit deny beats inherited
+    allow (Part-DB tri-state); documented eval order: deny → allow →
+    inherit → default-deny
+240. **RLS policy generator** — migration helper that emits standard
+    policy blocks per table from the permission matrix, so new tables
+    don't ship unprotected
+
 ---
 
 ## PHASE 3 — BRANDING & GO-LIVE PREP
 
-224. **Public landing page** (`app/page.tsx` rewrite): hero, screenshot tour,
+241. **Public landing page** (`app/page.tsx` rewrite): hero, screenshot tour,
     feature grid, "how it works" logic-chain diagram, comparison table vs
     spreadsheets/paper, footer.
-225. Footer footnotes: "Part of the ESO Industries ecosystem" →
+242. Footer footnotes: "Part of the ESO Industries ecosystem" →
     https://esoind.co.za + https://tyresync.co.za links;
     `mailto:esoken92@gmail.com` as primary contact/support.
-226. MCP setup page — copy-paste config snippet
+243. MCP setup page — copy-paste config snippet
     (`claude_desktop_config` / Cursor `mcpServers` entry) so visitors connect live.
-227. API playground page — try-it UI against REST API.
-228. **Demo-mode reset button** — one click reseeds demo data (critical for
+244. API playground page — try-it UI against REST API.
+245. **Demo-mode reset button** — one click reseeds demo data (critical for
     live demos/screenshots; admin-only, confirm-gated).
-229. `DEMO.md` presenter script — 5-minute flow: login → scan → stock take →
+246. `DEMO.md` presenter script — 5-minute flow: login → scan → stock take →
     MCP query → PDF report.
-230. Typst-generated architecture/system PDF (same pipeline) for "how it's built".
-231. Realistic seed story: tyre-shop inventory (tyres by size, fluids, tools,
+247. Typst-generated architecture/system PDF (same pipeline) for "how it's built".
+248. Realistic seed story: tyre-shop inventory (tyres by size, fluids, tools,
     consumables, vehicles-as-assets) so screenshots look alive.
-232. Roadmap page — public, signals active project.
-233. README final pass: screenshots embedded, badges, quickstart <5min,
+249. Roadmap page — public, signals active project.
+250. README final pass: screenshots embedded, badges, quickstart <5min,
     MCP/API highlights front-and-center, license block.
-234. `SETUP_DATABASE.md` + `.env.example` final consistency check.
-235. Final security re-review: secrets scan, RLS coverage, API auth on every
+251. `SETUP_DATABASE.md` + `.env.example` final consistency check.
+252. Final security re-review: secrets scan, RLS coverage, API auth on every
     route, Zod at every boundary, service-role server-only.
-236. Final verification: `npm ci` clean, tsc/lint/build green, `npm run dev`
+253. Final verification: `npm ci` clean, tsc/lint/build green, `npm run dev`
     smoke test of every route.
-237. Produce go-live checklist + hand back to owner for the visibility flip.
+254. Produce go-live checklist + hand back to owner for the visibility flip.
 
 ---
 
@@ -570,16 +623,17 @@ Every item below maps to a documented, quantified industry problem.*
 Research agents are DONE (reports merged above). Suggested build-time split
 (max 3 concurrent, disjoint write scopes):
 
-- **Agent A — Data/API layer:** items 6–30, 63–66, 73, 84–99 (migrations,
-  storerooms, sensors, API routes)
-- **Agent B — UI/UX:** items 31–44, 100–111 scan UX, 112–121 (pages,
-  components, landing, scan hardening UI)
+- **Agent A — Data/API layer:** items 6–30, 63–66, 73, 84–99, 224–233
+  (migrations, storerooms, sensors, permission matrix, API routes)
+- **Agent B — UI/UX:** items 31–44, 100–111 scan UX, 234–240 RBAC admin UI,
+  241–250 (pages, components, landing, scan hardening UI)
 - **Agent C — Integrations/reports:** items 53–62, 67–72, 75, 90, 92
   (PDF, MCP, AI, webhooks, email, sensor simulator)
 
 Phase 2a (tech debt) runs FIRST solo — it touches files everyone else uses.
-Phase 2i scan-security items (100–111) land with 2b/2d schema work, not after —
-labels minted before hardening ships are forgeable.
+Phase 2i scan-security items (100–111) and 2k permission matrix (224–233)
+land with 2b/2d schema work, not after — labels minted before hardening
+ships are forgeable, and permissions must exist before features gate on them.
 
 ## ACCEPTANCE CRITERIA
 
