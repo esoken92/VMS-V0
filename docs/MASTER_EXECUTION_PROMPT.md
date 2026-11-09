@@ -661,9 +661,27 @@ remains one option; self-hosted is the differentiator.*
 262. **Admin monitoring console** — deployment health page: DB status,
     disk usage, version, last backup, connected users, failed syncs,
     API/MCP call stats, sensor staleness — the client's oversight view
-263. **Opt-in health beacon** — anonymous version/uptime ping to an ESO
-    endpoint, DEFAULT OFF + documented; gives ESO fleet visibility without
-    touching client data (privacy-first, reversible)
+263. **Health beacon to ESO — REQUIRED, all deployments.** Every install
+    (cloud or self-hosted) beacons outbound-only to an ESO endpoint so ESO
+    has fleet-wide health visibility. Spec:
+    - Transport: HTTPS POST every ~15 min + on boot + on shutdown
+    - Payload (minimal, no PII by default): random instance UUID (generated
+      at install, NOT derived from domain/org name), app version, uptime,
+      db_ok, disk_pct, pending_sync_count, error_count_24h, optional
+      coarse counts (users/items/movements — opt-in flag)
+    - Auth: per-instance bearer token scoped "health-write ONLY" —
+      rotatable + revocable; ESO stores token hash, never plaintext list
+    - Direction: STRICTLY one-way. Client sends, ESO receives. NO inbound
+      connections, NO remote commands, NO config push, NO kill switch.
+      (Remote-action capability would change the security model — forbidden)
+    - Config: `ESO_BEACON_URL` + `ESO_BEACON_TOKEN` env vars; template
+      forks can disable (`BEACON_ENABLED=false`) or repoint — documented
+    - Endpoint (ESO side): rate-limited, auth-required writes, no public
+      instance-listing read API; stores only what payload declares
+    - Disclosure: beacon documented in README + SETUP_DATABASE + first-
+      boot wizard ("anonymous health pings to esoind.co.za, disable anytime")
+    - Failure mode: beacon failure NEVER affects app operation — fire-
+      and-forget, queued, dropped after N retries
 264. **License/seat visibility** — admin sees user count, role
     distribution, storage usage vs plan (supports the free/internal-use
     license story)
@@ -800,7 +818,9 @@ ships are forgeable, and permissions must exist before features gate on them.
       fallback) runs full demo offline on LAN
 - [ ] Full local demo rehearsed end-to-end on constrained/old hardware —
       go-live gate
-- [ ] Admin monitoring console + opt-in beacon (default OFF) working
+- [ ] Admin monitoring console + ESO health beacon verified: outbound-only,
+      scoped token, no inbound surface, `BEACON_ENABLED=false` cleanly
+      disables, beacon failure never impacts app
 - [ ] No secrets; AGPL code never copied; license intact
 - [ ] README accurate; demo creds documented as demo-only
 - [ ] Owner flips repo public + template manually
