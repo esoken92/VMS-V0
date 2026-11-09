@@ -3,38 +3,21 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, ClipboardList, CheckCircle, Clock, Play, Eye } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { createClient } from '@/lib/supabase/client';
+import {
+  listStockTakes,
+  getStockTakeItems,
+  startStockTake,
+  saveStockTakeCounts,
+  completeStockTake,
+} from '@/lib/actions/stock-takes';
+import { listProducts } from '@/lib/actions/products';
+import type { StockTakeDTO, ProductDTO } from '@/lib/types';
 
-interface StockTake {
-  id: string;
-  started_by: string;
-  status: 'open' | 'completed';
-  started_at: string;
-  completed_at: string | null;
-  notes: string | null;
-}
-
-interface StockTakeItem {
-  id: string;
-  stock_take_id: string;
-  product_id: string;
-  system_qty: number;
-  physical_qty: number | null;
-  variance: number | null;
-}
-
-interface Product {
-  id: string;
-  sku: string;
-  name: string;
-  current_stock: number;
-  unit_of_measure: string;
-}
+type StockTake = StockTakeDTO;
+type Product = ProductDTO;
 
 export default function StockTakesPage() {
   const { profile } = useAuth();
-  // @ts-ignore - Supabase type issue
-  const supabase = createClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [stockTakes, setStockTakes] = useState<StockTake[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -53,17 +36,11 @@ export default function StockTakesPage() {
 
   const fetchStockTakes = async () => {
     try {
-      const { data, error } = await supabase
-        .from('stock_takes')
-        .select(`
-          *,
-          profiles (full_name)
-        `)
-        .order('started_at', { ascending: false });
-      if (error) throw error;
-      setStockTakes(data || []);
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+      const result = await listStockTakes();
+      if (!result.success) throw new Error(result.error);
+      setStockTakes(result.data);
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to load stock takes' });
     } finally {
       setLoading(false);
     }
@@ -71,13 +48,9 @@ export default function StockTakesPage() {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('sku');
-      if (error) throw error;
-      setProducts(data || []);
-    } catch (err: any) {
+      const result = await listProducts();
+      if (result.success) setProducts(result.data);
+    } catch (err) {
       console.error('Error fetching products:', err);
     }
   };
@@ -85,18 +58,12 @@ export default function StockTakesPage() {
   const handleStartStockTake = async () => {
     if (!profile) return;
     try {
-      const { error } = await (supabase as any)
-        .from('stock_takes')
-        .insert({
-          started_by: profile.id,
-          status: 'open',
-        });
-
-      if (error) throw error;
+      const result = await startStockTake({});
+      if (!result.success) throw new Error(result.error);
       setMessage({ type: 'success', text: 'Stock take started successfully' });
       fetchStockTakes();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to start stock take' });
     }
   };
 
@@ -104,27 +71,23 @@ export default function StockTakesPage() {
     setActiveStockTake(stockTake);
     setCountedItems({});
     setNotes(stockTake.notes || '');
-    
+
     // Load existing counts for this stock take
     try {
-      const { data: items } = await supabase
-        .from('stock_take_items')
-        .select('*')
-        .eq('stock_take_id', stockTake.id);
-      
-      if (items) {
+      const result = await getStockTakeItems(stockTake.id);
+      if (result.success) {
         const existingCounts: Record<string, number> = {};
-        items.forEach((item: any) => {
+        for (const item of result.data) {
           if (item.physical_qty !== null) {
             existingCounts[item.product_id] = item.physical_qty;
           }
-        });
+        }
         setCountedItems(existingCounts);
       }
     } catch (err) {
       console.error('Error loading existing counts:', err);
     }
-    
+
     setCountingMode(true);
   };
 
@@ -137,44 +100,22 @@ export default function StockTakesPage() {
     if (!activeStockTake || !profile) return;
 
     try {
-      // Save only counted items
-      for (const [productId, physicalQty] of Object.entries(countedItems)) {
-        const product = products.find(p => p.id === productId);
-        if (!product) continue;
-
-        const variance = physicalQty - product.current_stock;
-
-        await (supabase as any)
-          .from('stock_take_items')
-          .upsert({
-            stock_take_id: activeStockTake.id,
-            product_id: productId,
-            system_qty: product.current_stock,
-            physical_qty: physicalQty,
-            variance: variance,
-            counted_by: profile.id,
-            counted_at: new Date().toISOString(),
-          }, {
-            onConflict: 'stock_take_id,product_id'
-          });
-      }
-
-      // Update notes
-      const { error: updateError } = await (supabase as any)
-        .from('stock_takes')
-        .update({
-          notes: notes,
-        })
-        .eq('id', activeStockTake.id);
-
-      if (updateError) throw updateError;
+      const result = await saveStockTakeCounts({
+        stock_take_id: activeStockTake.id,
+        counts: Object.entries(countedItems).map(([product_id, physical_qty]) => ({
+          product_id,
+          physical_qty,
+        })),
+        notes: notes || null,
+      });
+      if (!result.success) throw new Error(result.error);
 
       setMessage({ type: 'success', text: 'Draft saved successfully' });
       setCountingMode(false);
       setActiveStockTake(null);
       fetchStockTakes();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Save failed' });
     }
   };
 
@@ -182,50 +123,30 @@ export default function StockTakesPage() {
     if (!activeStockTake || !profile) return;
 
     try {
-      // Create stock take items for all products
-      for (const product of products) {
-        const physicalQty = countedItems[product.id] !== undefined ? countedItems[product.id] : null;
-        const variance = physicalQty !== null ? physicalQty - product.current_stock : null;
-
-        await (supabase as any)
-          .from('stock_take_items')
-          .upsert({
-            stock_take_id: activeStockTake.id,
-            product_id: product.id,
-            system_qty: product.current_stock,
-            physical_qty: physicalQty,
-            variance: variance,
-            counted_by: profile.id,
-            counted_at: new Date().toISOString(),
-          }, {
-            onConflict: 'stock_take_id,product_id'
-          });
-      }
-
-      // Update stock take status
-      const { error: updateError } = await (supabase as any)
-        .from('stock_takes')
-        .update({
-          status: 'completed',
-          completed_at: new Date().toISOString(),
-          notes: notes,
-        })
-        .eq('id', activeStockTake.id);
-
-      if (updateError) throw updateError;
+      // Send an entry for every product — null when uncounted (matches the
+      // original loop that upserted every product).
+      const result = await completeStockTake({
+        stock_take_id: activeStockTake.id,
+        counts: products.map((product) => ({
+          product_id: product.id,
+          physical_qty: countedItems[product.id] ?? null,
+        })),
+        notes: notes || null,
+      });
+      if (!result.success) throw new Error(result.error);
 
       setMessage({ type: 'success', text: 'Stock take completed successfully' });
       setCountingMode(false);
       setActiveStockTake(null);
       fetchStockTakes();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Complete failed' });
     }
   };
 
   const filteredStockTakes = stockTakes.filter(stockTake =>
     stockTake.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (stockTake as any).profiles?.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
+    stockTake.started_by_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getStatusColor = (status: string) => {
@@ -236,11 +157,8 @@ export default function StockTakesPage() {
     }
   };
 
-  const getProgress = (stockTake: StockTake) => {
-    // This would need to be calculated from stock_take_items
-    // For now, return a placeholder
-    return '0/0';
-  };
+  const getProgress = (stockTake: StockTake) =>
+    `${stockTake.items_counted}/${stockTake.items_total}`;
 
   return (
     <div className="space-y-6">
@@ -374,10 +292,10 @@ export default function StockTakesPage() {
                 <tr key={stockTake.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{stockTake.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {(stockTake as any).profiles?.full_name || 'Unknown'}
+                    {stockTake.started_by_name || 'Unknown'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {new Date(stockTake.started_at).toLocaleString()}
+                    {stockTake.started_at ? new Date(stockTake.started_at).toLocaleString() : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{getProgress(stockTake)}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -435,7 +353,7 @@ export default function StockTakesPage() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Started</p>
-                  <p className="font-medium text-gray-900">{new Date(activeStockTake.started_at).toLocaleString()}</p>
+                  <p className="font-medium text-gray-900">{activeStockTake.started_at ? new Date(activeStockTake.started_at).toLocaleString() : '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Completed</p>

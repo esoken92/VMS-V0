@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
+import { updateMyProfile, updateMyAlertPrefs } from '@/lib/actions/profile';
 import { User, Mail, Lock, Save, CheckCircle, AlertCircle, Bell } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { user, profile, updatePassword, resetPassword, setError } = useAuth();
+  const { user, profile, updatePassword, resetPassword, setError, refreshProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<{ full_name: string }>({ full_name: profile?.full_name || '' });
   const [passwordForm, setPasswordForm] = useState({
@@ -14,8 +15,8 @@ export default function ProfilePage() {
     confirmPassword: ''
   });
   const [alertPreferences, setAlertPreferences] = useState({
-    alert_low_stock: (profile as any)?.alert_low_stock ?? true,
-    alert_overdue_tools: (profile as any)?.alert_overdue_tools ?? true,
+    alert_low_stock: profile?.alert_low_stock ?? true,
+    alert_overdue_tools: profile?.alert_overdue_tools ?? true,
   });
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -27,21 +28,14 @@ export default function ProfilePage() {
     setMessage(null);
 
     try {
-      const supabase = (await import('@/lib/supabase/client')).createClient();
-      // @ts-ignore - Supabase type issue with update
-      const { error } = await (supabase as any)
-        .from('profiles')
-        .update({ full_name: editForm.full_name })
-        .eq('user_id', user?.id);
-
-      if (error) throw error;
+      const result = await updateMyProfile({ full_name: editForm.full_name });
+      if (!result.success) throw new Error(result.error);
 
       setMessage({ type: 'success', text: 'Profile updated successfully' });
       setIsEditing(false);
-      // Refresh profile
-      window.location.reload();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to update profile' });
+      await refreshProfile();
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to update profile' });
     } finally {
       setIsSubmitting(false);
     }
@@ -52,21 +46,13 @@ export default function ProfilePage() {
     setMessage(null);
 
     try {
-      const supabase = (await import('@/lib/supabase/client')).createClient();
-      // @ts-ignore - Supabase type issue with update
-      const { error } = await (supabase as any)
-        .from('profiles')
-        .update({
-          alert_low_stock: alertPreferences.alert_low_stock,
-          alert_overdue_tools: alertPreferences.alert_overdue_tools,
-        })
-        .eq('user_id', user?.id);
-
-      if (error) throw error;
+      const result = await updateMyAlertPrefs(alertPreferences);
+      if (!result.success) throw new Error(result.error);
 
       setMessage({ type: 'success', text: 'Alert preferences saved successfully' });
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to save alert preferences' });
+      await refreshProfile();
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to save alert preferences' });
     } finally {
       setIsSubmitting(false);
     }
@@ -83,8 +69,8 @@ export default function ProfilePage() {
       } else {
         setMessage({ type: 'error', text: result.error || 'Failed to send reset email' });
       }
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to send reset email' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to send reset email' });
     } finally {
       setIsSubmitting(false);
     }
@@ -116,8 +102,8 @@ export default function ProfilePage() {
       } else {
         setMessage({ type: 'error', text: result.error || 'Failed to update password' });
       }
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to update password' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to update password' });
     } finally {
       setIsSubmitting(false);
     }
@@ -288,7 +274,7 @@ export default function ProfilePage() {
               className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Mail className="h-4 w-4" />
-              {isSubmitting ? 'Sending...' : 'Send Password Reset Email'}
+              {isSubmitting ? 'Sending...' : 'Request Password Reset'}
             </button>
             <button
               onClick={() => setShowPasswordForm(true)}

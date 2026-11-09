@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Calendar, TrendingUp, Package, AlertTriangle, Download, BarChart3, FileText } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { getReportData } from '@/lib/actions/reports';
+import type { ReportMovementDTO, ReportProductDTO } from '@/lib/types';
 
 export default function ReportsPage() {
-  // @ts-ignore - Supabase type issue
-  const supabase = createClient();
   const [dateRange, setDateRange] = useState('30d');
   const [loading, setLoading] = useState(true);
   const [showExtraReportsModal, setShowExtraReportsModal] = useState(false);
@@ -17,43 +16,29 @@ export default function ReportsPage() {
     lowStockItems: 0,
     scrapRate: 0,
   });
-  const [movements, setMovements] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
+  const [movements, setMovements] = useState<ReportMovementDTO[]>([]);
+  const [products, setProducts] = useState<ReportProductDTO[]>([]);
 
-  useEffect(() => {
-    fetchReportData();
-  }, [dateRange]);
-
-  const fetchReportData = async () => {
+  const fetchReportData = useCallback(async () => {
     try {
       setLoading(true);
-      
-      // Calculate date range
       const days = parseInt(dateRange);
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
-      
-      // Fetch movements
-      const { data: movementsData } = await supabase
-        .from('stock_movements')
-        .select('*')
-        .gte('created_at', startDate.toISOString());
-      
-      // Fetch products
-      const { data: productsData } = await supabase
-        .from('products')
-        .select('*');
-      
-      setMovements(movementsData || []);
-      setProducts(productsData || []);
-      
+      const result = await getReportData(days);
+      if (!result.success) throw new Error(result.error);
+
+      const movementsData = result.data.movements;
+      const productsData = result.data.products;
+
+      setMovements(movementsData);
+      setProducts(productsData);
+
       // Calculate KPIs
-      const totalMovements = movementsData?.length || 0;
-      const stockValue = (productsData as any)?.reduce((sum: number, p: any) => sum + (p.current_stock * p.average_cost), 0) || 0;
-      const lowStockItems = (productsData as any)?.filter((p: any) => p.current_stock <= p.min_threshold).length || 0;
-      const scrapMovements = (movementsData as any)?.filter((m: any) => m.type === 'scrap').length || 0;
+      const totalMovements = movementsData.length;
+      const stockValue = productsData.reduce((sum, p) => sum + p.current_stock * p.average_cost, 0);
+      const lowStockItems = productsData.filter((p) => p.current_stock <= p.min_threshold).length;
+      const scrapMovements = movementsData.filter((m) => m.type === 'scrap').length;
       const scrapRate = totalMovements > 0 ? (scrapMovements / totalMovements) * 100 : 0;
-      
+
       setKpiData({
         totalMovements,
         stockValue,
@@ -65,7 +50,11 @@ export default function ReportsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [dateRange]);
+
+  useEffect(() => {
+    fetchReportData();
+  }, [fetchReportData]);
 
   const handleExport = () => {
     // Simple CSV export

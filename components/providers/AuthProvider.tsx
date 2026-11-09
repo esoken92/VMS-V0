@@ -1,356 +1,236 @@
 /**
  * AuthProvider - Global Authentication Context
- * Manages user session, role-based state, and auth operations
+ * Auth.js (NextAuth v5) credentials session + server actions.
+ *
+ * `profile` is the EFFECTIVE profile — when a super_admin impersonates
+ * someone, it's the target's profile (matching the old sessionStorage UX,
+ * now enforced server-side via the impersonation cookie + DB session row).
  */
 
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Database } from '@/lib/supabase/types';
+import { getSessionProfile } from '@/lib/actions/session-profile';
+import { signupUser, requestPasswordReset, changeMyPassword } from '@/lib/actions/auth';
+import { startImpersonation, endImpersonation } from '@/lib/actions/impersonation';
+import type { ImpersonationState, ProfileDTO } from '@/lib/types';
 
-type Profile = Database['public']['Tables']['profiles']['Row'];
-type User = any; // Supabase user type
+export interface SessionUser {
+  id: string;
+  email: string | null;
+  name?: string | null;
+}
+
+interface ActionResult {
+  success: boolean;
+  error?: string;
+  message?: string;
+}
 
 interface AuthContextType {
-  user: User | null;
-  profile: Profile | null;
+  user: SessionUser | null;
+  profile: ProfileDTO | null;
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
   isImpersonating: boolean;
-  impersonatedByUser: any;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signup: (email: string, password: string, fullName: string) => Promise<{ success: boolean; error?: string; message?: string }>;
+  /** The real signed-in admin while impersonating (null otherwise). */
+  impersonatedByUser: { id: string; full_name: string } | null;
+  login: (email: string, password: string) => Promise<ActionResult>;
+  signup: (email: string, password: string, fullName: string) => Promise<ActionResult>;
   logout: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ success: boolean; error?: string; message?: string }>;
-  updatePassword: (newPassword: string) => Promise<{ success: boolean; error?: string; message?: string }>;
-  impersonateUser: (targetUserId: string, reason?: string) => Promise<{ success: boolean; error?: string }>;
-  exitImpersonation: () => { success: boolean; error?: string };
+  resetPassword: (email: string) => Promise<ActionResult>;
+  updatePassword: (newPassword: string) => Promise<ActionResult>;
+  impersonateUser: (targetUserId: string, reason?: string) => Promise<ActionResult>;
+  exitImpersonation: () => Promise<ActionResult>;
   hasRole: (requiredRoles: string | string[]) => boolean;
   setError: (error: string | null) => void;
   ensureProfile: () => Promise<void>;
+  /** Re-fetch the effective profile (after edits/impersonation changes). */
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+function AuthProviderInner({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const supabase = createClient();
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
+  const [profile, setProfile] = useState<ProfileDTO | null>(null);
+  const [impersonation, setImpersonation] = useState<ImpersonationState | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isImpersonating, setIsImpersonating] = useState(false);
-  const [impersonatedByUser, setImpersonatedByUser] = useState<any>(null);
 
-  // Initialize auth state on mount
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        setLoading(true);
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+  const sessionUser: SessionUser | null = useMemo(
+    () =>
+      session?.user
+        ? {
+            id: session.user.id,
+            email: session.user.email ?? null,
+            name: session.user.name ?? null,
+          }
+        : null,
+    [session?.user],
+  );
 
-        if (session?.user) {
-          setUser(session.user);
-          // Don't fetch profile on init - fetch lazily when needed
-          // This speeds up initial load
-        } else {
-          setUser(null);
-          setProfile(null);
-        }
-      } catch (err: any) {
-        console.error('Auth initialization error:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initializeAuth();
-
-    // Subscribe to auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event: any, session: any) => {
-      if (session?.user) {
-        setUser(session.user);
-        // Don't fetch profile on auth change - fetch lazily
-      } else {
-        setUser(null);
+  const refreshProfile = useCallback(async () => {
+    if (!session?.user) {
+      setProfile(null);
+      setImpersonation(null);
+      return;
+    }
+    setProfileLoading(true);
+    try {
+      const result = await getSessionProfile();
+      if (result.success && result.data) {
+        setProfile(result.data.profile);
+        setImpersonation(result.data.impersonation);
+      } else if (result.success) {
         setProfile(null);
-        setIsImpersonating(false);
-        setImpersonatedByUser(null);
+        setImpersonation(null);
+      } else {
+        setError(result.error);
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load profile');
+    } finally {
+      setProfileLoading(false);
+    }
+  }, [session?.user]);
+
+  // Fetch the effective profile whenever the session user changes.
+  useEffect(() => {
+    if (status === 'authenticated') {
+      void refreshProfile();
+    } else if (status === 'unauthenticated') {
+      setProfile(null);
+      setImpersonation(null);
+    }
+  }, [status, refreshProfile]);
+
+  const ensureProfile = useCallback(async () => {
+    if (sessionUser && !profile && !profileLoading) {
+      await refreshProfile();
+    }
+  }, [sessionUser, profile, profileLoading, refreshProfile]);
+
+  const login = async (email: string, password: string): Promise<ActionResult> => {
+    setError(null);
+    const res = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
     });
-
-    return () => {
-      subscription?.unsubscribe();
-    };
-  }, [supabase]);
-
-  // Fetch user profile with role
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) throw error;
-      setProfile(data);
-    } catch (err: any) {
-      console.error('Error fetching profile:', err);
-      setError(err.message);
+    if (res?.error) {
+      const msg = 'Invalid email or password';
+      setError(msg);
+      return { success: false, error: msg };
     }
+    return { success: true };
   };
 
-  // Ensure profile is loaded (lazy loading)
-  const ensureProfile = async () => {
-    if (user && !profile) {
-      await fetchUserProfile(user.id);
+  const signup = async (
+    email: string,
+    password: string,
+    fullName: string,
+  ): Promise<ActionResult> => {
+    setError(null);
+    const res = await signupUser({ email, password, full_name: fullName });
+    if (!res.success) {
+      setError(res.error);
+      return { success: false, error: res.error };
     }
-  };
-
-  // Login with email and password
-  const login = async (email: string, password: string) => {
-    try {
-      setError(null);
-      setLoading(true);
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      if (data.user) {
-        setUser(data.user);
-        // Don't fetch profile here - let the dashboard handle it
-        // This avoids double-fetching and speeds up login
-
-        // Redirect to dashboard after successful login
-        router.push('/dashboard');
-        return { success: true };
-      }
-
-      return { success: false, error: 'Login failed' };
-    } catch (err: any) {
-      const errorMessage =
-        err.message === 'Invalid login credentials'
-          ? 'Invalid email or password'
-          : err.message;
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Sign up with email and password
-  const signup = async (email: string, password: string, fullName: string) => {
-    try {
-      setError(null);
-      setLoading(true);
-
-      // Create auth user
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (signUpError) throw signUpError;
-
-      if (data.user) {
-        // Create profile with 'staff' as default role
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            // @ts-ignore - Supabase types are placeholders
-            id: data.user.id,
-            user_id: data.user.id,
-            full_name: fullName,
-            role: 'staff', // Default role - admins can update
-          });
-
-        if (profileError) throw profileError;
-
-        // Auto-login after signup (Supabase handles session)
-        await fetchUserProfile(data.user.id);
-
-        return {
-          success: true,
-          message:
-            'Signup successful! Please check your email to confirm your account.',
-        };
-      }
-      
-      return { success: false, error: 'Signup failed' };
-    } catch (err: any) {
-      const errorMessage = err.message || 'Signup failed';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Send password reset email
-  const resetPassword = async (email: string) => {
-    try {
-      setError(null);
-
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/auth/reset-password`,
-      });
-
-      if (error) throw error;
-
+    // Auto sign-in after signup
+    const signInRes = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    });
+    if (signInRes?.error) {
       return {
         success: true,
-        message: 'Password reset email sent. Check your inbox.',
+        message: 'Account created. Please sign in.',
       };
-    } catch (err: any) {
-      const errorMessage = err.message || 'Password reset failed';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
     }
+    router.push('/dashboard');
+    return { success: true, message: 'Account created.' };
   };
 
-  // Update password (for reset flow)
-  const updatePassword = async (newPassword: string) => {
-    try {
-      setError(null);
-      setLoading(true);
-
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
-
-      if (error) throw error;
-
-      return { success: true, message: 'Password updated successfully' };
-    } catch (err: any) {
-      const errorMessage = err.message || 'Password update failed';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Logout
   const logout = async () => {
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
-      setUser(null);
-      setProfile(null);
-      setIsImpersonating(false);
-      setImpersonatedByUser(null);
-      router.push('/auth/login');
-    } catch (err: any) {
-      console.error('Logout error:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    setProfile(null);
+    setImpersonation(null);
+    await signOut({ redirect: false });
+    router.push('/auth/login');
   };
 
-  // Super admin "View As" impersonation
-  const impersonateUser = async (targetUserId: string, reason?: string) => {
-    try {
-      setError(null);
-
-      if (!profile || profile.role !== 'super_admin') {
-        throw new Error('Only super admins can impersonate users');
-      }
-
-      // Fetch target user profile
-      const { data: targetProfile, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', targetUserId)
-        .single();
-
-      if (error) throw error;
-
-      // Create impersonation session in database
-      // @ts-ignore - Supabase type issue
-      const { error: sessionError } = await supabase.rpc('start_impersonation', {
-        p_target_user_id: targetUserId,
-        p_reason: reason || 'No reason provided'
-      } as any);
-
-      if (sessionError) throw sessionError;
-
-      // Set impersonation context
-      setIsImpersonating(true);
-      setImpersonatedByUser({
-        originalUserId: user.id,
-        originalProfile: profile,
-      });
-
-      // Store in session storage for API requests
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem('impersonated_user_id', targetUserId);
-        sessionStorage.setItem('impersonated_by_user_id', user.id);
-      }
-
-      router.push('/dashboard');
-      return { success: true };
-    } catch (err: any) {
-      const errorMessage = err.message || 'Impersonation failed';
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    }
+  const resetPassword = async (email: string): Promise<ActionResult> => {
+    setError(null);
+    const res = await requestPasswordReset({ email });
+    if (!res.success) return { success: false, error: res.error };
+    return { success: true, message: res.data.message };
   };
 
-  // Exit impersonation mode
-  const exitImpersonation = () => {
-    try {
-      setIsImpersonating(false);
-      if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('impersonated_user_id');
-        sessionStorage.removeItem('impersonated_by_user_id');
-      }
-      router.refresh();
-      return { success: true };
-    } catch (err: any) {
-      setError(err.message);
-      return { success: false, error: err.message };
+  const updatePassword = async (newPassword: string): Promise<ActionResult> => {
+    setError(null);
+    const res = await changeMyPassword({ new_password: newPassword });
+    if (!res.success) {
+      setError(res.error);
+      return { success: false, error: res.error };
     }
+    return { success: true, message: 'Password updated successfully' };
   };
 
-  // Check if user has specific role
+  const impersonateUser = async (
+    targetUserId: string,
+    reason?: string,
+  ): Promise<ActionResult> => {
+    setError(null);
+    const res = await startImpersonation({
+      target_user_id: targetUserId,
+      reason: reason || null,
+    });
+    if (!res.success) {
+      setError(res.error);
+      return { success: false, error: res.error };
+    }
+    await refreshProfile();
+    router.push('/dashboard');
+    router.refresh();
+    return { success: true };
+  };
+
+  const exitImpersonation = async (): Promise<ActionResult> => {
+    const res = await endImpersonation();
+    if (!res.success) return { success: false, error: res.error };
+    setImpersonation(null);
+    await refreshProfile();
+    router.refresh();
+    return { success: true };
+  };
+
   const hasRole = (requiredRoles: string | string[]): boolean => {
-    if (!Array.isArray(requiredRoles)) {
-      requiredRoles = [requiredRoles];
-    }
-    return !!(profile?.role && requiredRoles.includes(profile.role));
+    const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
+    return !!profile?.role && roles.includes(profile.role);
   };
 
-  // Check if user is authenticated
-  const isAuthenticated = !!user && !!profile;
+  const loading = status === 'loading' || (status === 'authenticated' && profileLoading && !profile);
 
   const value: AuthContextType = {
-    // State
-    user,
+    user: sessionUser,
     profile,
     loading,
     error,
-    isAuthenticated,
-    isImpersonating,
-    impersonatedByUser,
-
-    // Methods
+    isAuthenticated: status === 'authenticated' && !!sessionUser,
+    isImpersonating: !!impersonation?.active,
+    impersonatedByUser: impersonation?.impersonator ?? null,
     login,
     signup,
     logout,
@@ -359,13 +239,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     impersonateUser,
     exitImpersonation,
     hasRole,
-
-    // Utilities
     setError,
     ensureProfile,
+    refreshProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <SessionProvider>
+      <AuthProviderInner>{children}</AuthProviderInner>
+    </SessionProvider>
+  );
 }
 
 // Custom hook to use auth context

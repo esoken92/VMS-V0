@@ -3,20 +3,17 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, MapPin, Edit, Trash2 } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { createClient } from '@/lib/supabase/client';
+import {
+  listBinLocations,
+  upsertBinLocation,
+  deleteBinLocation,
+} from '@/lib/actions/bin-locations';
+import type { BinLocationDTO } from '@/lib/types';
 
-interface BinLocation {
-  id: string;
-  zone: string;
-  bin_location: string;
-  max_weight_kg: number;
-  description: string | null;
-}
+type BinLocation = BinLocationDTO;
 
 export default function BinLocationsPage() {
   const { hasRole } = useAuth();
-  // @ts-ignore - Supabase type issue
-  const supabase = createClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [binLocations, setBinLocations] = useState<BinLocation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,14 +37,11 @@ export default function BinLocationsPage() {
 
   const fetchBinLocations = async () => {
     try {
-      const { data, error } = await supabase
-        .from('bin_locations')
-        .select('*')
-        .order('zone, bin_location');
-      if (error) throw error;
-      setBinLocations(data || []);
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+      const result = await listBinLocations();
+      if (!result.success) throw new Error(result.error);
+      setBinLocations(result.data);
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to load bin locations' });
     } finally {
       setLoading(false);
     }
@@ -78,40 +72,37 @@ export default function BinLocationsPage() {
   const handleDeleteBin = async () => {
     if (!deleteBin) return;
     try {
-      const { error } = await supabase
-        .from('bin_locations')
-        .delete()
-        .eq('id', deleteBin.id);
-      if (error) throw error;
+      const result = await deleteBinLocation(deleteBin.id);
+      if (!result.success) throw new Error(result.error);
       setMessage({ type: 'success', text: 'Bin location deleted successfully' });
       setDeleteBin(null);
       fetchBinLocations();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Delete failed' });
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (editingBin) {
-        const { error } = await (supabase as any)
-          .from('bin_locations')
-          .update(formData)
-          .eq('id', editingBin.id);
-        if (error) throw error;
-        setMessage({ type: 'success', text: 'Bin location updated successfully' });
-      } else {
-        const { error } = await (supabase as any)
-          .from('bin_locations')
-          .insert(formData);
-        if (error) throw error;
-        setMessage({ type: 'success', text: 'Bin location added successfully' });
-      }
+      const result = await upsertBinLocation({
+        ...(editingBin ? { id: editingBin.id } : {}),
+        zone: formData.zone,
+        bin_location: formData.bin_location,
+        max_weight_kg: formData.max_weight_kg,
+        description: formData.description || null,
+      });
+      if (!result.success) throw new Error(result.error);
+      setMessage({
+        type: 'success',
+        text: editingBin
+          ? 'Bin location updated successfully'
+          : 'Bin location added successfully',
+      });
       setShowModal(false);
       fetchBinLocations();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Save failed' });
     }
   };
 

@@ -6,8 +6,8 @@
 -- SECURITY NOTE: these are well-known credentials for local/demo use only.
 -- Do NOT run this seed on any environment you consider sensitive.
 --
--- Run with:  supabase db reset          (local — runs after migrations)
---         or paste into the SQL Editor  (hosted project)
+-- Run with:  npm run db:seed     (scripts/seed.ts executes this file, then
+--                                sets argon2id password hashes — see below)
 -- ============================================================================
 
 -- ============================================================================
@@ -15,58 +15,28 @@
 -- ============================================================================
 -- The app and RLS policies treat profiles.id = auth.users.id (1:1 identity),
 -- so the profile PK is intentionally the same UUID as the auth user.
+--
+-- Passwords are NOT stored here: auth is app-managed (Auth.js credentials
+-- provider) and verifies argon2id hashes in profiles.password_hash.
+-- scripts/seed.ts sets those hashes after running this file. Plain SQL cannot
+-- produce argon2, so this file only creates the identity rows.
 
-DO $$
-DECLARE
-  v_user_id UUID;
-BEGIN
-  -- Demo Admin (super_admin) - Full access to all features
-  SELECT id INTO v_user_id FROM auth.users WHERE email = 'demo.admin@vms-demo.com';
-  IF v_user_id IS NULL THEN
-    INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at)
-    VALUES (gen_random_uuid(), 'demo.admin@vms-demo.com', crypt('DemoAdmin123!', gen_salt('bf')), NOW())
-    RETURNING id INTO v_user_id;
-  END IF;
-  INSERT INTO profiles (id, user_id, full_name, role)
-  VALUES (v_user_id, v_user_id, 'Demo Admin', 'super_admin')
-  ON CONFLICT (id) DO UPDATE SET role = 'super_admin';
+INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at) VALUES
+  ('a0000000-0000-4000-8000-000000000001', 'demo.admin@vms-demo.com',   '', NOW()),
+  ('a0000000-0000-4000-8000-000000000002', 'demo.manager@vms-demo.com', '', NOW()),
+  ('a0000000-0000-4000-8000-000000000003', 'demo.fleet@vms-demo.com',   '', NOW()),
+  ('a0000000-0000-4000-8000-000000000004', 'demo.worker@vms-demo.com',  '', NOW())
+ON CONFLICT (email) DO NOTHING;
 
-  -- Demo Manager (manager) - Management access to inventory and reports
-  v_user_id := NULL;
-  SELECT id INTO v_user_id FROM auth.users WHERE email = 'demo.manager@vms-demo.com';
-  IF v_user_id IS NULL THEN
-    INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at)
-    VALUES (gen_random_uuid(), 'demo.manager@vms-demo.com', crypt('DemoManager123!', gen_salt('bf')), NOW())
-    RETURNING id INTO v_user_id;
-  END IF;
-  INSERT INTO profiles (id, user_id, full_name, role)
-  VALUES (v_user_id, v_user_id, 'Demo Manager', 'manager')
-  ON CONFLICT (id) DO UPDATE SET role = 'manager';
-
-  -- Demo Fleet Dispatch (fleet_dispatch) - Tool loan and movement access
-  v_user_id := NULL;
-  SELECT id INTO v_user_id FROM auth.users WHERE email = 'demo.fleet@vms-demo.com';
-  IF v_user_id IS NULL THEN
-    INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at)
-    VALUES (gen_random_uuid(), 'demo.fleet@vms-demo.com', crypt('DemoFleet123!', gen_salt('bf')), NOW())
-    RETURNING id INTO v_user_id;
-  END IF;
-  INSERT INTO profiles (id, user_id, full_name, role)
-  VALUES (v_user_id, v_user_id, 'Demo Fleet Dispatch', 'fleet_dispatch')
-  ON CONFLICT (id) DO UPDATE SET role = 'fleet_dispatch';
-
-  -- Demo Worker (staff) - Basic read access and limited actions
-  v_user_id := NULL;
-  SELECT id INTO v_user_id FROM auth.users WHERE email = 'demo.worker@vms-demo.com';
-  IF v_user_id IS NULL THEN
-    INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at)
-    VALUES (gen_random_uuid(), 'demo.worker@vms-demo.com', crypt('DemoWorker123!', gen_salt('bf')), NOW())
-    RETURNING id INTO v_user_id;
-  END IF;
-  INSERT INTO profiles (id, user_id, full_name, role)
-  VALUES (v_user_id, v_user_id, 'Demo Worker', 'staff')
-  ON CONFLICT (id) DO UPDATE SET role = 'staff';
-END $$;
+INSERT INTO profiles (id, user_id, full_name, role) VALUES
+  ('a0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000001', 'Demo Admin',          'super_admin'),
+  ('a0000000-0000-4000-8000-000000000002', 'a0000000-0000-4000-8000-000000000002', 'Demo Manager',        'manager'),
+  ('a0000000-0000-4000-8000-000000000003', 'a0000000-0000-4000-8000-000000000003', 'Demo Fleet Dispatch', 'fleet_dispatch'),
+  ('a0000000-0000-4000-8000-000000000004', 'a0000000-0000-4000-8000-000000000004', 'Demo Worker',         'staff')
+ON CONFLICT (id) DO UPDATE SET
+  user_id = EXCLUDED.user_id,
+  full_name = EXCLUDED.full_name,
+  role = EXCLUDED.role;
 
 -- ============================================================================
 -- BIN LOCATIONS
@@ -165,6 +135,10 @@ ON CONFLICT (sku) DO NOTHING;
 -- ============================================================================
 -- STOCK MOVEMENTS (attributed to the demo admin)
 -- ============================================================================
+-- Guarded so re-running the seed doesn't duplicate history rows.
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM stock_movements) THEN
 INSERT INTO stock_movements (product_id, user_id, type, quantity, reason) VALUES
 -- Inbound movements
 ((SELECT id FROM products WHERE sku = 'BRK-001'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'inbound', 100, 'Initial stock'),
@@ -178,7 +152,9 @@ INSERT INTO stock_movements (product_id, user_id, type, quantity, reason) VALUES
 -- Scrap movements
 ((SELECT id FROM products WHERE sku = 'BRK-002'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'scrap', -5, 'Damaged goods'),
 ((SELECT id FROM products WHERE sku = 'TIR-002'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'scrap', -2, 'Damaged tire');
+  END IF;
 
+  IF NOT EXISTS (SELECT 1 FROM tool_loans) THEN
 -- ============================================================================
 -- TOOL LOANS
 -- ============================================================================
@@ -191,7 +167,9 @@ INSERT INTO tool_loans (tool_product_id, worker_profile_id, checked_out_by_user_
 INSERT INTO tool_loans (tool_product_id, worker_profile_id, checked_out_by_user_id, condition_on_checkout, condition_on_return, returned_at, notes) VALUES
 ((SELECT id FROM products WHERE sku = 'TL-002'), (SELECT id FROM auth.users WHERE email = 'demo.worker@vms-demo.com'), (SELECT id FROM auth.users WHERE email = 'demo.fleet@vms-demo.com'), 'Good', 'Good', NOW() - INTERVAL '2 days', 'Returned after use'),
 ((SELECT id FROM products WHERE sku = 'TL-005'), (SELECT id FROM auth.users WHERE email = 'demo.worker@vms-demo.com'), (SELECT id FROM auth.users WHERE email = 'demo.fleet@vms-demo.com'), 'Excellent', 'Excellent', NOW() - INTERVAL '1 day', 'Returned after use');
+  END IF;
 
+  IF NOT EXISTS (SELECT 1 FROM stock_takes) THEN
 -- ============================================================================
 -- STOCK TAKES
 -- ============================================================================
@@ -214,3 +192,5 @@ INSERT INTO stock_take_items (stock_take_id, product_id, system_qty, physical_qt
 UPDATE stock_takes
 SET completed_at = NOW() - INTERVAL '3 days'
 WHERE status = 'completed';
+  END IF;
+END $$;

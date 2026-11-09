@@ -125,21 +125,17 @@ export default function SignupForm() {
             Account Created!
           </h2>
           <p className="text-gray-600 mb-6">
-            Please check your email to confirm your account before signing in.
+            Your account is ready — you&apos;re being signed in with your new
+            credentials now.
           </p>
 
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
-            <p className="text-sm text-blue-900">
-              <strong>We sent a confirmation link to:</strong>
-            </p>
-            <p className="text-sm text-blue-800 font-mono mt-2">
-              {formData.email}
-            </p>
+            <p className="text-sm text-blue-800 font-mono">{formData.email}</p>
           </div>
 
           <p className="text-sm text-gray-600 mb-6">
-            Click the link in the email to verify your account. Then you can
-            sign in with your credentials.
+            New accounts start with the <strong>staff</strong> role. An admin
+            can change your role from Dashboard → Users.
           </p>
 
           <Link

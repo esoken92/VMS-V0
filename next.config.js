@@ -10,13 +10,8 @@ const withPWA = require('next-pwa')({
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['*.supabase.co'],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.supabase.co',
-      },
-    ],
+    // Local uploads are served from /api/uploads — no remote hosts needed.
+    remotePatterns: [],
   },
   experimental: {
     serverActions: {

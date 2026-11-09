@@ -2,27 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { MapPin, Search, Filter, Box } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { listBinLocations } from '@/lib/actions/bin-locations';
+import { listProducts } from '@/lib/actions/products';
+import type { BinLocationDTO, ProductDTO } from '@/lib/types';
 
-interface BinLocation {
-  id: string;
-  zone: string;
-  bin_location: string;
-  max_weight_kg: number;
-  description: string | null;
-}
-
-interface Product {
-  id: string;
-  sku: string;
-  name: string;
-  current_stock: number;
-  bin_location_id: string | null;
-}
+type BinLocation = BinLocationDTO;
+type Product = ProductDTO;
 
 export default function ZoneMapPage() {
-  // @ts-ignore - Supabase type issue
-  const supabase = createClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedZone, setSelectedZone] = useState('all');
   const [binLocations, setBinLocations] = useState<BinLocation[]>([]);
@@ -37,12 +24,12 @@ export default function ZoneMapPage() {
 
   const fetchData = async () => {
     try {
-      const [binsData, productsData] = await Promise.all([
-        supabase.from('bin_locations').select('*').order('zone, bin_location'),
-        supabase.from('products').select('*'),
+      const [binsRes, productsRes] = await Promise.all([
+        listBinLocations(),
+        listProducts(),
       ]);
-      setBinLocations(binsData.data || []);
-      setProducts(productsData.data || []);
+      if (binsRes.success) setBinLocations(binsRes.data);
+      if (productsRes.success) setProducts(productsRes.data);
     } catch (err) {
       console.error('Error fetching data:', err);
     } finally {

@@ -114,6 +114,11 @@ export default function ResetPasswordForm() {
         <p className="text-gray-600 mt-2">
           Create a strong password for your account
         </p>
+        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-3">
+          Email reset links aren&apos;t configured on this instance — this page
+          only works while you&apos;re signed in. Otherwise ask an admin to
+          reset your password from Dashboard → Users.
+        </p>
       </div>
 
       {submitError && (

@@ -3,19 +3,16 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, LogOut, AlertCircle, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { createClient } from '@/lib/supabase/client';
+import {
+  listToolLoans,
+  listAssignableWorkers,
+  checkOutTools,
+  returnTools,
+} from '@/lib/actions/tool-loans';
+import { listToolProducts } from '@/lib/actions/products';
+import type { ToolLoanDTO, ProfileOptionDTO } from '@/lib/types';
 
-interface ToolLoan {
-  id: string;
-  product_id: string;
-  user_id: string;
-  checked_out_by: string;
-  checked_out_at: string;
-  returned_at: string | null;
-  condition_out: string | null;
-  condition_in: string | null;
-  notes: string | null;
-}
+type ToolLoan = ToolLoanDTO;
 
 interface Product {
   id: string;
@@ -24,15 +21,10 @@ interface Product {
   item_type: string;
 }
 
-interface Profile {
-  id: string;
-  full_name: string;
-}
+type Profile = ProfileOptionDTO;
 
 export default function ToolLoansPage() {
   const { profile } = useAuth();
-  // @ts-ignore - Supabase type issue
-  const supabase = createClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [toolLoans, setToolLoans] = useState<ToolLoan[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -61,20 +53,11 @@ export default function ToolLoansPage() {
 
   const fetchToolLoans = async () => {
     try {
-      const { data, error } = await supabase
-        .from('tool_loans')
-        .select(`
-          *,
-          products (sku, name),
-          profiles (full_name),
-          checker_out (full_name),
-          checker_in (full_name)
-        `)
-        .order('checked_out_at', { ascending: false });
-      if (error) throw error;
-      setToolLoans(data || []);
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+      const result = await listToolLoans();
+      if (!result.success) throw new Error(result.error);
+      setToolLoans(result.data);
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to load tool loans' });
     } finally {
       setLoading(false);
     }
@@ -82,27 +65,18 @@ export default function ToolLoansPage() {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('item_type', 'tool')
-        .order('name');
-      if (error) throw error;
-      setProducts(data || []);
-    } catch (err: any) {
+      const result = await listToolProducts();
+      if (result.success) setProducts(result.data);
+    } catch (err) {
       console.error('Error fetching products:', err);
     }
   };
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('full_name');
-      if (error) throw error;
-      setUsers(data || []);
-    } catch (err: any) {
+      const result = await listAssignableWorkers();
+      if (result.success) setUsers(result.data);
+    } catch (err) {
       console.error('Error fetching users:', err);
     }
   };
@@ -149,22 +123,18 @@ export default function ToolLoansPage() {
     if (!profile) return;
 
     try {
-      const { error } = await (supabase as any)
-        .from('tool_loans')
-        .insert({
-          product_id: formData.product_id,
-          user_id: formData.user_id,
-          checked_out_by: profile.id,
-          condition_out: formData.condition_out,
-          notes: formData.notes,
-        });
-
-      if (error) throw error;
+      const result = await checkOutTools({
+        tool_product_ids: [formData.product_id],
+        worker_profile_id: formData.user_id || null,
+        condition_on_checkout: formData.condition_out,
+        notes: formData.notes || null,
+      });
+      if (!result.success) throw new Error(result.error);
       setMessage({ type: 'success', text: 'Tool checked out successfully' });
       setShowCheckoutModal(false);
       fetchToolLoans();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Checkout failed' });
     }
   };
 
@@ -173,22 +143,17 @@ export default function ToolLoansPage() {
     if (!selectedLoan || !profile) return;
 
     try {
-      const { error } = await (supabase as any)
-        .from('tool_loans')
-        .update({
-          returned_at: new Date().toISOString(),
-          returned_by: profile.id,
-          condition_in: formData.condition_in,
-        })
-        .eq('id', selectedLoan.id);
-
-      if (error) throw error;
+      const result = await returnTools({
+        loan_ids: [selectedLoan.id],
+        condition_on_return: formData.condition_in,
+      });
+      if (!result.success) throw new Error(result.error);
       setMessage({ type: 'success', text: 'Tool returned successfully' });
       setShowReturnModal(false);
       setSelectedLoan(null);
       fetchToolLoans();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Return failed' });
     }
   };
 
@@ -197,26 +162,20 @@ export default function ToolLoansPage() {
     if (!profile || selectedToolIds.length === 0 || !formData.user_id) return;
 
     try {
-      for (const toolId of selectedToolIds) {
-        const { error } = await (supabase as any)
-          .from('tool_loans')
-          .insert({
-            tool_product_id: toolId,
-            worker_profile_id: formData.user_id,
-            checked_out_by_user_id: profile.id,
-            condition_on_checkout: formData.condition_out,
-            notes: formData.notes,
-          });
+      const result = await checkOutTools({
+        tool_product_ids: selectedToolIds,
+        worker_profile_id: formData.user_id,
+        condition_on_checkout: formData.condition_out,
+        notes: formData.notes || null,
+      });
+      if (!result.success) throw new Error(result.error);
 
-        if (error) throw error;
-      }
-
-      setMessage({ type: 'success', text: `${selectedToolIds.length} tools checked out successfully` });
+      setMessage({ type: 'success', text: `${result.data.count} tools checked out successfully` });
       setShowBulkCheckoutModal(false);
       setSelectedToolIds([]);
       fetchToolLoans();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Bulk checkout failed' });
     }
   };
 
@@ -225,40 +184,31 @@ export default function ToolLoansPage() {
     if (!profile || selectedToolIds.length === 0) return;
 
     try {
-      for (const toolId of selectedToolIds) {
-        const { error } = await (supabase as any)
-          .from('tool_loans')
-          .update({
-            returned_at: new Date().toISOString(),
-            condition_on_return: formData.condition_in,
-          })
-          .eq('id', toolId);
+      const result = await returnTools({
+        loan_ids: selectedToolIds,
+        condition_on_return: formData.condition_in,
+      });
+      if (!result.success) throw new Error(result.error);
 
-        if (error) throw error;
-      }
-
-      setMessage({ type: 'success', text: `${selectedToolIds.length} tools returned successfully` });
+      setMessage({ type: 'success', text: `${result.data.count} tools returned successfully` });
       setShowBulkReturnModal(false);
       setSelectedToolIds([]);
       fetchToolLoans();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Bulk return failed' });
     }
   };
 
   const activeLoans = toolLoans.filter(loan => !loan.returned_at);
   const returnedLoans = toolLoans.filter(loan => loan.returned_at);
 
-  const filteredActiveLoans = activeLoans.filter(loan => {
-    const product = (loan as any).products;
-    const userProfile = (loan as any).profiles;
-    return (
-      product?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      userProfile?.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
+  const filteredActiveLoans = activeLoans.filter(loan =>
+    loan.product_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    loan.worker_name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const isOverdue = (loan: ToolLoan) => {
+    if (!loan.checked_out_at) return false;
     const checkoutDate = new Date(loan.checked_out_at);
     const daysSinceCheckout = Math.floor((Date.now() - checkoutDate.getTime()) / (1000 * 60 * 60 * 24));
     return daysSinceCheckout > 7; // Consider overdue after 7 days
@@ -371,22 +321,20 @@ export default function ToolLoansPage() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredActiveLoans.map((loan) => {
-                const product = (loan as any).products;
-                const userProfile = (loan as any).profiles;
                 const overdue = isOverdue(loan);
                 return (
                   <tr key={loan.id} className={`hover:bg-gray-50 ${overdue ? 'bg-red-50' : ''}`}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {product?.name || 'Unknown'} ({product?.sku || ''})
+                      {loan.product_name || 'Unknown'} ({loan.product_sku || ''})
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {userProfile?.full_name || 'Unknown'}
+                      {loan.worker_name || 'Unknown'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {new Date(loan.checked_out_at).toLocaleDateString()}
+                      {loan.checked_out_at ? new Date(loan.checked_out_at).toLocaleDateString() : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">
-                      {loan.condition_out || 'N/A'}
+                      {loan.condition_on_checkout || 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 text-xs font-medium rounded ${overdue ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
@@ -505,11 +453,11 @@ export default function ToolLoansPage() {
             <form onSubmit={handleReturnSubmit} className="p-6 space-y-4">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Tool</p>
-                <p className="font-medium text-gray-900">{(selectedLoan as any).products?.name || 'Unknown'}</p>
+                <p className="font-medium text-gray-900">{selectedLoan.product_name || 'Unknown'}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-1">Checked Out To</p>
-                <p className="text-gray-900">{(selectedLoan as any).profiles?.full_name || 'Unknown'}</p>
+                <p className="text-gray-900">{selectedLoan.worker_name || 'Unknown'}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Return Condition *</label>
@@ -648,27 +596,23 @@ export default function ToolLoansPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Select Active Loans to Return *</label>
                 <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-2 space-y-2">
-                  {activeLoans.map(loan => {
-                    const product = (loan as any).products;
-                    const userProfile = (loan as any).profiles;
-                    return (
-                      <label key={loan.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedToolIds.includes(loan.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedToolIds([...selectedToolIds, loan.id]);
-                            } else {
-                              setSelectedToolIds(selectedToolIds.filter(id => id !== loan.id));
-                            }
-                          }}
-                          className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                        />
-                        <span className="text-sm text-gray-900">{product?.name || 'Unknown'} - {userProfile?.full_name || 'Unknown'}</span>
-                      </label>
-                    );
-                  })}
+                  {activeLoans.map(loan => (
+                    <label key={loan.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedToolIds.includes(loan.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedToolIds([...selectedToolIds, loan.id]);
+                          } else {
+                            setSelectedToolIds(selectedToolIds.filter(id => id !== loan.id));
+                          }
+                        }}
+                        className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                      />
+                      <span className="text-sm text-gray-900">{loan.product_name || 'Unknown'} - {loan.worker_name || 'Unknown'}</span>
+                    </label>
+                  ))}
                 </div>
                 <p className="text-xs text-gray-500 mt-1">{selectedToolIds.length} loans selected</p>
               </div>

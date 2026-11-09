@@ -6,13 +6,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, error: authError, loading } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -84,8 +85,10 @@ export default function LoginForm() {
     const result = await login(formData.email, formData.password);
 
     if (result.success) {
-      // Redirect to dashboard (handled by AuthProvider)
-      router.push('/dashboard');
+      // Honor middleware's ?next= redirect target (dashboard default).
+      const next = searchParams.get('next');
+      router.push(next && next.startsWith('/') ? next : '/dashboard');
+      router.refresh();
     } else {
       setSubmitError(result.error || 'Login failed');
     }
@@ -248,28 +251,26 @@ export default function LoginForm() {
         </Link>
       </p>
 
-      {/* Demo Credentials */}
+      {/* Demo Credentials (seeded via `npm run db:seed` — local demo only) */}
       <div className="mt-8 p-4 bg-purple-50 border border-purple-200 rounded-lg">
         <p className="text-sm font-medium text-purple-900 mb-3">🎯 Demo Credentials</p>
         <div className="space-y-2 text-xs">
           <div className="flex justify-between items-center">
             <span className="text-purple-800 font-medium">Admin:</span>
-            <span className="text-purple-700">demo.admin@vms-demo.com / DemoAdmin123!</span>
+            <span className="text-purple-700">admin@vms.local / admin123</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-purple-800 font-medium">Manager:</span>
-            <span className="text-purple-700">demo.manager@vms-demo.com / DemoManager123!</span>
+            <span className="text-purple-700">manager@vms.local / manager123</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-purple-800 font-medium">Fleet:</span>
-            <span className="text-purple-700">demo.fleet@vms-demo.com / DemoFleet123!</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-purple-800 font-medium">Worker:</span>
-            <span className="text-purple-700">demo.worker@vms-demo.com / DemoWorker123!</span>
+            <span className="text-purple-800 font-medium">Staff:</span>
+            <span className="text-purple-700">staff@vms.local / staff123</span>
           </div>
         </div>
-        <p className="text-xs text-purple-600 mt-3 italic">For demonstration purposes only</p>
+        <p className="text-xs text-purple-600 mt-3 italic">
+          Local demo accounts only — change or remove before any real deployment
+        </p>
       </div>
     </div>
   );

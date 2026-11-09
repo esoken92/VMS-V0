@@ -2,23 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { Search, Shield, AlertTriangle, Eye, Download } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { listActivityLogs } from '@/lib/actions/audit-log';
+import type { ActivityLogDTO } from '@/lib/types';
 
-interface ActivityLog {
-  id: string;
-  user_id: string;
-  action: string;
-  table_name: string | null;
-  record_id: string | null;
-  old_values: any;
-  new_values: any;
-  ip_address: string | null;
-  created_at: string;
-}
+type ActivityLog = ActivityLogDTO;
 
 export default function AuditLogPage() {
-  // @ts-ignore - Supabase type issue
-  const supabase = createClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('all');
   const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
@@ -32,16 +21,8 @@ export default function AuditLogPage() {
 
   const fetchActivityLogs = async () => {
     try {
-      const { data, error } = await supabase
-        .from('activity_logs')
-        .select(`
-          *,
-          profiles (full_name)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(100);
-      if (error) throw error;
-      setActivityLogs(data || []);
+      const result = await listActivityLogs(100);
+      if (result.success) setActivityLogs(result.data);
     } catch (err) {
       console.error('Error fetching activity logs:', err);
     } finally {
@@ -52,8 +33,8 @@ export default function AuditLogPage() {
   const handleExport = () => {
     const headers = ['Timestamp', 'User', 'Action', 'Table', 'Record ID', 'IP Address'];
     const rows = activityLogs.map(log => [
-      log.created_at,
-      (log as any).profiles?.full_name || 'Unknown',
+      log.created_at ?? '',
+      log.user_name || 'Unknown',
       log.action,
       log.table_name || '-',
       log.record_id || '-',
@@ -76,9 +57,8 @@ export default function AuditLogPage() {
   };
 
   const filteredLogs = activityLogs.filter(log => {
-    const userProfile = (log as any).profiles;
-    const matchesSearch = 
-      userProfile?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch =
+      log.user_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       log.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
       log.table_name?.toLowerCase().includes(searchQuery.toLowerCase());
     
@@ -159,16 +139,19 @@ export default function AuditLogPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredLogs.map((log) => {
-                const userProfile = (log as any).profiles;
-                return (
-                  <tr key={log.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {new Date(log.created_at).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {userProfile?.full_name || 'Unknown'}
-                    </td>
+              {filteredLogs.map((log) => (
+                <tr key={log.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {log.created_at ? new Date(log.created_at).toLocaleString() : '-'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {log.user_name || 'Unknown'}
+                    {log.impersonated_by_name ? (
+                      <span className="block text-xs text-yellow-700">
+                        via {log.impersonated_by_name}
+                      </span>
+                    ) : null}
+                  </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 text-xs font-medium rounded ${getActionColor(log.action)}`}>
                         {log.action}
@@ -190,8 +173,7 @@ export default function AuditLogPage() {
                       </button>
                     </td>
                   </tr>
-                );
-              })}
+              ))}
               {filteredLogs.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-gray-500">No activity logs found</td>
@@ -213,11 +195,11 @@ export default function AuditLogPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Timestamp</p>
-                  <p className="text-gray-900">{new Date(selectedLog.created_at).toLocaleString()}</p>
+                  <p className="text-gray-900">{selectedLog.created_at ? new Date(selectedLog.created_at).toLocaleString() : '-'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-1">User</p>
-                  <p className="text-gray-900">{(selectedLog as any).profiles?.full_name || 'Unknown'}</p>
+                  <p className="text-gray-900">{selectedLog.user_name || 'Unknown'}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Action</p>
@@ -236,7 +218,7 @@ export default function AuditLogPage() {
                   <p className="text-gray-900">{selectedLog.ip_address || '-'}</p>
                 </div>
               </div>
-              {selectedLog.old_values && (
+              {!!selectedLog.old_values && (
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Old Values</p>
                   <pre className="bg-gray-50 p-3 rounded text-xs overflow-auto max-h-32">
@@ -244,7 +226,7 @@ export default function AuditLogPage() {
                   </pre>
                 </div>
               )}
-              {selectedLog.new_values && (
+              {!!selectedLog.new_values && (
                 <div>
                   <p className="text-sm text-gray-600 mb-1">New Values</p>
                   <pre className="bg-gray-50 p-3 rounded text-xs overflow-auto max-h-32">

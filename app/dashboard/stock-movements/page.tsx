@@ -3,30 +3,18 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, ArrowDown, ArrowUp, Trash2, Upload } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { createClient } from '@/lib/supabase/client';
+import {
+  listStockMovements,
+  recordStockMovement,
+} from '@/lib/actions/stock-movements';
+import { listProducts } from '@/lib/actions/products';
+import type { StockMovementDTO, ProductDTO } from '@/lib/types';
 
-interface StockMovement {
-  id: string;
-  product_id: string;
-  user_id: string;
-  type: 'inbound' | 'outbound' | 'adjustment' | 'scrap' | 'tool_checkout' | 'receiving';
-  quantity: number;
-  reason: string | null;
-  created_at: string;
-}
-
-interface Product {
-  id: string;
-  sku: string;
-  name: string;
-  current_stock: number;
-  unit_of_measure: string;
-}
+type StockMovement = StockMovementDTO;
+type Product = ProductDTO;
 
 export default function StockMovementsPage() {
   const { profile } = useAuth();
-  // @ts-ignore - Supabase type issue
-  const supabase = createClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [movements, setMovements] = useState<StockMovement[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -49,19 +37,11 @@ export default function StockMovementsPage() {
 
   const fetchMovements = async () => {
     try {
-      const { data, error } = await supabase
-        .from('stock_movements')
-        .select(`
-          *,
-          products (sku, name),
-          profiles (full_name)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(50);
-      if (error) throw error;
-      setMovements(data || []);
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+      const result = await listStockMovements(50);
+      if (!result.success) throw new Error(result.error);
+      setMovements(result.data);
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to load movements' });
     } finally {
       setLoading(false);
     }
@@ -69,13 +49,9 @@ export default function StockMovementsPage() {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('sku');
-      if (error) throw error;
-      setProducts(data || []);
-    } catch (err: any) {
+      const result = await listProducts();
+      if (result.success) setProducts(result.data);
+    } catch (err) {
       console.error('Error fetching products:', err);
     }
   };
@@ -97,69 +73,49 @@ export default function StockMovementsPage() {
     if (!profile) return;
 
     try {
-      let scrapImageUrl = null;
+      let scrapImageUrl: string | null = null;
 
-      // Upload scrap image if provided
+      // Upload scrap image via the local uploads API (no object storage on
+      // this self-hosted instance — files land in ./uploads, streamed by
+      // GET /api/uploads/[file]).
       if (movementType === 'scrap' && formData.scrap_image) {
-        const fileName = `scrap-${Date.now()}-${formData.scrap_image.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('company-assets')
-          .upload(fileName, formData.scrap_image);
-
-        if (uploadError) throw uploadError;
-
-        const { data: urlData } = supabase.storage
-          .from('company-assets')
-          .getPublicUrl(fileName);
-        scrapImageUrl = urlData.publicUrl;
+        const body = new FormData();
+        body.append('file', formData.scrap_image);
+        body.append('kind', 'scrap');
+        const res = await fetch('/api/uploads', { method: 'POST', body });
+        if (!res.ok) {
+          const data = (await res.json().catch(() => ({}))) as { error?: string };
+          throw new Error(data.error || 'Image upload failed');
+        }
+        const data = (await res.json()) as { url: string };
+        scrapImageUrl = data.url;
       }
 
-      // Record movement
-      const { error: movementError } = await (supabase as any)
-        .from('stock_movements')
-        .insert({
-          product_id: formData.product_id,
-          user_id: profile.id,
-          type: movementType,
-          quantity: movementType === 'inbound' ? Math.abs(formData.quantity) : -Math.abs(formData.quantity),
-          reason: formData.reason,
-          scrap_image_url: scrapImageUrl,
-        });
-
-      if (movementError) throw movementError;
-
-      // Update product stock
-      const product = products.find(p => p.id === formData.product_id);
-      if (product) {
-        const stockChange = movementType === 'inbound' ? Math.abs(formData.quantity) : -Math.abs(formData.quantity);
-        const { error: updateError } = await (supabase as any)
-          .from('products')
-          .update({
-            current_stock: product.current_stock + stockChange,
-            last_movement_date: new Date().toISOString(),
-          })
-          .eq('id', formData.product_id);
-
-        if (updateError) throw updateError;
-      }
+      // Record movement + stock update atomically (server action, role-gated)
+      const result = await recordStockMovement({
+        product_id: formData.product_id,
+        type: movementType,
+        quantity: formData.quantity,
+        reason: formData.reason || null,
+        scrap_image_url: scrapImageUrl,
+      });
+      if (!result.success) throw new Error(result.error);
 
       setMessage({ type: 'success', text: `${movementType.charAt(0).toUpperCase() + movementType.slice(1)} movement recorded successfully` });
       setShowModal(false);
       fetchMovements();
       fetchProducts();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to record movement' });
     }
   };
 
-  const filteredMovements = movements.filter(movement => {
-    const product = products.find(p => p.id === movement.product_id);
-    return (
-      product?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product?.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      movement.reason?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  });
+  const filteredMovements = movements.filter(movement =>
+    movement.product_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    movement.product_sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    movement.user_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    movement.reason?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -267,31 +223,28 @@ export default function StockMovementsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredMovements.map((movement) => {
-                const product = products.find(p => p.id === movement.product_id);
-                return (
-                  <tr key={movement.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {new Date(movement.created_at).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 text-xs font-medium rounded ${getTypeColor(movement.type)}`}>
-                        {movement.type.charAt(0).toUpperCase() + movement.type.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {product?.name || 'Unknown'} ({product?.sku || ''})
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium {getQuantityColor(movement.type)}">
-                      {movement.quantity > 0 ? '+' : ''}{movement.quantity} {product?.unit_of_measure || ''}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{movement.reason || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {(movement as any).profiles?.full_name || 'Unknown'}
-                    </td>
-                  </tr>
-                );
-              })}
+              {filteredMovements.map((movement) => (
+                <tr key={movement.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {movement.created_at ? new Date(movement.created_at).toLocaleString() : '-'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 py-1 text-xs font-medium rounded ${getTypeColor(movement.type)}`}>
+                      {movement.type.charAt(0).toUpperCase() + movement.type.slice(1)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {movement.product_name || 'Unknown'} ({movement.product_sku || ''})
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium {getQuantityColor(movement.type)}">
+                    {movement.quantity > 0 ? '+' : ''}{movement.quantity} {movement.product_unit || ''}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{movement.reason || '-'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {movement.user_name || 'Unknown'}
+                  </td>
+                </tr>
+              ))}
               {filteredMovements.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-gray-500">No movements found</td>

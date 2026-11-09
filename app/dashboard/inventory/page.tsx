@@ -3,21 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Filter, MoreVertical, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { createClient } from '@/lib/supabase/client';
+import { listProducts, upsertProduct, deleteProduct as deleteProductAction } from '@/lib/actions/products';
+import { listSuppliers } from '@/lib/actions/suppliers';
+import { listBinLocations } from '@/lib/actions/bin-locations';
+import type { ProductDTO } from '@/lib/types';
 
-interface Product {
-  id: string;
-  sku: string;
-  name: string;
-  item_type: 'consumable' | 'fluid' | 'tool' | 'tire';
-  current_stock: number;
-  min_threshold: number;
-  average_cost: number;
-  unit_of_measure: string;
-  issuing_unit: string;
-  bin_location_id: string | null;
-  supplier_id: string | null;
-}
+type Product = ProductDTO;
 
 interface Supplier {
   id: string;
@@ -32,7 +23,6 @@ interface BinLocation {
 
 export default function InventoryPage() {
   const { hasRole } = useAuth();
-  const supabase = createClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
@@ -45,7 +35,7 @@ export default function InventoryPage() {
   const [formData, setFormData] = useState({
     sku: '',
     name: '',
-    item_type: 'consumable' as const,
+    item_type: 'consumable' as Product['item_type'],
     current_stock: 0,
     min_threshold: 0,
     average_cost: 0,
@@ -67,14 +57,11 @@ export default function InventoryPage() {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('sku');
-      if (error) throw error;
-      setProducts(data || []);
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+      const result = await listProducts();
+      if (!result.success) throw new Error(result.error);
+      setProducts(result.data);
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to load products' });
     } finally {
       setLoading(false);
     }
@@ -82,26 +69,18 @@ export default function InventoryPage() {
 
   const fetchSuppliers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('suppliers')
-        .select('*')
-        .order('name');
-      if (error) throw error;
-      setSuppliers(data || []);
-    } catch (err: any) {
+      const result = await listSuppliers();
+      if (result.success) setSuppliers(result.data);
+    } catch (err) {
       console.error('Error fetching suppliers:', err);
     }
   };
 
   const fetchBinLocations = async () => {
     try {
-      const { data, error } = await supabase
-        .from('bin_locations')
-        .select('*')
-        .order('zone, bin_location');
-      if (error) throw error;
-      setBinLocations(data || []);
-    } catch (err: any) {
+      const result = await listBinLocations();
+      if (result.success) setBinLocations(result.data);
+    } catch (err) {
       console.error('Error fetching bin locations:', err);
     }
   };
@@ -128,7 +107,6 @@ export default function InventoryPage() {
     setFormData({
       sku: product.sku,
       name: product.name,
-      // @ts-ignore - Supabase type issue
       item_type: product.item_type,
       current_stock: product.current_stock,
       min_threshold: product.min_threshold,
@@ -144,46 +122,43 @@ export default function InventoryPage() {
   const handleDeleteProduct = async () => {
     if (!deleteProduct) return;
     try {
-      const { error } = await supabase
-        .from('products')
-        .delete()
-        .eq('id', deleteProduct.id);
-      if (error) throw error;
+      const result = await deleteProductAction(deleteProduct.id);
+      if (!result.success) throw new Error(result.error);
       setMessage({ type: 'success', text: 'Product deleted successfully' });
       setDeleteProduct(null);
       fetchProducts();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Delete failed' });
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const productData = {
-        ...formData,
+      const result = await upsertProduct({
+        ...(editingProduct ? { id: editingProduct.id } : {}),
+        sku: formData.sku,
+        name: formData.name,
+        item_type: formData.item_type,
+        current_stock: formData.current_stock,
+        min_threshold: formData.min_threshold,
+        average_cost: formData.average_cost,
+        unit_of_measure: formData.unit_of_measure,
+        issuing_unit: formData.issuing_unit,
         supplier_id: formData.supplier_id || null,
         bin_location_id: formData.bin_location_id || null,
-      };
-
-      if (editingProduct) {
-        const { error } = await (supabase as any)
-          .from('products')
-          .update(productData)
-          .eq('id', editingProduct.id);
-        if (error) throw error;
-        setMessage({ type: 'success', text: 'Product updated successfully' });
-      } else {
-        const { error } = await (supabase as any)
-          .from('products')
-          .insert(productData);
-        if (error) throw error;
-        setMessage({ type: 'success', text: 'Product added successfully' });
-      }
+      });
+      if (!result.success) throw new Error(result.error);
+      setMessage({
+        type: 'success',
+        text: editingProduct
+          ? 'Product updated successfully'
+          : 'Product added successfully',
+      });
       setShowModal(false);
       fetchProducts();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Save failed' });
     }
   };
 
@@ -408,7 +383,7 @@ export default function InventoryPage() {
                   <select
                     required
                     value={formData.item_type}
-                    onChange={(e) => setFormData({ ...formData, item_type: e.target.value as any })}
+                    onChange={(e) => setFormData({ ...formData, item_type: e.target.value as Product['item_type'] })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="consumable">Consumable</option>

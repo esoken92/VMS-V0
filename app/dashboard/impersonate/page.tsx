@@ -2,14 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
+import { listImpersonatableUsers } from '@/lib/actions/impersonation';
+import type { ImpersonatableUserDTO } from '@/lib/types';
 import { Search, UserCheck, LogOut, CheckCircle, AlertCircle, Shield } from 'lucide-react';
 
-interface User {
-  id: string;
-  email: string;
-  full_name: string;
-  role: 'super_admin' | 'admin' | 'fleet_dispatch' | 'staff';
-}
+// The action already filters out super_admins server-side.
+type User = ImpersonatableUserDTO;
 
 export default function ImpersonatePage() {
   const { hasRole, impersonateUser, exitImpersonation, isImpersonating, impersonatedByUser } = useAuth();
@@ -33,16 +31,10 @@ export default function ImpersonatePage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const supabase = (await import('@/lib/supabase/client')).createClient();
-      // @ts-ignore - Supabase type issue
-      const { data, error } = await supabase.rpc('get_all_users');
-
-      if (error) throw error;
-
-      // Filter out super_admins (can't impersonate other super_admins)
-      // @ts-ignore - Supabase type issue
-      setUsers((data || []).filter((u: User) => u.role !== 'super_admin'));
-    } catch (err: any) {
+      const result = await listImpersonatableUsers();
+      if (!result.success) throw new Error(result.error);
+      setUsers(result.data);
+    } catch (err) {
       console.error('Failed to fetch users:', err);
       setMessage({ type: 'error', text: 'Failed to load users' });
     } finally {
@@ -65,15 +57,15 @@ export default function ImpersonatePage() {
       } else {
         setMessage({ type: 'error', text: result.error || 'Failed to start impersonation' });
       }
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to start impersonation' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to start impersonation' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleExitImpersonation = () => {
-    const result = exitImpersonation();
+  const handleExitImpersonation = async () => {
+    const result = await exitImpersonation();
     if (result.success) {
       window.location.reload();
     } else {
@@ -81,9 +73,9 @@ export default function ImpersonatePage() {
     }
   };
 
-  const filteredUsers = users.filter(user => 
-    user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users.filter(user =>
+    user.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (isImpersonating) {
@@ -171,7 +163,7 @@ export default function ImpersonatePage() {
                 <option value="">Choose a user...</option>
                 {filteredUsers.map((user) => (
                   <option key={user.id} value={user.id}>
-                    {user.full_name} ({user.email}) - {user.role.replace('_', ' ')}
+                    {user.full_name} ({user.email ?? 'no email'}) - {user.role.replace('_', ' ')}
                   </option>
                 ))}
               </select>
@@ -227,7 +219,7 @@ export default function ImpersonatePage() {
                   filteredUsers.map((user) => (
                     <tr key={user.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.full_name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{user.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{user.email ?? '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 py-1 text-xs font-medium rounded capitalize ${
                           user.role === 'admin' ? 'bg-blue-100 text-blue-700' :

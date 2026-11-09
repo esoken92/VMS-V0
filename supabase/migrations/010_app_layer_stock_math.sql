@@ -1,0 +1,16 @@
+-- ============================================================================
+-- Move products.current_stock maintenance into the application layer.
+-- ============================================================================
+-- The original trigger double-counted alongside the client's own stock update,
+-- and mis-signed outbound quantities (stock_movements stores negative quantity
+-- for outbound/scrap, so `current_stock - NEW.quantity` *added* stock).
+-- Stock is now updated atomically inside the same transaction as the
+-- stock_movements INSERT in lib/actions/stock-movements.ts, so this trigger
+-- must not also fire.
+--
+-- Kept intentionally:
+--   * audit triggers (002) — still write activity_logs rows; the app sets
+--     request.jwt.claim.sub / app.impersonated_by via set_config per tx.
+--   * update_product_last_movement + update_updated_at triggers.
+-- ============================================================================
+DROP TRIGGER IF EXISTS update_product_current_stock ON stock_movements;

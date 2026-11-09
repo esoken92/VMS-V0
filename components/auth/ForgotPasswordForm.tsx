@@ -53,25 +53,27 @@ export default function ForgotPasswordForm() {
       <div className="w-full max-w-md mx-auto">
         <div className="text-center">
           <div className="flex justify-center mb-4">
-            <Mail className="h-12 w-12 text-green-600" />
+            <Mail className="h-12 w-12 text-gray-500" />
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Check Your Email
+            Contact Your Administrator
           </h2>
           <p className="text-gray-600 mb-6">
-            We&apos;ve sent a password reset link to:
+            Password reset emails aren&apos;t enabled on this self-hosted
+            instance — no mail provider is configured yet.
           </p>
 
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
-            <p className="text-sm text-blue-800 font-mono">{email}</p>
+            <p className="text-sm text-blue-900">
+              Ask an admin to reset the password for:
+            </p>
+            <p className="text-sm text-blue-800 font-mono mt-2">{email}</p>
           </div>
 
-          <p className="text-sm text-gray-600 mb-2">
-            Click the link in the email to reset your password.
-          </p>
-
-          <p className="text-xs text-gray-500 mb-6">
-            The link will expire in 24 hours for security.
+          <p className="text-sm text-gray-600 mb-6">
+            Admins can set a new password from{' '}
+            <strong>Dashboard → Users</strong>. If you signed up on this
+            instance, your account is active and you can sign in directly.
           </p>
 
           <Link
@@ -100,7 +102,7 @@ export default function ForgotPasswordForm() {
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-gray-900">Reset Password</h1>
         <p className="text-gray-600 mt-2">
-          Enter your email to receive a password reset link
+          Enter your email — your administrator can reset it for you
         </p>
       </div>
 
@@ -145,10 +147,10 @@ export default function ForgotPasswordForm() {
           {loading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Sending...
+              Checking...
             </>
           ) : (
-            'Send Reset Link'
+            'Request Password Reset'
           )}
         </button>
       </form>

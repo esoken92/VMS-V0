@@ -8,15 +8,15 @@ import { Shield, LogOut } from 'lucide-react';
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isImpersonating, impersonatedByUser, exitImpersonation, ensureProfile } = useAuth();
+  const { isImpersonating, profile, impersonatedByUser, exitImpersonation, ensureProfile } = useAuth();
 
   // Load profile lazily when dashboard is accessed
   useEffect(() => {
     ensureProfile();
   }, [ensureProfile]);
 
-  const handleExitImpersonation = () => {
-    const result = exitImpersonation();
+  const handleExitImpersonation = async () => {
+    const result = await exitImpersonation();
     if (result.success) {
       window.location.reload();
     }
@@ -58,7 +58,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               <div className="flex items-center gap-3">
                 <Shield className="h-5 w-5 text-yellow-600" />
                 <p className="text-sm text-yellow-900">
-                  Viewing as <strong>{impersonatedByUser?.full_name || 'Unknown'}</strong> (Impersonation Mode)
+                  Viewing as <strong>{profile?.full_name || 'Unknown'}</strong>
+                  {impersonatedByUser?.full_name
+                    ? ` — signed in as ${impersonatedByUser.full_name}`
+                    : ''}{' '}
+                  (Impersonation Mode)
                 </p>
               </div>
               <button

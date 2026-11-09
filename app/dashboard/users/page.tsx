@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
+import {
+  listUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+} from '@/lib/actions/users';
+import type { UserListItemDTO } from '@/lib/types';
 import { Plus, Search, MoreVertical, Trash2, Edit, UserPlus, CheckCircle, AlertCircle } from 'lucide-react';
 
-interface User {
-  id: string;
-  email: string;
-  full_name: string;
-  role: 'super_admin' | 'admin' | 'manager' | 'fleet_dispatch' | 'staff';
-  created_at: string;
-  last_sign_in_at: string | null;
-}
+type User = UserListItemDTO;
 
 export default function UsersPage() {
   const { hasRole } = useAuth();
@@ -30,12 +30,12 @@ export default function UsersPage() {
     email: '',
     password: '',
     full_name: '',
-    role: 'staff' as const
+    role: 'staff' as User['role']
   });
 
   const [editForm, setEditForm] = useState({
     full_name: '',
-    role: 'staff' as 'super_admin' | 'admin' | 'manager' | 'fleet_dispatch' | 'staff'
+    role: 'staff' as User['role']
   });
 
   // Admins can manage users; only super_admin can delete or grant super_admin
@@ -51,14 +51,10 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const supabase = (await import('@/lib/supabase/client')).createClient();
-      // @ts-ignore - Supabase type issue
-      const { data, error } = await supabase.rpc('get_all_users');
-
-      if (error) throw error;
-
-      setUsers(data || []);
-    } catch (err: any) {
+      const result = await listUsers();
+      if (!result.success) throw new Error(result.error);
+      setUsers(result.data);
+    } catch (err) {
       console.error('Failed to fetch users:', err);
       setMessage({ type: 'error', text: 'Failed to load users' });
     } finally {
@@ -72,23 +68,15 @@ export default function UsersPage() {
     setMessage(null);
 
     try {
-      const supabase = (await import('@/lib/supabase/client')).createClient();
-      // @ts-ignore - Supabase type issue
-      const { error } = await supabase.rpc('create_user_with_profile', {
-        p_email: addForm.email,
-        p_password: addForm.password,
-        p_full_name: addForm.full_name,
-        p_role: addForm.role
-      } as any);
-
-      if (error) throw error;
+      const result = await createUser(addForm);
+      if (!result.success) throw new Error(result.error);
 
       setMessage({ type: 'success', text: 'User created successfully' });
       setShowAddModal(false);
       setAddForm({ email: '', password: '', full_name: '', role: 'staff' });
       fetchUsers();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to create user' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to create user' });
     } finally {
       setIsSubmitting(false);
     }
@@ -100,34 +88,19 @@ export default function UsersPage() {
     setMessage(null);
 
     try {
-      const supabase = (await import('@/lib/supabase/client')).createClient();
-      
-      // Update profile
-      // @ts-ignore - Supabase type issue
-      const { error: profileError } = await supabase.rpc('update_user_profile', {
-        p_user_id: selectedUser?.id,
-        p_full_name: editForm.full_name
-      } as any);
-
-      if (profileError) throw profileError;
-
-      // Update role if changed
-      if (editForm.role !== selectedUser?.role) {
-        // @ts-ignore - Supabase type issue
-        const { error: roleError } = await supabase.rpc('update_user_role', {
-          p_user_id: selectedUser?.id,
-          p_new_role: editForm.role
-        } as any);
-
-        if (roleError) throw roleError;
-      }
+      const result = await updateUser({
+        user_id: selectedUser?.id ?? '',
+        full_name: editForm.full_name,
+        ...(editForm.role !== selectedUser?.role ? { role: editForm.role } : {}),
+      });
+      if (!result.success) throw new Error(result.error);
 
       setMessage({ type: 'success', text: 'User updated successfully' });
       setShowEditModal(false);
       setSelectedUser(null);
       fetchUsers();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to update user' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to update user' });
     } finally {
       setIsSubmitting(false);
     }
@@ -138,20 +111,15 @@ export default function UsersPage() {
     setMessage(null);
 
     try {
-      const supabase = (await import('@/lib/supabase/client')).createClient();
-      // @ts-ignore - Supabase type issue
-      const { error } = await supabase.rpc('delete_user', {
-        p_user_id: selectedUser?.id
-      } as any);
-
-      if (error) throw error;
+      const result = await deleteUser(selectedUser?.id ?? '');
+      if (!result.success) throw new Error(result.error);
 
       setMessage({ type: 'success', text: 'User deleted successfully' });
       setShowDeleteModal(false);
       setSelectedUser(null);
       fetchUsers();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to delete user' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to delete user' });
     } finally {
       setIsSubmitting(false);
     }
@@ -170,7 +138,7 @@ export default function UsersPage() {
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = 
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (user.email ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.full_name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRole = roleFilter === 'all' || user.role === roleFilter;
     return matchesSearch && matchesRole;
@@ -287,7 +255,7 @@ export default function UsersPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {new Date(user.created_at).toLocaleDateString()}
+                      {user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleDateString() : 'Never'}
@@ -361,7 +329,7 @@ export default function UsersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
                 <select
                   value={addForm.role}
-                  onChange={(e) => setAddForm({ ...addForm, role: e.target.value as any })}
+                  onChange={(e) => setAddForm({ ...addForm, role: e.target.value as User['role'] })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="staff">Staff</option>
@@ -415,7 +383,7 @@ export default function UsersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input
                   type="email"
-                  value={selectedUser.email}
+                  value={selectedUser.email ?? ''}
                   disabled
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
                 />
@@ -424,7 +392,7 @@ export default function UsersPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
                 <select
                   value={editForm.role}
-                  onChange={(e) => setEditForm({ ...editForm, role: e.target.value as any })}
+                  onChange={(e) => setEditForm({ ...editForm, role: e.target.value as User['role'] })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="staff">Staff</option>

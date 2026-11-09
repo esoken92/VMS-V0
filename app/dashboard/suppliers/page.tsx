@@ -3,20 +3,17 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Phone, Mail, Truck, Edit, Trash2, Eye } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { createClient } from '@/lib/supabase/client';
+import {
+  listSuppliers,
+  upsertSupplier,
+  deleteSupplier as deleteSupplierAction,
+} from '@/lib/actions/suppliers';
+import type { SupplierDTO } from '@/lib/types';
 
-interface Supplier {
-  id: string;
-  name: string;
-  contact_email: string | null;
-  phone: string | null;
-  address: string | null;
-}
+type Supplier = SupplierDTO;
 
 export default function SuppliersPage() {
   const { hasRole } = useAuth();
-  // @ts-ignore - Supabase type issue
-  const supabase = createClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,14 +39,11 @@ export default function SuppliersPage() {
 
   const fetchSuppliers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('suppliers')
-        .select('*')
-        .order('name');
-      if (error) throw error;
-      setSuppliers(data || []);
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+      const result = await listSuppliers();
+      if (!result.success) throw new Error(result.error);
+      setSuppliers(result.data);
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to load suppliers' });
     } finally {
       setLoading(false);
     }
@@ -85,40 +79,37 @@ export default function SuppliersPage() {
   const handleDeleteSupplier = async () => {
     if (!deleteSupplier) return;
     try {
-      const { error } = await supabase
-        .from('suppliers')
-        .delete()
-        .eq('id', deleteSupplier.id);
-      if (error) throw error;
+      const result = await deleteSupplierAction(deleteSupplier.id);
+      if (!result.success) throw new Error(result.error);
       setMessage({ type: 'success', text: 'Supplier deleted successfully' });
       setDeleteSupplier(null);
       fetchSuppliers();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Delete failed' });
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (editingSupplier) {
-        const { error } = await (supabase as any)
-          .from('suppliers')
-          .update(formData)
-          .eq('id', editingSupplier.id);
-        if (error) throw error;
-        setMessage({ type: 'success', text: 'Supplier updated successfully' });
-      } else {
-        const { error } = await (supabase as any)
-          .from('suppliers')
-          .insert(formData);
-        if (error) throw error;
-        setMessage({ type: 'success', text: 'Supplier added successfully' });
-      }
+      const result = await upsertSupplier({
+        ...(editingSupplier ? { id: editingSupplier.id } : {}),
+        name: formData.name,
+        contact_email: formData.contact_email || null,
+        phone: formData.phone || null,
+        address: formData.address || null,
+      });
+      if (!result.success) throw new Error(result.error);
+      setMessage({
+        type: 'success',
+        text: editingSupplier
+          ? 'Supplier updated successfully'
+          : 'Supplier added successfully',
+      });
       setShowModal(false);
       fetchSuppliers();
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Save failed' });
     }
   };
 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
+import { listSettings, updateSettings } from '@/lib/actions/settings';
 import { Settings, Save, CheckCircle, AlertCircle, Building, Bell, Package, Shield, Upload, X } from 'lucide-react';
 
 export default function SettingsPage() {
@@ -24,26 +25,20 @@ export default function SettingsPage() {
 
   const fetchSettings = async () => {
     try {
-      const supabase = (await import('@/lib/supabase/client')).createClient();
-      // @ts-ignore - Supabase type issue
-      const { data, error } = await supabase.rpc('get_system_settings');
-
-      if (error) throw error;
+      const result = await listSettings();
+      if (!result.success) throw new Error(result.error);
 
       const settingsMap: Record<string, string> = {};
-      if (data) {
-        // @ts-ignore - Supabase type issue
-        data.forEach((setting: any) => {
-          settingsMap[setting.key] = setting.value;
-        });
+      for (const setting of result.data) {
+        settingsMap[setting.key] = setting.value;
       }
       setSettings(settingsMap);
-      
+
       // Set logo preview if exists
       if (settingsMap.logo_url) {
         setLogoPreview(settingsMap.logo_url);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error('Failed to fetch settings:', err);
     }
   };
@@ -81,39 +76,25 @@ export default function SettingsPage() {
     setMessage(null);
 
     try {
-      const supabase = (await import('@/lib/supabase/client')).createClient();
+      // Local filesystem upload (replaces Supabase Storage)
+      const body = new FormData();
+      body.append('file', logoFile);
+      body.append('kind', 'logo');
+      const res = await fetch('/api/uploads', { method: 'POST', body });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(data.error || 'Logo upload failed');
+      }
+      const { url: logoUrl } = (await res.json()) as { url: string };
 
-      // Upload to Supabase Storage
-      const fileName = `logo-${Date.now()}-${logoFile.name}`;
-      // @ts-ignore - Supabase type issue
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('company-assets')
-        .upload(fileName, logoFile);
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      // @ts-ignore - Supabase type issue
-      const { data: urlData } = supabase.storage
-        .from('company-assets')
-        .getPublicUrl(fileName);
-
-      const logoUrl = urlData.publicUrl;
-
-      // Update settings
-      // @ts-ignore - Supabase type issue
-      const { error: updateError } = await supabase.rpc('update_system_setting', {
-        p_key: 'logo_url',
-        p_value: logoUrl
-      } as any);
-
-      if (updateError) throw updateError;
+      const result = await updateSettings({ entries: { logo_url: logoUrl } });
+      if (!result.success) throw new Error(result.error);
 
       setSettings({ ...settings, logo_url: logoUrl });
       setMessage({ type: 'success', text: 'Logo uploaded successfully' });
       setLogoFile(null);
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to upload logo' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to upload logo' });
     } finally {
       setIsUploadingLogo(false);
     }
@@ -125,22 +106,12 @@ export default function SettingsPage() {
     setMessage(null);
 
     try {
-      const supabase = (await import('@/lib/supabase/client')).createClient();
-
-      // Update each setting
-      for (const [key, value] of Object.entries(settings)) {
-        // @ts-ignore - Supabase type issue
-        const { error } = await supabase.rpc('update_system_setting', {
-          p_key: key,
-          p_value: value
-        } as any);
-
-        if (error) throw error;
-      }
+      const result = await updateSettings({ entries: settings });
+      if (!result.success) throw new Error(result.error);
 
       setMessage({ type: 'success', text: 'Settings saved successfully' });
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to save settings' });
+    } catch (err) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to save settings' });
     } finally {
       setIsSaving(false);
     }
@@ -207,6 +178,7 @@ export default function SettingsPage() {
               <div className="space-y-3">
                 {logoPreview && (
                   <div className="relative inline-block">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- preview may be a blob/data URL which next/image cannot optimize */}
                     <img
                       src={logoPreview}
                       alt="Company Logo"
