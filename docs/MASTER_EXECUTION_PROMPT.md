@@ -618,17 +618,166 @@ Grocy ~28 granular permissions, Snipe-IT permission groups.*
 
 ---
 
+## PHASE 4 — DEPLOYMENT, ON-PREM & LOCAL DEMO
+
+*The system is free and runs on the client's OWN internal/intranet
+infrastructure — including old/broken kit. It must be solid, hardened,
+role-based, and monitorable by the client company. Cloud (Vercel+Supabase)
+remains one option; self-hosted is the differentiator.*
+
+**Deployment architecture:**
+
+255. **ADR: deployment options** — `docs/DEPLOYMENT.md` comparing:
+    (a) Vercel + Supabase Cloud (managed, easiest),
+    (b) Docker Compose self-host (Next standalone + self-hosted Supabase:
+    Postgres, GoTrue auth, PostgREST, Storage — the official Supabase
+    self-host path),
+    (c) Desktop wrapper (Tauri/Electron shell auto-starting local server —
+    "runs on the client's PC" feel),
+    (d) Embedded-DB single-process path (evaluate `@electric-sql/pglite`
+    WASM-Postgres or SQLite adapter — research before committing; Supabase
+    auth/RLS coupling makes this the risky option, document honestly)
+256. **Docker Compose bundle** — `deploy/` dir: Next.js `output:'standalone'`
+    build + supabase services + Caddy (auto-TLS) or nginx; `docker compose
+    up` = whole system running; `.env` template with generated secrets
+257. **Windows-first install** — `install.ps1` + `install.bat` alongside
+    compose file; detect Docker/Podman/WSL2, offer guided paths; works on
+    machines where "Docker isn't a thing" via documented fallbacks
+258. **Minimum hardware spec** — target: old office PC (4GB RAM, x64,
+    Win10+); MEASURE actual footprint and only claim "runs on a 2015
+    laptop" if verified on real/constrained hardware
+259. **LAN/intranet mode** — zero internet required: self-host fonts
+    (next/font/google downloads at build — vendor Inter locally), no
+    external CDN calls, no telemetry by default; full audit for outbound
+    requests
+260. **Offline-first data** — PWA + Dexie queue (scaffold exists) so floor
+    devices keep working through server restarts/network blips; honest
+    sync-state UI (item 192)
+261. **Multi-PC LAN access** — one server PC hosts; staff connect via
+    browser; hostname/mDNS discovery doc + Windows firewall rules guide
+
+**Monitoring & oversight ("company can monitor it"):**
+
+262. **Admin monitoring console** — deployment health page: DB status,
+    disk usage, version, last backup, connected users, failed syncs,
+    API/MCP call stats, sensor staleness — the client's oversight view
+263. **Opt-in health beacon** — anonymous version/uptime ping to an ESO
+    endpoint, DEFAULT OFF + documented; gives ESO fleet visibility without
+    touching client data (privacy-first, reversible)
+264. **License/seat visibility** — admin sees user count, role
+    distribution, storage usage vs plan (supports the free/internal-use
+    license story)
+265. **Audit-log completeness for oversight** — every admin action,
+    permission change, config change, backup, and update already lands in
+    activity_logs; oversight page surfaces it filtered
+
+**Operations:**
+
+266. **Backup & restore** — one-click DB dump + storage archive +
+    scheduled backups; restore wizard; backup files stay on-prem
+267. **Update mechanism** — `update` command: pull new image → run
+    pending migrations (additive-only) → health-check → swap; version
+    endpoint for support
+268. **Air-gapped mode** — verified full-offline incl. no license check,
+    no telemetry, no external fonts/CDN; documented as supported config
+269. **First-boot wizard** — set admin password (force-change on demo
+    creds), org name, timezone, currency, demo-data on/off
+270. **Security hardening for LAN** — bind-address config, TLS via
+    self-signed or LAN cert guide, forced credential change, rate limits,
+    service-role never leaves server env
+271. **Uninstall/clean-removal docs** — removes containers, volumes, data
+    dir; no orphaned services
+272. **Troubleshooting guide** — common old-infra issues: port conflicts,
+    low RAM, Windows firewall, Docker Desktop licensing on old Windows,
+    WSL2 requirements, proxy environments
+
+**Local demo & rehearsal (BEFORE go-live):**
+
+273. **Local demo kit** — `docker compose up` OR `npm run dev` reproduces
+    the FULL demo incl. seed data; works offline; DEMO.md script runs
+    end-to-end (login → scan → stock take → MCP query → PDF report)
+274. **Old-hardware rehearsal** — actually run the complete demo on a
+    constrained VM/old machine; record results; fix what breaks; this is
+    a go-live gate, not optional
+275. **Smoke-test suite** — `scripts/smoke.mjs` hits key routes + API +
+    MCP tool calls + PDF render; run in CI and before every demo
+276. **Demo data portability** — seed + demo-reset work identically in
+    cloud and self-hosted modes; demo never requires internet
+
+---
+
+## PHASE 5 — MOBILE, PWA & CROSS-DEVICE
+
+*The floor worker's primary device is a phone or tablet — often a budget
+Android on a bad connection. Mobile web must be first-class, not an
+afterthought; the PWA should feel like a native app without an app store.*
+
+277. **Mobile-first responsive web** — every page usable one-handed on a
+    360px screen; tables collapse to cards, filters become bottom sheets,
+    forms stack; desktop gets the dense layout
+278. **Installable PWA** — manifest + icons + splash screens +
+    `display:standalone`; next-pwa already configured — finish it:
+    offline shell, install prompt, update-available toast
+279. **Mobile app shell** — bottom tab nav (Home/Scan/Stock/Tasks/More),
+    thumb-zone primary actions, collapsible header; desktop keeps sidebar
+280. **Camera-first mobile scanning** — ZXing scan view is THE mobile
+    home action; torch toggle, continuous-scan mode, haptic+audio
+    confirm; works front/rear camera
+281. **Scan-anything flows on mobile** — product, bin, room, PO, loan,
+    stock-take all resolve from one scanner; context decides the action
+282. **Mobile stock take** — guided count mode: scan bin → scan items →
+    enter qty → next; progress ring; blind mode hides expected qty;
+    works fully offline, syncs on reconnect
+283. **Mobile receiving/issue** — quick receive (scan PO → scan item →
+    qty → done) and quick issue; photo capture for damage/condition
+284. **Mobile tool loans** — checkout/checkin in ≤3 taps: scan tool →
+    scan person/badge → confirm; overdue badges on home
+285. **Mobile dashboard cards** — stat cards + alert list + quick actions;
+    charts get mobile-optimized tooltips/legends; every number deep-links
+286. **Mobile auth** — passkeys/WebAuthn + biometric unlock where
+    available; PIN fallback for shared floor devices (pairs w/ item 237);
+    session persistence tuned for shift workers
+287. **Web Push notifications** — low-stock, overdue loans, excursion
+    alerts, task assignments → phone even when PWA closed (VAPID keys,
+    per-user subscription prefs)
+288. **Offline-first mobile** — Dexie queue for all mutations; sync
+    banner shows pending count; conflict resolution UI for the rare
+    collision; works in basement stockrooms with zero signal
+289. **Capacitor wrapper (optional)** — same codebase wrapped as real
+    iOS/Android apps for clients who want store-distributed or
+    kiosk-locked installs; no rewrite, shares all logic
+290. **Deep links** — scan URLs, notification taps, shared product links
+    open the right screen; universal-link config for the wrapper
+291. **Low-end device performance** — budget-Android budget: lazy-load
+    charts, virtualized lists, image compression, <3s interactive on
+    3GB-RAM devices; tested on real cheap hardware not just emulation
+292. **Data-saver mode** — toggle reduces images/charts/payloads for
+    metered connections; respects `Save-Data` header
+293. **Mobile printing** — print labels via Bluetooth/ESC-POS thermal
+    printers or OS print dialog; pick-ticket PDF shares to any printer
+    app; QR label preview before print
+294. **Mobile admin-lite** — managers approve variances, acknowledge
+    alerts, review exceptions from phone; destructive actions still
+    desktop-gated where sensible
+295. **Cross-device test matrix** — Playwright mobile emulation + real-
+    device checklist (iPhone SE, budget Samsung, tablet); smoke tests
+    cover mobile flows; documented in TESTING.md
+
+---
+
 ## SUBAGENT ALLOCATION PLAN
 
 Research agents are DONE (reports merged above). Suggested build-time split
 (max 3 concurrent, disjoint write scopes):
 
-- **Agent A — Data/API layer:** items 6–30, 63–66, 73, 84–99, 224–233
-  (migrations, storerooms, sensors, permission matrix, API routes)
-- **Agent B — UI/UX:** items 31–44, 100–111 scan UX, 234–240 RBAC admin UI,
-  241–250 (pages, components, landing, scan hardening UI)
-- **Agent C — Integrations/reports:** items 53–62, 67–72, 75, 90, 92
-  (PDF, MCP, AI, webhooks, email, sensor simulator)
+- **Agent A — Data/API layer:** items 6–30, 63–66, 73, 84–99, 224–233,
+  255–261, 266–268 (migrations, storerooms, sensors, permission matrix,
+  API routes, deploy/DB plumbing)
+- **Agent B — UI/UX + mobile:** items 31–44, 100–111 scan UX, 234–240
+  RBAC admin UI, 241–250, 277–295 (pages, components, landing, mobile/PWA)
+- **Agent C — Integrations/reports:** items 53–62, 67–72, 75, 90, 92,
+  262–265, 269–276 (PDF, MCP, AI, webhooks, email, sensor simulator,
+  monitoring console, demo kit)
 
 Phase 2a (tech debt) runs FIRST solo — it touches files everyone else uses.
 Phase 2i scan-security items (100–111) and 2k permission matrix (224–233)
@@ -645,6 +794,13 @@ ships are forgeable, and permissions must exist before features gate on them.
 - [ ] MCP endpoint live w/ scoped keys; smoke-tested tools
 - [ ] Typst PDF renders a real report w/o Chromium
 - [ ] Landing page + dashboard screenshots captured
+- [ ] Mobile web + PWA verified on real budget device (scan, stock take,
+      receive, approve flows one-handed)
+- [ ] Self-hosted path verified: `docker compose up` (or documented
+      fallback) runs full demo offline on LAN
+- [ ] Full local demo rehearsed end-to-end on constrained/old hardware —
+      go-live gate
+- [ ] Admin monitoring console + opt-in beacon (default OFF) working
 - [ ] No secrets; AGPL code never copied; license intact
 - [ ] README accurate; demo creds documented as demo-only
 - [ ] Owner flips repo public + template manually
