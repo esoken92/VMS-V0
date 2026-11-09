@@ -661,65 +661,44 @@ remains one option; self-hosted is the differentiator.*
 262. **Admin monitoring console** — deployment health page: DB status,
     disk usage, version, last backup, connected users, failed syncs,
     API/MCP call stats, sensor staleness — the client's oversight view
-263. **Health beacon to ESO — REQUIRED, all deployments.** Every install
-    (cloud or self-hosted) beacons outbound-only to an ESO endpoint so ESO
-    has fleet-wide health visibility. Spec:
-    - Transport: HTTPS POST every ~15 min + on boot + on shutdown
-    - Payload (minimal, no PII by default): random instance UUID (generated
-      at install, NOT derived from domain/org name), app version, uptime,
-      db_ok, disk_pct, pending_sync_count, error_count_24h, optional
-      coarse counts (users/items/movements — opt-in flag)
-    - Auth: per-instance bearer token scoped "health-write ONLY" —
-      rotatable + revocable; ESO stores token hash, never plaintext list
-    - Direction: STRICTLY one-way. Client sends, ESO receives. NO inbound
-      connections, NO remote commands, NO config push, NO kill switch.
-      (Remote-action capability would change the security model — forbidden)
-    - Config: `ESO_BEACON_URL` + `ESO_BEACON_TOKEN` env vars; template
-      forks can disable (`BEACON_ENABLED=false`) or repoint — documented
-    - Endpoint (ESO side): rate-limited, auth-required writes, no public
-      instance-listing read API; stores only what payload declares
-    - Disclosure: beacon documented in README + SETUP_DATABASE + first-
-      boot wizard ("anonymous health pings to esoind.co.za, disable anytime")
-    - Failure mode: beacon failure NEVER affects app operation — fire-
-      and-forget, queued, dropped after N retries
-264. **License/seat visibility** — admin sees user count, role
+263. **License/seat visibility** — admin sees user count, role
     distribution, storage usage vs plan (supports the free/internal-use
     license story)
-265. **Audit-log completeness for oversight** — every admin action,
+264. **Audit-log completeness for oversight** — every admin action,
     permission change, config change, backup, and update already lands in
     activity_logs; oversight page surfaces it filtered
 
 **Operations:**
 
-266. **Backup & restore** — one-click DB dump + storage archive +
+265. **Backup & restore** — one-click DB dump + storage archive +
     scheduled backups; restore wizard; backup files stay on-prem
-267. **Update mechanism** — `update` command: pull new image → run
+266. **Update mechanism** — `update` command: pull new image → run
     pending migrations (additive-only) → health-check → swap; version
     endpoint for support
-268. **Air-gapped mode** — verified full-offline incl. no license check,
+267. **Air-gapped mode** — verified full-offline incl. no license check,
     no telemetry, no external fonts/CDN; documented as supported config
-269. **First-boot wizard** — set admin password (force-change on demo
+268. **First-boot wizard** — set admin password (force-change on demo
     creds), org name, timezone, currency, demo-data on/off
-270. **Security hardening for LAN** — bind-address config, TLS via
+269. **Security hardening for LAN** — bind-address config, TLS via
     self-signed or LAN cert guide, forced credential change, rate limits,
     service-role never leaves server env
-271. **Uninstall/clean-removal docs** — removes containers, volumes, data
+270. **Uninstall/clean-removal docs** — removes containers, volumes, data
     dir; no orphaned services
-272. **Troubleshooting guide** — common old-infra issues: port conflicts,
+271. **Troubleshooting guide** — common old-infra issues: port conflicts,
     low RAM, Windows firewall, Docker Desktop licensing on old Windows,
     WSL2 requirements, proxy environments
 
 **Local demo & rehearsal (BEFORE go-live):**
 
-273. **Local demo kit** — `docker compose up` OR `npm run dev` reproduces
+272. **Local demo kit** — `docker compose up` OR `npm run dev` reproduces
     the FULL demo incl. seed data; works offline; DEMO.md script runs
     end-to-end (login → scan → stock take → MCP query → PDF report)
-274. **Old-hardware rehearsal** — actually run the complete demo on a
+273. **Old-hardware rehearsal** — actually run the complete demo on a
     constrained VM/old machine; record results; fix what breaks; this is
     a go-live gate, not optional
-275. **Smoke-test suite** — `scripts/smoke.mjs` hits key routes + API +
+274. **Smoke-test suite** — `scripts/smoke.mjs` hits key routes + API +
     MCP tool calls + PDF render; run in CI and before every demo
-276. **Demo data portability** — seed + demo-reset work identically in
+275. **Demo data portability** — seed + demo-reset work identically in
     cloud and self-hosted modes; demo never requires internet
 
 ---
@@ -730,54 +709,54 @@ remains one option; self-hosted is the differentiator.*
 Android on a bad connection. Mobile web must be first-class, not an
 afterthought; the PWA should feel like a native app without an app store.*
 
-277. **Mobile-first responsive web** — every page usable one-handed on a
+276. **Mobile-first responsive web** — every page usable one-handed on a
     360px screen; tables collapse to cards, filters become bottom sheets,
     forms stack; desktop gets the dense layout
-278. **Installable PWA** — manifest + icons + splash screens +
+277. **Installable PWA** — manifest + icons + splash screens +
     `display:standalone`; next-pwa already configured — finish it:
     offline shell, install prompt, update-available toast
-279. **Mobile app shell** — bottom tab nav (Home/Scan/Stock/Tasks/More),
+278. **Mobile app shell** — bottom tab nav (Home/Scan/Stock/Tasks/More),
     thumb-zone primary actions, collapsible header; desktop keeps sidebar
-280. **Camera-first mobile scanning** — ZXing scan view is THE mobile
+279. **Camera-first mobile scanning** — ZXing scan view is THE mobile
     home action; torch toggle, continuous-scan mode, haptic+audio
     confirm; works front/rear camera
-281. **Scan-anything flows on mobile** — product, bin, room, PO, loan,
+280. **Scan-anything flows on mobile** — product, bin, room, PO, loan,
     stock-take all resolve from one scanner; context decides the action
-282. **Mobile stock take** — guided count mode: scan bin → scan items →
+281. **Mobile stock take** — guided count mode: scan bin → scan items →
     enter qty → next; progress ring; blind mode hides expected qty;
     works fully offline, syncs on reconnect
-283. **Mobile receiving/issue** — quick receive (scan PO → scan item →
+282. **Mobile receiving/issue** — quick receive (scan PO → scan item →
     qty → done) and quick issue; photo capture for damage/condition
-284. **Mobile tool loans** — checkout/checkin in ≤3 taps: scan tool →
+283. **Mobile tool loans** — checkout/checkin in ≤3 taps: scan tool →
     scan person/badge → confirm; overdue badges on home
-285. **Mobile dashboard cards** — stat cards + alert list + quick actions;
+284. **Mobile dashboard cards** — stat cards + alert list + quick actions;
     charts get mobile-optimized tooltips/legends; every number deep-links
-286. **Mobile auth** — passkeys/WebAuthn + biometric unlock where
+285. **Mobile auth** — passkeys/WebAuthn + biometric unlock where
     available; PIN fallback for shared floor devices (pairs w/ item 237);
     session persistence tuned for shift workers
-287. **Web Push notifications** — low-stock, overdue loans, excursion
+286. **Web Push notifications** — low-stock, overdue loans, excursion
     alerts, task assignments → phone even when PWA closed (VAPID keys,
     per-user subscription prefs)
-288. **Offline-first mobile** — Dexie queue for all mutations; sync
+287. **Offline-first mobile** — Dexie queue for all mutations; sync
     banner shows pending count; conflict resolution UI for the rare
     collision; works in basement stockrooms with zero signal
-289. **Capacitor wrapper (optional)** — same codebase wrapped as real
+288. **Capacitor wrapper (optional)** — same codebase wrapped as real
     iOS/Android apps for clients who want store-distributed or
     kiosk-locked installs; no rewrite, shares all logic
-290. **Deep links** — scan URLs, notification taps, shared product links
+289. **Deep links** — scan URLs, notification taps, shared product links
     open the right screen; universal-link config for the wrapper
-291. **Low-end device performance** — budget-Android budget: lazy-load
+290. **Low-end device performance** — budget-Android budget: lazy-load
     charts, virtualized lists, image compression, <3s interactive on
     3GB-RAM devices; tested on real cheap hardware not just emulation
-292. **Data-saver mode** — toggle reduces images/charts/payloads for
+291. **Data-saver mode** — toggle reduces images/charts/payloads for
     metered connections; respects `Save-Data` header
-293. **Mobile printing** — print labels via Bluetooth/ESC-POS thermal
+292. **Mobile printing** — print labels via Bluetooth/ESC-POS thermal
     printers or OS print dialog; pick-ticket PDF shares to any printer
     app; QR label preview before print
-294. **Mobile admin-lite** — managers approve variances, acknowledge
+293. **Mobile admin-lite** — managers approve variances, acknowledge
     alerts, review exceptions from phone; destructive actions still
     desktop-gated where sensible
-295. **Cross-device test matrix** — Playwright mobile emulation + real-
+294. **Cross-device test matrix** — Playwright mobile emulation + real-
     device checklist (iPhone SE, budget Samsung, tablet); smoke tests
     cover mobile flows; documented in TESTING.md
 
@@ -818,9 +797,9 @@ ships are forgeable, and permissions must exist before features gate on them.
       fallback) runs full demo offline on LAN
 - [ ] Full local demo rehearsed end-to-end on constrained/old hardware —
       go-live gate
-- [ ] Admin monitoring console + ESO health beacon verified: outbound-only,
-      scoped token, no inbound surface, `BEACON_ENABLED=false` cleanly
-      disables, beacon failure never impacts app
+- [ ] Admin monitoring console working (health, users, sync, storage);
+      NO telemetry/beacon of any kind — free open-use product, zero
+      outbound phone-home
 - [ ] No secrets; AGPL code never copied; license intact
 - [ ] README accurate; demo creds documented as demo-only
 - [ ] Owner flips repo public + template manually
