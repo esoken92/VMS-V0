@@ -61,3 +61,4 @@ sample-inventory.pdf
 
 # headless QA sweep artifacts (screenshots + report.json)
 playtest-output/
+.next-dev.log
