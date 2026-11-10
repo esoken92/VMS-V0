@@ -16,7 +16,7 @@
 | Validation | **Zod** | Every action/API boundary validates input |
 | Offline / PWA | **handwritten `public/sw.js`** | Installable; static-asset caching only — offline write queue is roadmap work |
 | Charts | **Recharts** | Dashboard stats, climate timelines, stock history |
-| PDF reports | **Typst** (in-process compilation) | No Chromium/Gotenberg/Playwright in shipped code — templates in `lib/pdf/typst/` |
+| PDF reports | **Typst** (in-process compilation) | No Chromium/Gotenberg/Playwright in shipped code — templates in `lib/pdf/templates/` |
 | Email / AI / storage / sensors | Env-gated adapters | Optional; unset env = graceful "not configured". See `docs/INTEGRATIONS.md` |
 
 No telemetry, no analytics SDKs, nothing phones home.
@@ -77,9 +77,9 @@ ledger vs balance, documents vs lines**.
 | `unit_conversions` | e.g. drum → litre, `DECIMAL(15,4)` precision |
 | `suppliers` | Vendor records |
 | `bin_locations` | Zone/bin model with weight capacity; feeds the zone map |
-| `stock_movements` | **The ledger.** `inbound/outbound/adjustment/scrap/tool_checkout/receiving` — append-only |
-| `receiving_documents` + `receiving_items` | Goods-receipt docs (header/lines) |
-| `stock_takes` + `stock_take_items` | Blind counts (`open/completed`), variance posting |
+| `stock_movements` | **The ledger.** `inbound/outbound/adjustment/scrap/tool_checkout/receiving` + system legs `transfer/kit_consume/kit_produce` — append-only |
+| `receiving_documents` + `receiving_items` | Goods-receipt docs (schema present; no write path yet — receiving goes through scan/movements today) |
+| `stock_takes` + `stock_take_items` | Blind counts (`open/completed`); variance is recorded on the take — posting it to the ledger is a manual adjustment today |
 | `tool_loans` | Custody chain: checkout, return, condition, due dates |
 | `activity_logs` | Field-level audit: actor, action, before/after, impersonation context |
 | `impersonation_sessions` | Super-admin "view as" — mandatory reason, time-boxed |
@@ -89,11 +89,13 @@ ledger vs balance, documents vs lines**.
 **Ledger rule:** on-hand quantity is a *projection* over
 `stock_movements`, never a column you update. Corrections are new rows.
 
-Planned/porting additions (see master prompt §2b–2i): `stock_items`
-(physical instances: serial/batch/expiry), `storerooms` + type presets,
-`sensor_readings`, `scan_events`, `permissions`/`role_permissions`,
-`api_keys`, `product_barcodes`, `custom_fields` JSONB, purchase orders
-and transfer/issue documents.
+Added since this doc was written: `storerooms` + room-type presets,
+`sensor_readings`, `scan_events`, `api_keys`, `instance_config` +
+provisioning flags, `transfers` + `transfer_items` + `product_stock`
+(per-bin projection) + `product_components` (kits/BOM), `audit`
+append-only hardening, and `stock_movements.client_ref` (write
+idempotency). Still planned: `stock_items` (per-unit serial/expiry
+instances) and purchase orders — see the master prompt roadmap.
 
 ## Auth & authorization model
 

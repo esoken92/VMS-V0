@@ -1284,12 +1284,12 @@ Status legend: ✅ verified live · ⏳ owner/hardware-gated · 🚧 roadmap ·
 | 2g API/MCP | ✅ REST v1 + scoped keys + MCP + OpenAPI/llms.txt + /docs reference page (item 65 — hand-rendered from the live spec, air-gap safe, no CDN) |
 | 2h auth/security | ✅ Auth.js + argon2id + append-only audit (DB-enforced) |
 | 2i storerooms | ✅ rooms, zones, sensors, thresholds, simulator |
-| 2j industry pain-points | 🚧 roadmap |
+| 2j industry pain-points | ✅ audited — docs/PAIN-POINTS.md: 7 done / 15 partial / 44 gaps with evidence refs + top-10 ranking; implementation of the gaps is the remaining roadmap |
 | 2k RBAC | ✅ permission matrix + personas + forbidden gate |
-| 2l/2m market fit + packs | 🚧 framework seeded via wizard; packs pending |
+| 2l/2m market fit + packs | 🚧 framework + ✅ pack depth: cold_chain pack, 5 new flags, 5 report packs, per-pack storeroom presets (propose→create on apply), 6 one-click presets (General/Pharmacy/Tool Library/Fleet Parts/Cold Storage/School) in the wizard — docs/INDUSTRY-PACKS.md; deep vertical features (e-sig, CAPA, recall ingest) pending |
 | 2n provisioning | ✅ 4-step wizard + feature flags + preview |
 | 2o personas/audit/reports | ✅ personas + append-only audit + verify-ledger + report builder (8 datasets → table/CSV/Typst-PDF; covers dead-stock 59 + audit-log export 61) |
 | 3 branding/go-live | ✅ README, screenshots, LICENSE, CI, templates |
 | 4 deployment | ✅ docker-compose + PGlite + Vercel/Supabase runbook (hosted copy needs owner's Supabase project) |
 | 5 mobile/PWA | 🚧 installable shell + ✅ offline scan queue (receive/issue, IDB-backed, replay via REST) — device test + remaining mutation types pending |
-| 6 Rust offline | 🚧 roadmap |
+| 6 Rust offline | 🚧 scaffold landed — offline/ workspace: Axum+SQLite mirror of the REST contract (health/login/products/movements/bins/storerooms live, rest honest 501s), Tauri v2 shell layout, cargo check+clippy clean, 16/16 tests — docs/OFFLINE-APP.md parity matrix |

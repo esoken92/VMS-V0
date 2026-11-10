@@ -56,12 +56,12 @@ The app is plain Postgres — Supabase is just one way to host it:
 
 - Endpoint: `POST /api/sensors/ingest` (authenticated, idempotent on device+metric+timestamp).
 - Bridge any MQTT/webhook source; a built-in simulator generates simulated readings without hardware.
-- ESP32 examples + MQTT broker notes live in `docs/SENSORS.md`.
+- ESP32 examples + MQTT broker notes are planned as `docs/SENSORS.md` — not written yet; the ingest endpoint and simulator are the integration surface today.
 
 ## Typst PDF reports (built-in, no service needed)
 
 In-process Typst compilation — no Gotenberg, no Chromium, no Playwright.
-Templates live in `lib/pdf/typst/`; add a `.typ` template + a route and you have a report.
+Templates live in `lib/pdf/templates/`; add a `.typ` template + a route and you have a report.
 
 ## What we deliberately don't wire
 

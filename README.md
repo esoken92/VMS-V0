@@ -166,9 +166,10 @@ color-blind-safe status pairs:
   threshold rules, excursion alerts, built-in sensor simulator
 - **REST API + MCP server** — scoped API keys; agents and assistants can
   query stock through MCP tools with the same permission checks
-- **Installable PWA** — manifest + service worker ship today; the queued
-  offline write-path is roadmap work (the Rust companion is the
-  deep-offline target)
+- **Installable PWA + offline write-queue** — scans for receive/issue
+  queue in IndexedDB when the network drops and replay through the REST
+  API on reconnect (idempotent, pending count on the scan page); the
+  Rust companion under `offline/` is the deep-offline target
 - **Self-hosted** — Postgres + one Next.js app. No telemetry, no per-seat
   fees, your data stays yours
 

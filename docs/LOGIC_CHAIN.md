@@ -64,10 +64,14 @@ This is the real gate, and it lives **in the application layer**: a
 permission matrix of `role × action × scope` evaluated server-side on
 every mutation and sensitive read.
 
-- `staff` can count; `manager` can approve variances; `super_admin` can
-  impersonate (with a mandatory reason, itself audited).
-- Scopes matter: "manager of the cold room" is not "manager of
-  everything".
+- `staff` counts; completing a stock take (and writing its variance to
+  the record) needs `stock_takes:write` — a manager-or-above permission;
+  `super_admin` can impersonate (with a mandatory reason, itself
+  audited). A separate variance-approval step is roadmap work, not
+  implemented.
+- Scopes today are row-level (e.g. staff see only their own movements);
+  per-room role scoping fields exist on `storerooms` but write paths do
+  not enforce them yet — also roadmap work.
 - Client-side role checks only hide buttons. The server re-checks every
   time — a hidden button is UX, a server check is security.
 
