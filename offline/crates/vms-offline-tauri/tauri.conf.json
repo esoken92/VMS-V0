@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "VMS Offline",
+  "version": "0.1.0",
+  "identifier": "com.vms.offline",
+  "build": {
+    "frontendDist": "./dist",
+    "devUrl": "http://localhost:3000"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "VMS Offline",
+        "width": 1280,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; connect-src 'self' http://127.0.0.1:3300 http://localhost:3300"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all"
+  }
+}

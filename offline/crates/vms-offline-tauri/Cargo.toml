@@ -1,0 +1,19 @@
+[package]
+name = "vms-offline-tauri"
+description = "VMS offline desktop shell — Tauri v2 wrapping the same Next.js frontend (spec item 300)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "net"] }
+axum = "0.8"
+# The shell embeds and spawns the API backend so the artifact is one unit.
+vms-offline-server = { path = "../vms-offline-server" }

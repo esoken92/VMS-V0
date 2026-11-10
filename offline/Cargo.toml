@@ -1,0 +1,30 @@
+# Cargo workspace for the VMS offline artifact (spec item 300/313).
+#
+# `vms-offline-server` is the Axum + SQLite backend implementing the same
+# /api/v1 contract as the Next.js app. `vms-offline-tauri` is the Tauri v2
+# desktop shell that wraps the same Next.js frontend.
+#
+# Default members keep `cargo check` / `cargo test` fast: the Tauri crate
+# pulls a very large dependency tree (wry/tao/WebView2) that is only needed
+# when actually building the desktop shell — check it explicitly with
+# `cargo check -p vms-offline-tauri`.
+
+[workspace]
+resolver = "2"
+members = [
+    "crates/vms-offline-server",
+    "crates/vms-offline-tauri",
+]
+default-members = ["crates/vms-offline-server"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "CC-BY-NC-SA-4.0"
+publish = false
+
+[profile.release]
+# Footprint budget (spec item 310): keep the binary small.
+lto = true
+codegen-units = 1
+strip = true

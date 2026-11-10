@@ -13,6 +13,8 @@ export default defineConfig([
     'next-env.d.ts',
     'public/**',
     'playtest-output/**',
+    // Rust offline artifact — cargo build output contains generated JS.
+    'offline/target/**',
   ]),
   {
     rules: {
