@@ -9,7 +9,7 @@ import {
   deleteUser,
 } from '@/lib/actions/users';
 import type { UserListItemDTO } from '@/lib/types';
-import { Plus, Search, MoreVertical, Trash2, Edit, UserPlus, CheckCircle, AlertCircle } from 'lucide-react';
+import { Search, Trash2, Edit, UserPlus, CheckCircle, AlertCircle } from 'lucide-react';
 
 type User = UserListItemDTO;
 

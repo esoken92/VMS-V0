@@ -75,14 +75,14 @@ export async function verifyImpersonationCookie(
 
 /** Server-components/actions: read + verify the impersonation cookie. */
 export async function readImpersonationCookie(): Promise<ImpersonationCookie | null> {
-  const store = cookies();
+  const store = await cookies();
   return verifyImpersonationCookie(store.get(IMPERSONATION_COOKIE)?.value);
 }
 
 /** Server actions only: set the cookie (throws outside a writable context). */
 export async function setImpersonationCookie(payload: ImpersonationCookie) {
   const token = await createImpersonationCookie(payload);
-  cookies().set(IMPERSONATION_COOKIE, token, {
+  (await cookies()).set(IMPERSONATION_COOKIE, token, {
     httpOnly: true,
     sameSite: 'lax',
     secure: process.env.NODE_ENV === 'production',
@@ -91,6 +91,6 @@ export async function setImpersonationCookie(payload: ImpersonationCookie) {
   });
 }
 
-export function clearImpersonationCookie() {
-  cookies().delete(IMPERSONATION_COOKIE);
+export async function clearImpersonationCookie() {
+  (await cookies()).delete(IMPERSONATION_COOKIE);
 }

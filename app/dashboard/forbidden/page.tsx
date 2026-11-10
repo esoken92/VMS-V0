@@ -15,11 +15,12 @@ export const metadata = {
   title: 'Access denied — VMS',
 };
 
-export default function ForbiddenPage({
-  searchParams,
-}: {
-  searchParams: { denied?: string };
-}) {
+export default async function ForbiddenPage(
+  props: {
+    searchParams: Promise<{ denied?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
       <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mb-4">

@@ -31,8 +31,11 @@ export function CameraScanner({
   const lastDecode = useRef<{ code: string; at: number } | null>(null);
   const onScanRef = useRef(onScan);
   const onErrorRef = useRef(onError);
-  onScanRef.current = onScan;
-  onErrorRef.current = onError;
+
+  useEffect(() => {
+    onScanRef.current = onScan;
+    onErrorRef.current = onError;
+  });
 
   useEffect(() => {
     if (!active) return;

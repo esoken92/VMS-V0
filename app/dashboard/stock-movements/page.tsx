@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Search, ArrowDown, ArrowUp, Trash2, Upload } from 'lucide-react';
+import { Search, ArrowDown, ArrowUp, Trash2, Upload } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import {
   listStockMovements,

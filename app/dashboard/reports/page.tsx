@@ -11,7 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { Calendar, TrendingUp, Package, AlertTriangle, Download, BarChart3, FileText } from 'lucide-react';
+import { TrendingUp, Package, AlertTriangle, Download, BarChart3, FileText } from 'lucide-react';
 import { getReportData } from '@/lib/actions/reports';
 import type { ReportMovementDTO, ReportProductDTO } from '@/lib/types';
 
@@ -28,6 +28,9 @@ export default function ReportsPage() {
   });
   const [movements, setMovements] = useState<ReportMovementDTO[]>([]);
   const [products, setProducts] = useState<ReportProductDTO[]>([]);
+  // "Now" is captured when data lands so render stays pure (react-hooks/purity)
+  // and day buckets stay consistent across re-renders.
+  const [asOf, setAsOf] = useState(0);
 
   const fetchReportData = useCallback(async () => {
     try {
@@ -41,6 +44,7 @@ export default function ReportsPage() {
 
       setMovements(movementsData);
       setProducts(productsData);
+      setAsOf(Date.now());
 
       // Calculate KPIs
       const totalMovements = movementsData.length;
@@ -103,10 +107,11 @@ export default function ReportsPage() {
 
   // Group movements per day × type for the trend chart.
   const trendData = useMemo(() => {
+    if (asOf === 0) return [];
     const days = parseInt(dateRange === '1y' ? '365' : dateRange);
     const byDay = new Map<string, { day: string; inbound: number; outbound: number; scrap: number; adjustment: number }>();
     for (let i = days - 1; i >= 0; i--) {
-      const d = new Date(Date.now() - i * 86_400_000);
+      const d = new Date(asOf - i * 86_400_000);
       const key = d.toISOString().slice(0, 10);
       byDay.set(key, { day: key.slice(5), inbound: 0, outbound: 0, scrap: 0, adjustment: 0 });
     }
@@ -131,7 +136,7 @@ export default function ReportsPage() {
       return [...byMonth.values()];
     }
     return data;
-  }, [movements, dateRange]);
+  }, [movements, dateRange, asOf]);
 
   return (
     <div className="space-y-6">

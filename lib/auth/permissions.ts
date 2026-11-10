@@ -58,7 +58,7 @@ export type Permission =
   | 'impersonation:use'
   | 'reports:read';
 
-const ALL_MOVEMENT_PERMS = [
+export const ALL_MOVEMENT_PERMS = [
   'stock_movements:create:inbound',
   'stock_movements:create:outbound',
   'stock_movements:create:adjustment',

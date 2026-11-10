@@ -8,13 +8,13 @@
 
 | Layer | Choice | Notes |
 |---|---|---|
-| Framework | **Next.js 14** (App Router) | Server components by default; server actions + route handlers for mutations |
-| UI | **React 18**, **TypeScript** (strict), **Tailwind CSS** | shadcn-style design tokens (`hsl(var(--token))`), class-based dark mode, lucide-react icons |
+| Framework | **Next.js 16** (App Router) | Server components by default; server actions + route handlers for mutations |
+| UI | **React 19**, **TypeScript** (strict), **Tailwind CSS** | shadcn-style design tokens (`hsl(var(--token))`), class-based dark mode, lucide-react icons |
 | Database | **Postgres 16** | `docker-compose.yml` ships a single `db` service; `supabase/migrations/*.sql` mounts into `/docker-entrypoint-initdb.d` as canonical init SQL |
 | ORM / migrations | **Drizzle ORM** + drizzle-kit | Additive migrations only — never edit an applied migration |
 | Auth | **Auth.js v5** | Credentials provider, **argon2id** password hashing; no hosted-IdP dependency |
 | Validation | **Zod** | Every action/API boundary validates input |
-| Offline / PWA | **next-pwa** + Dexie (IndexedDB) | Installable; scan queue syncs on reconnect |
+| Offline / PWA | **handwritten `public/sw.js`** | Installable; static-asset caching only — offline write queue is roadmap work |
 | Charts | **Recharts** | Dashboard stats, climate timelines, stock history |
 | PDF reports | **Typst** (in-process compilation) | No Chromium/Gotenberg/Playwright in shipped code — templates in `lib/pdf/typst/` |
 | Email / AI / storage / sensors | Env-gated adapters | Optional; unset env = graceful "not configured". See `docs/INTEGRATIONS.md` |
@@ -48,7 +48,7 @@ No telemetry, no analytics SDKs, nothing phones home.
 │   ├── supabase/             # (being replaced) → Drizzle client + schema
 │   ├── navigation-config.ts  # Role-scoped sidebar items
 │   ├── offline/  hooks/  utils/
-├── middleware.ts             # Edge gate: session + route rules
+├── proxy.ts             # Edge gate: session + route rules
 ├── drizzle/                  # Drizzle schema + generated migrations
 ├── supabase/migrations/      # Canonical init SQL (001→00N, ordered)
 ├── supabase/seed.sql         # Demo users + sample dataset (public creds)
@@ -93,7 +93,7 @@ and transfer/issue documents.
 Three layers, defense in depth — see `docs/LOGIC_CHAIN.md` for the
 narrative version:
 
-1. **Middleware** (`middleware.ts`) — route-level gate: public routes,
+1. **Proxy** (`proxy.ts`) — route-level gate: public routes,
    session redirect, first-pass role gating for admin areas.
 2. **App-layer permission matrix** — `role × action × scope` evaluated
    server-side on every handler/action. The primary enforcement layer;

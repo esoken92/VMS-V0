@@ -23,13 +23,17 @@ import { apiErrorResponse, rateLimitedResponse } from './http';
 import { checkRateLimit, rateLimitHeaders } from './ratelimit';
 
 export interface RouteContext {
+  params: Promise<Record<string, string>>;
+}
+
+export interface ResolvedRouteContext {
   params: Record<string, string>;
 }
 
 type ApiHandler = (
   req: NextRequest,
   principal: ApiPrincipal,
-  ctx: RouteContext,
+  ctx: ResolvedRouteContext,
 ) => Promise<NextResponse> | NextResponse;
 
 export function withApi(scope: ApiScope, handler: ApiHandler) {
@@ -46,7 +50,7 @@ export function withApi(scope: ApiScope, handler: ApiHandler) {
       }
 
       requireApiScope(principal, scope);
-      const res = await handler(req, principal, ctx);
+      const res = await handler(req, principal, { params: await ctx.params });
       for (const [k, v] of Object.entries(rateLimitHeaders(rate))) {
         res.headers.set(k, v);
       }

@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { db } from '@/lib/db';
 import { products, profiles, stockMovements } from '@/drizzle/schema';
 import { setAuditContext } from '@/lib/db/context';
-import { requirePermission, requireUser, can } from '@/lib/auth/session';
+import { requireUser, can } from '@/lib/auth/session';
 import { canCreateMovement } from '@/lib/auth/permissions';
 import { actionError, fail, ok, type Result } from '@/lib/result';
 import { MOVEMENT_TYPES } from '@/lib/auth/roles';

@@ -136,7 +136,7 @@ permissions of the account that issued it.
 
 | Hop | Location |
 |---|---|
-| Middleware | `middleware.ts` |
+| Proxy | `proxy.ts` (Next.js 16 renamed middleware) |
 | Auth config | `auth.config.ts` / `lib/auth*` (Auth.js v5) |
 | Permission matrix | `lib/permissions*` (server-side checks on every action) |
 | Transactions | `lib/db*` / route handlers and server actions |

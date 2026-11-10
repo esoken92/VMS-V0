@@ -2,16 +2,17 @@ import type { Metadata, Viewport } from 'next'
 import { IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 import { SiteFooter } from '@/components/marketing/site-footer'
+import { ServiceWorkerRegister } from '@/components/sw-register'
 
 const plexSans = IBM_Plex_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-sans',
+  variable: '--font-plex-sans',
 })
 const plexMono = IBM_Plex_Mono({
   subsets: ['latin'],
   weight: ['400', '500'],
-  variable: '--font-mono',
+  variable: '--font-plex-mono',
 })
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
@@ -19,7 +20,7 @@ const DESCRIPTION =
   'VMS is a free, open-source, self-hosted inventory management template: ' +
   'typed storerooms, scan-first barcode/QR/RFID workflows, an append-only ' +
   'ledger, RBAC, stock takes, tool loans, sensor monitoring, and a REST + ' +
-  'MCP API. Next.js 14 and Postgres — runs on a laptop or a site server.'
+  'MCP API. Next.js 16 and Postgres — runs on a laptop or a site server.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
@@ -74,6 +75,7 @@ export default function RootLayout({
       <body className={`${plexSans.variable} ${plexMono.variable} font-sans`}>
         {children}
         <SiteFooter />
+        <ServiceWorkerRegister />
       </body>
     </html>
   )

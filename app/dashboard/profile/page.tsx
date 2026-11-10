@@ -6,7 +6,7 @@ import { updateMyProfile, updateMyAlertPrefs } from '@/lib/actions/profile';
 import { User, Mail, Lock, Save, CheckCircle, AlertCircle, Bell } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { user, profile, updatePassword, resetPassword, setError, refreshProfile } = useAuth();
+  const { user, profile, updatePassword, resetPassword, refreshProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState<{ full_name: string }>({ full_name: profile?.full_name || '' });
   const [passwordForm, setPasswordForm] = useState({

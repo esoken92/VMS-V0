@@ -103,7 +103,7 @@ checked; `vms-owner.json` is the real liveness signal.
   checks `opening + Σ movements = current_stock` for every product and
   must exit 0 — run it after touching seeds or movement code.
 - **Persona gates live in ONE place**: `lib/persona.ts` `ROUTE_ACCESS`
-  (longest-prefix) drives both middleware denies and nav visibility.
+  (longest-prefix) drives both proxy denies and nav visibility.
   Adding a builder surface? Add its prefix there — hiding nav alone is
   not enforcement. `/dashboard/forbidden` is the deny target.
 - **Authentication copy**: `components/auth/LoginForm.tsx` demo-creds
@@ -125,3 +125,13 @@ checked; `vms-owner.json` is the real liveness signal.
 - Zod at every boundary; no `any` on new code.
 - No secrets in repo; `.env` never committed.
 - Keep service secrets server-side.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

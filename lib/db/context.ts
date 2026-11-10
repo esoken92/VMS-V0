@@ -31,10 +31,10 @@ export interface AuditActor {
   impersonatorId?: string | null;
 }
 
-function safeRequestHeader(name: string): string {
+async function safeRequestHeader(name: string): Promise<string> {
   try {
     // headers() throws outside a request context (e.g. seed script, jobs).
-    return headers().get(name) ?? '';
+    return (await headers()).get(name) ?? '';
   } catch {
     return '';
   }
@@ -45,9 +45,9 @@ function safeRequestHeader(name: string): string {
  */
 export async function setAuditContext(tx: Tx, actor: AuditActor) {
   const ip =
-    safeRequestHeader('x-forwarded-for').split(',')[0]?.trim() ??
-    safeRequestHeader('x-real-ip');
-  const ua = safeRequestHeader('user-agent');
+    (await safeRequestHeader('x-forwarded-for')).split(',')[0]?.trim() ??
+    (await safeRequestHeader('x-real-ip'));
+  const ua = await safeRequestHeader('user-agent');
 
   await tx.execute(sql`SELECT set_config('request.jwt.claim.sub', ${actor.userId}, true)`);
   await tx.execute(

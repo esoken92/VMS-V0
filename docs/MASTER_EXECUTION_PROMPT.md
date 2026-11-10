@@ -28,8 +28,9 @@ can run immediately with a world-class public presentation.
   projects (Part-DB, Homebox, Snipe-IT, Carbon) — patterns only, never code.
 - **Secrets:** never commit credentials. `seed.sql` demo passwords are intentional
   and documented — do not "fix" them, but never reuse them elsewhere.
-- **Stack:** Next.js 14 App Router + TypeScript + Tailwind + Supabase
-  (Auth/Postgres/RLS/Storage) + `next-pwa` + Recharts + Zod (installed, underused).
+- **Stack:** Next.js 16 App Router + TypeScript strict + Tailwind CSS 4 +
+  Postgres/PGlite (Drizzle) + Auth.js v5 + handwritten service worker +
+  Recharts 3 + Zod. (Upgraded from Next.js 14 + Supabase + next-pwa.)
 - **Definition of done per phase:** `npx tsc --noEmit`, `npx eslint . --max-warnings=0`,
   `npm run build` all green. CI green before any push. Verify `git remote -v` +
   `git fetch` before committing.
@@ -737,7 +738,7 @@ afterthought; the PWA should feel like a native app without an app store.*
     360px screen; tables collapse to cards, filters become bottom sheets,
     forms stack; desktop gets the dense layout
 277. **Installable PWA** — manifest + icons + splash screens +
-    `display:standalone`; next-pwa already configured — finish it:
+    `display:standalone`; handwritten sw.js registered — finish it:
     offline shell, install prompt, update-available toast
 278. **Mobile app shell** — bottom tab nav (Home/Scan/Stock/Tasks/More),
     thumb-zone primary actions, collapsible header; desktop keeps sidebar

@@ -82,8 +82,9 @@ async function findEntity(
 
 export async function GET(
   _request: Request,
-  { params }: { params: { type: string; id: string } },
+  props: { params: Promise<{ type: string; id: string }> }
 ) {
+  const params = await props.params;
   let ctx;
   try {
     ctx = await requireUser();

@@ -8,7 +8,8 @@
  */
 
 import Link from 'next/link';
-import { Github, ArrowRight, Terminal } from 'lucide-react';
+import { ArrowRight, Terminal } from 'lucide-react';
+import { GithubIcon } from '@/components/icons/github';
 import { ThemeScope } from '@/components/marketing/theme-script';
 import { SiteNav } from '@/components/marketing/site-nav';
 import { FeatureGrid } from '@/components/marketing/feature-grid';
@@ -91,7 +92,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-card px-8 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-accent sm:w-auto"
               >
-                <Github className="h-5 w-5" aria-hidden="true" />
+                <GithubIcon className="h-5 w-5" aria-hidden="true" />
                 Star on GitHub
               </a>
             </div>
@@ -236,7 +237,7 @@ export default function Home() {
                   rel="noopener noreferrer"
                   className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-8 py-3.5 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
                 >
-                  <Github className="h-5 w-5" aria-hidden="true" />
+                  <GithubIcon className="h-5 w-5" aria-hidden="true" />
                   Get the code
                 </a>
                 <Link

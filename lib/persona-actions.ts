@@ -28,7 +28,7 @@ export async function enterWorkerPreview(): Promise<Result<null>> {
     if (!canPreviewAsWorker(ctx.actor.role)) {
       return fail('Only admins can use worker preview', 'FORBIDDEN');
     }
-    cookies().set(PREVIEW_COOKIE, PREVIEW_VALUE, {
+    (await cookies()).set(PREVIEW_COOKIE, PREVIEW_VALUE, {
       // NOT httpOnly — client components read it to render preview state.
       // It is downgrade-only: it can never widen what a request may do.
       httpOnly: false,
@@ -46,7 +46,7 @@ export async function enterWorkerPreview(): Promise<Result<null>> {
 export async function exitWorkerPreview(): Promise<Result<null>> {
   try {
     await requireUser();
-    cookies().delete(PREVIEW_COOKIE);
+    (await cookies()).delete(PREVIEW_COOKIE);
     return ok(null);
   } catch (err) {
     return actionError(err);

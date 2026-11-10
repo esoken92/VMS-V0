@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Search, Filter, MoreVertical, Edit, Trash2, AlertTriangle } from 'lucide-react';
+import { Plus, Search, Filter, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { listProducts, upsertProduct, deleteProduct as deleteProductAction } from '@/lib/actions/products';
 import { listSuppliers } from '@/lib/actions/suppliers';

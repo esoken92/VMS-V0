@@ -1,15 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/*
- * Design tokens — monochromatic palette, hue 210.
- * Single source of truth for every color in the app: pages and components
- * must consume these tokens (bg-card, text-muted-foreground, bg-primary…),
- * never raw palette utilities (bg-blue-600, text-gray-900).
- * Status colors (success/warning/info/destructive) are the only non-210
- * hues and exist because they carry meaning, not decoration.
- */
+@custom-variant dark (&:is(.dark *));
 
 /*
  * Design tokens — custom palette (dusty lavender / coral glow / canary /
@@ -100,6 +91,53 @@
     --sidebar-muted: 204 15% 60%;
     --sidebar-border: 204 25% 14%;
   }
+}
+
+/* Maps the channel variables above into Tailwind color tokens. `inline`
+   keeps the hsl(var(--x)) indirection so .dark swaps values at runtime. */
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-lavender: hsl(var(--lavender));
+  --color-highlight: hsl(var(--highlight));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive-bright: hsl(var(--destructive-bright));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-success-bright: hsl(var(--success-bright));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-warning-bright: hsl(var(--warning-bright));
+  --color-info: hsl(var(--info));
+  --color-info-foreground: hsl(var(--info-foreground));
+  --color-info-bright: hsl(var(--info-bright));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-muted: hsl(var(--sidebar-muted));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+
+  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 }
 
 @layer base {

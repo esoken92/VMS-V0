@@ -44,7 +44,6 @@ import {
   isEmbeddedOwnerAlive,
   VMS_DATA_DIR,
   type EmbeddedPGliteClient,
-  type EmbeddedTxClient,
 } from '../lib/db/pglite-factory';
 import { wrapPGlite } from './db-executor';
 import { runSeed } from './seed';

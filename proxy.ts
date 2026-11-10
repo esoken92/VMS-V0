@@ -1,12 +1,12 @@
 /**
- * Next.js Middleware — Auth.js (NextAuth v5) JWT session.
+ * Next.js Proxy — Auth.js (NextAuth v5) JWT session.
  * Protects routes and enforces authentication/authorization.
  *
  * Role/persona gates come from ONE place: lib/persona.ts (ROUTE_ACCESS),
  * which mirrors the per-item visibility in lib/navigation-config.ts.
  * Denied requests redirect to /dashboard/forbidden (a clean 403 page —
  * never a silent loop back to /dashboard). Server actions re-check the
- * permission matrix on every write — middleware is navigation gating,
+ * permission matrix on every write — proxy is navigation gating,
  * not the enforcement layer.
  *
  * Impersonation: the signed `vms_impersonation` cookie carries the effective
@@ -60,7 +60,7 @@ async function impersonatedRole(request: NextRequest): Promise<UserRole | null> 
 const { auth } = NextAuth(authConfig);
 
 // The auth() wrapper augments the request with `.auth` — let TS infer it.
-export default auth(async function middleware(request) {
+export default auth(async function proxy(request) {
   const { pathname } = request.nextUrl;
   const session = request.auth;
 

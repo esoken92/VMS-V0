@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Search, Shield, AlertTriangle, Eye, Download } from 'lucide-react';
+import { Search, Shield, Eye, Download } from 'lucide-react';
 import { listActivityLogs } from '@/lib/actions/audit-log';
 import type { ActivityLogDTO } from '@/lib/types';
 

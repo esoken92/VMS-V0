@@ -39,7 +39,9 @@ export function useHidWedge(
 ): void {
   // Latest callback without re-binding the listener every render.
   const onScanRef = useRef(onScan);
-  onScanRef.current = onScan;
+  useEffect(() => {
+    onScanRef.current = onScan;
+  });
 
   useEffect(() => {
     if (!enabled) return;

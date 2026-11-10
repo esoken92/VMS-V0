@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Search, ClipboardList, CheckCircle, Clock, Play, Eye } from 'lucide-react';
+import { Plus, Search, ClipboardList, CheckCircle, Play, Eye } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import {
   listStockTakes,

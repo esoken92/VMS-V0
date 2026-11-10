@@ -11,7 +11,7 @@ an audit trail that never forgets.
 
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![CI](https://github.com/esoken92/VMS-Demo-V0/actions/workflows/ci.yml/badge.svg)](https://github.com/esoken92/VMS-Demo-V0/actions/workflows/ci.yml)
-[![Next.js 14](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![Postgres 16](https://img.shields.io/badge/Postgres-16-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8)](https://web.dev/progressive-web-apps/)
@@ -117,6 +117,36 @@ as a super admin.
 | ![Ledger](public/screenshots/ledger.png) | ![Integrations](public/screenshots/integrations.png) |
 | Per-product running balance — every product reconciles: opening + movements = closing | Scoped API keys, REST v1 + OpenAPI, MCP tools for agents |
 
+### Design tokens
+
+Every color is a semantic token in
+[`app/globals.css`](app/globals.css) — components never use raw palette
+utilities. The palette is a custom five-color scheme (dusty lavender,
+coral glow, canary, pale amber, air-force blue) mapped onto roles, with
+color-blind-safe status pairs:
+
+```css
+/* app/globals.css */
+:root {
+  --primary: 17 72% 46%;      /* coral glow — buttons, links, CTAs      */
+  --sidebar: 204 30% 10%;     /* air-force blue — fixed dark rail      */
+  --success: 168 60% 28%;     /* Okabe-Ito bluish-green (CVD-safe)     */
+  --warning: 55 78% 32%;      /* pale amber family                     */
+  --info:    204 28% 40%;     /* air-force blue                        */
+  --highlight: 60 92% 61%;    /* canary — markers only, never text     */
+  --lavender: 324 24% 48%;    /* dusty lavender — secondary accent     */
+}
+/* Tailwind 4 @theme maps each channel var to a color utility */
+```
+
+```html
+<!-- components consume tokens — no hex, no bg-blue-600, anywhere -->
+<button class="bg-primary text-primary-foreground hover:bg-primary/90">
+  View demo
+</button>
+<span class="bg-success/10 text-success">In stock</span>
+```
+
 ## Features
 
 - **Storerooms by type** — cold room, dry store, secure cage, vehicle bay,
@@ -147,14 +177,15 @@ Every request walks one chain — nothing reaches the database without
 passing every gate:
 
 ```
-request → middleware → auth gate → permission check
+request → proxy (route gate) → auth gate → permission check
         → Postgres transaction → append-only audit log → UI
 ```
 
-Stack: **Next.js 14** (App Router) · **React 18** · **TypeScript strict** ·
-**Tailwind** · **Postgres 16** · **Drizzle ORM** · **Auth.js v5**
-(credentials, argon2id) · **next-pwa** ·
-**Recharts** · **Typst** PDF reports (in-process — no Chromium).
+Stack: **Next.js 16** (App Router, Turbopack) · **React 19** ·
+**TypeScript strict** · **Tailwind CSS 4** · **Postgres 16** ·
+**Drizzle ORM** · **Auth.js v5** (credentials, argon2id) ·
+**Recharts 3** · **Typst** PDF reports (in-process — no Chromium) ·
+handwritten service worker (installable PWA).
 
 Deep dive: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
 Narrative walkthrough: [docs/LOGIC_CHAIN.md](docs/LOGIC_CHAIN.md)

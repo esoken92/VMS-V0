@@ -1,6 +1,6 @@
 'use server';
 
-import { asc, eq } from 'drizzle-orm';
+import { asc } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { systemSettings } from '@/drizzle/schema';

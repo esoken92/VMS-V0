@@ -23,7 +23,6 @@ import type { ScanEntityType } from '@/drizzle/scan-schema';
 export const MAX_SCAN_LENGTH = 128;
 export const LABEL_TOKEN_PREFIX = 'vms.v1.';
 
-// eslint-disable-next-line no-control-regex -- intentional: strips C0/C1 control bytes
 const CONTROL_CHARS = /[\u0000-\u001F\u007F-\u009F]/g;
 
 /** Sanitize a raw scanned payload. Never throws. */

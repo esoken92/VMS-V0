@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { listSettings, updateSettings } from '@/lib/actions/settings';
-import { Settings, Save, CheckCircle, AlertCircle, Building, Bell, Package, Shield, Upload, X } from 'lucide-react';
+import { Save, CheckCircle, AlertCircle, Building, Bell, Package, Shield, Upload, X } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { profile, hasRole } = useAuth();
+  const { hasRole } = useAuth();
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);

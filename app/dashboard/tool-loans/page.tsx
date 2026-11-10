@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Search, LogOut, AlertCircle, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Plus, Search, LogOut, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import {
   listToolLoans,
@@ -27,6 +27,8 @@ export default function ToolLoansPage() {
   const { profile } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [toolLoans, setToolLoans] = useState<ToolLoan[]>([]);
+  // "Now" is captured when loans land so isOverdue stays a pure render check.
+  const [asOf, setAsOf] = useState(0);
   const [products, setProducts] = useState<Product[]>([]);
   const [users, setUsers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +60,7 @@ export default function ToolLoansPage() {
       const result = await listToolLoans();
       if (!result.success) throw new Error(result.error);
       setToolLoans(result.data);
+      setAsOf(Date.now());
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to load tool loans' });
     } finally {
@@ -222,7 +225,6 @@ export default function ToolLoansPage() {
   };
 
   const activeLoans = toolLoans.filter(loan => !loan.returned_at);
-  const returnedLoans = toolLoans.filter(loan => loan.returned_at);
 
   const filteredActiveLoans = activeLoans.filter(loan =>
     loan.product_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -232,7 +234,7 @@ export default function ToolLoansPage() {
   const isOverdue = (loan: ToolLoan) => {
     if (!loan.checked_out_at) return false;
     const checkoutDate = new Date(loan.checked_out_at);
-    const daysSinceCheckout = Math.floor((Date.now() - checkoutDate.getTime()) / (1000 * 60 * 60 * 24));
+    const daysSinceCheckout = Math.floor((asOf - checkoutDate.getTime()) / (1000 * 60 * 60 * 24));
     return daysSinceCheckout > 7; // Consider overdue after 7 days
   };
 

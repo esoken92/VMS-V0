@@ -91,6 +91,8 @@ const SCOPE_DESCRIPTIONS: Record<string, string> = {
 export default function IntegrationsPage() {
   const { profile } = useAuth();
   const [keys, setKeys] = useState<ApiKeyListItem[]>([]);
+  // "Now" is captured when keys land so the expired check stays pure.
+  const [asOf, setAsOf] = useState(0);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -114,6 +116,7 @@ export default function IntegrationsPage() {
       const result = await listApiKeys();
       if (!result.success) throw new Error(result.error);
       setKeys(result.data);
+      setAsOf(Date.now());
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to load keys' });
     } finally {
@@ -330,7 +333,7 @@ export default function IntegrationsPage() {
               <tbody className="divide-y divide-border">
                 {keys.map((k) => {
                   const revoked = !!k.revoked_at;
-                  const expired = !!k.expires_at && new Date(k.expires_at).getTime() <= Date.now();
+                  const expired = !!k.expires_at && new Date(k.expires_at).getTime() <= asOf;
                   return (
                     <tr key={k.id} className={revoked ? 'opacity-50' : ''}>
                       <td className="px-4 py-3 text-sm font-medium text-foreground">{k.name}</td>

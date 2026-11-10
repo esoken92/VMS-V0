@@ -7,7 +7,8 @@
  */
 
 import Link from 'next/link';
-import { Github, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import { GithubIcon } from '@/components/icons/github';
 import { ThemeScript } from './theme-script';
 
 export const GITHUB_URL = 'https://github.com/esoken92/VMS-Demo-V0';
@@ -98,7 +99,7 @@ export function SiteFooter() {
                 aria-label="VMS on GitHub"
                 className="text-muted-foreground transition-colors hover:text-foreground"
               >
-                <Github className="h-5 w-5" aria-hidden="true" />
+                <GithubIcon className="h-5 w-5" aria-hidden="true" />
               </a>
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
