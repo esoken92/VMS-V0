@@ -339,3 +339,28 @@ export interface KitDTO {
   component_count: number;
   buildable: number;
 }
+
+export interface ReportDatasetMetaDTO {
+  id: string;
+  label: string;
+  description: string;
+  columns: { key: string; label: string }[];
+  filters: {
+    key: string;
+    label: string;
+    type: 'number' | 'select';
+    options?: { value: string; label: string }[];
+    default?: string;
+    placeholder?: string;
+  }[];
+}
+
+export interface CustomReportResultDTO {
+  dataset: string;
+  label: string;
+  columns: { key: string; label: string }[];
+  rows: Record<string, string | number | null>[];
+  row_count: number;
+  capped: boolean;
+  generated_at: string;
+}

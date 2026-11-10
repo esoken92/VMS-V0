@@ -1285,7 +1285,7 @@ Status legend: ✅ verified live · ⏳ owner/hardware-gated · 🚧 roadmap ·
 | 2k RBAC | ✅ permission matrix + personas + forbidden gate |
 | 2l/2m market fit + packs | 🚧 framework seeded via wizard; packs pending |
 | 2n provisioning | ✅ 4-step wizard + feature flags + preview |
-| 2o personas/audit/reports | ✅ personas + append-only audit + verify-ledger; report builder pending |
+| 2o personas/audit/reports | ✅ personas + append-only audit + verify-ledger + report builder (8 datasets → table/CSV/Typst-PDF; covers dead-stock 59 + audit-log export 61) |
 | 3 branding/go-live | ✅ README, screenshots, LICENSE, CI, templates |
 | 4 deployment | ✅ docker-compose + PGlite + Vercel/Supabase runbook (hosted copy needs owner's Supabase project) |
 | 5 mobile/PWA | 🚧 installable shell; offline write-queue + device test pending |
