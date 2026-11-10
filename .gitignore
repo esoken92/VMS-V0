@@ -54,3 +54,7 @@ uploads/
 # embedded PGlite database (zero-install standalone mode)
 .vms-data/
 .pglite-test/
+
+# clicktest runtime state + sample renders
+.clicktest-state.json
+sample-inventory.pdf
