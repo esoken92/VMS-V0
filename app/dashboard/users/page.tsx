@@ -218,7 +218,7 @@ export default function UsersPage() {
       </div>
 
       {/* Users Table */}
-      <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
+      <div className="bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
         {loading ? (
           <div className="p-8 text-center text-muted-foreground">Loading users...</div>
         ) : (

@@ -72,8 +72,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col md:ml-64">
+      {/* Main Content — min-w-0 lets wide tables scroll instead of
+          squeezing the sticky sidebar (it sits in-flow, so no ml offset). */}
+      <div className="flex-1 min-w-0 flex flex-col">
         {/* TopBar */}
         <TopBar onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} />
 

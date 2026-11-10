@@ -85,7 +85,7 @@ await page.keyboard.press('Enter') // native form submit — works when button e
 await page.waitForFunction(() => !location.pathname.includes('/auth/login'), { timeout: 45000 }).catch(() => null)
 await new Promise((r) => setTimeout(r, 2500))
 console.log('post-login URL:', page.url())
-const errText = await page.$eval('.text-red-700, .text-red-800', (el) => el.textContent).catch(() => null)
+const errText = await page.$eval('.bg-destructive/10, .text-destructive', (el) => el.textContent).catch(() => null)
 if (errText) console.log('login error text:', errText)
 
 // Give the monitoring page real telemetry: click "Seed 24h history" once.

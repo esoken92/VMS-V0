@@ -325,7 +325,7 @@ export default function ToolLoansPage() {
       </div>
 
       {/* Active Loans Table */}
-      <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
+      <div className="bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
         <div className="px-6 py-4 border-b border-border bg-muted">
           <h2 className="text-sm font-semibold text-foreground">Active Tool Loans ({activeLoans.length})</h2>
         </div>

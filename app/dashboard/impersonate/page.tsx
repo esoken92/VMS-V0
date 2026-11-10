@@ -200,7 +200,7 @@ export default function ImpersonatePage() {
             Loading users...
           </div>
         ) : (
-          <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
+          <div className="bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
             <table className="w-full">
               <thead className="bg-muted border-b border-border">
                 <tr>

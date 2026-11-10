@@ -190,7 +190,7 @@ export default function LedgerPage() {
           )}
 
           {/* Ledger table */}
-          <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
+          <div className="bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
             <table className="w-full">
               <thead className="bg-muted border-b border-border">
                 <tr>
@@ -278,7 +278,7 @@ export default function LedgerPage() {
             </div>
           </div>
 
-          <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
+          <div className="bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
             <table className="w-full">
               <thead className="bg-muted border-b border-border">
                 <tr>

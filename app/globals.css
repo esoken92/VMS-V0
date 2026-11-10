@@ -140,6 +140,16 @@
   --radius-sm: calc(var(--radius) - 4px);
 }
 
+/* Page container — centers content and caps it at 1400px, matching the
+   Tailwind 3 `container { center: true, padding: 2rem, screens: { '2xl':
+   '1400px' } }` setting this used to live in tailwind.config.ts. */
+@utility container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1400px;
+  padding-inline: 2rem;
+}
+
 @layer base {
   * {
     @apply border-border;

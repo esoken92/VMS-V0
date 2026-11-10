@@ -58,3 +58,6 @@ uploads/
 # clicktest runtime state + sample renders
 .clicktest-state.json
 sample-inventory.pdf
+
+# headless QA sweep artifacts (screenshots + report.json)
+playtest-output/

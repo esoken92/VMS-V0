@@ -27,7 +27,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="hidden md:flex w-64 bg-sidebar text-sidebar-foreground flex-col h-screen sticky top-0 z-40">
+    <aside className="hidden md:flex w-64 shrink-0 bg-sidebar text-sidebar-foreground flex-col h-screen sticky top-0 z-40">
       {/* Logo Section */}
       <div className="p-6 border-b border-sidebar-border">
         <Link href="/dashboard" className="flex items-center gap-2">

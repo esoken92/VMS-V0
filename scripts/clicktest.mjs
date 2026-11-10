@@ -94,7 +94,7 @@ async function waitOutcome(page, successText, timeout = 15000) {
     .waitForFunction(
       (st) => {
         if (document.body.innerText.includes(st)) return 'success'
-        const err = document.querySelector('.bg-red-50')
+        const err = document.querySelector('.bg-destructive/10')
         if (err && (err.textContent || '').trim()) return `error:${err.textContent.trim()}`
         return false
       },
@@ -276,7 +276,7 @@ if (page.url().includes('/auth/login')) {
     .waitForFunction(() => !location.pathname.includes('/auth/login'), { timeout: 30000 })
     .catch(() => null)
   const errText = await page
-    .$eval('.text-red-700, .text-red-800', (el) => el.textContent)
+    .$eval('.bg-destructive/10, .text-destructive', (el) => el.textContent)
     .catch(() => null)
   if (errText) console.log('    login error text:', errText)
 }
@@ -443,7 +443,7 @@ if (WORKER_MODE) {
   await submitModal(page)
   await sleep(2500)
   const dupErr = await page.evaluate(() => {
-    const banner = document.querySelector('.bg-red-50')
+    const banner = document.querySelector('.bg-destructive/10')
     return banner ? banner.textContent.trim() : null
   })
   const crashText = await pageHasText(page, 'Internal Server Error')
@@ -773,7 +773,7 @@ if (WORKER_MODE) {
   await sleep(800)
   const onRoomDetail = page.url().match(/\/dashboard\/rooms\/[0-9a-f-]{36}/) !== null
   const roomErr = await page.evaluate(() => {
-    const banner = document.querySelector('.bg-red-50')
+    const banner = document.querySelector('.bg-destructive/10')
     return banner ? banner.textContent.trim() : null
   })
   check('storeroom create → redirects to room detail', onRoomDetail, page.url() + (roomErr ? ` err=${roomErr}` : ''))

@@ -95,7 +95,7 @@ export default function RoomsPage() {
         </div>
       </div>
 
-      <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
+      <div className="bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
         {loading ? (
           <div className="p-8 text-center text-muted-foreground">Loading rooms…</div>
         ) : (
