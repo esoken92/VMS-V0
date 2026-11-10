@@ -45,9 +45,14 @@ No telemetry, no analytics SDKs, nothing phones home.
 │   ├── auth/                 # Form components
 │   └── providers/            # AuthProvider (session/role/impersonation)
 ├── lib/
-│   ├── supabase/             # (being replaced) → Drizzle client + schema
+│   ├── db/                   # Driver select (Postgres vs embedded PGlite),
+│   │                         #   socket ownership, request-context GUCs
+│   ├── actions/              # Server actions — the write surface
+│   ├── api/                  # REST v1 handlers, OpenAPI spec, MCP glue
+│   ├── auth/                 # Roles, permission matrix, session helpers
+│   ├── scan/  mcp/  storerooms/  pdf/  hooks/  utils/
+│   ├── persona.ts            # ROUTE_ACCESS — the one persona gate map
 │   ├── navigation-config.ts  # Role-scoped sidebar items
-│   ├── offline/  hooks/  utils/
 ├── proxy.ts             # Edge gate: session + route rules
 ├── drizzle/                  # Drizzle schema + generated migrations
 ├── supabase/migrations/      # Canonical init SQL (001→00N, ordered)

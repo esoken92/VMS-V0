@@ -88,11 +88,12 @@ can run immediately with a world-class public presentation.
 ### 1b. Deliverables
 
 - **`docs/LOGIC_CHAIN.md`** — visible architecture + UX-flow document:
-  request → middleware → Supabase RLS → SECURITY DEFINER RPC → movement ledger →
-  UI update; plus the "one scan → one action" UX chain and the MCP query chain.
+  request → proxy (Auth.js JWT) → app-layer permission matrix → server
+  action → movement ledger → UI update; plus the "one scan → one action"
+  UX chain and the MCP query chain.
   This is a living artifact — write it for a smart non-engineer.
-- **`docs/ARCHITECTURE.md`** — deeper: schema map, RLS model, RPC inventory,
-  API/MCP surface, PDF pipeline.
+- **`docs/ARCHITECTURE.md`** — deeper: schema map, permission model,
+  server-action inventory, API/MCP surface, PDF pipeline.
 - **Marketing mockups/screenshots** — produce screenshot-ready pages (see Phase 3
   landing page) AND capture real screenshots via Playwright once Phase 2 core
   screens exist: front page, dashboard, MCP setup/config, API docs, PDF report.
@@ -826,8 +827,9 @@ run the core floor workflows standalone on a single PC.*
     (served from bundled assets or localhost sidecar); Rust backend =
     Axum + SQLx + SQLite (`rusqlite` acceptable for simpler queries).
     One codebase, two shells — UI never forks
-301. **Shared API contract** — the OpenAPI spec (item 65) is the
-    contract BOTH backends implement: web = Supabase RPC/PostgREST,
+301. **Shared API contract** — the OpenAPI spec (`lib/api/openapi.ts`,
+    served at `/api/v1/openapi.json`) is the contract BOTH backends
+    implement: web = Next.js route handlers + Drizzle + Postgres/Auth.js,
     offline = Rust handlers → SQLite. Same routes, same Zod-equivalent
     validation (serde + validator crate), same response shapes — this is
     what makes dual-backend feasible without a rewrite
