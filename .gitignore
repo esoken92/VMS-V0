@@ -63,3 +63,5 @@ sample-inventory.pdf
 playtest-output/
 .next-dev.log
 tsconfig.tsbuildinfo
+
+.vercel
