@@ -112,39 +112,43 @@ export async function listRoomStatuses(): Promise<Result<RoomStatusDTO[]>> {
   try {
     await requireUser();
 
-    const rooms = await db
-      .select({
-        id: storerooms.id,
-        name: storerooms.name,
-        type: storerooms.type,
-        tempMin: storerooms.tempMin,
-        tempMax: storerooms.tempMax,
-      })
-      .from(storerooms)
-      .where(eq(storerooms.active, true))
-      .orderBy(asc(storerooms.name));
-
-    // Latest temperature + humidity + overall latest reading per room.
-    const latest = executeRows<{
-      room_id: string;
-      metric: string;
-      value: string;
-      recorded_at: Date;
-    }>(
-      await db.execute(sql`
+    const [rooms, latestRes, latestAnyRes, alertCounts] = await Promise.all([
+      db
+        .select({
+          id: storerooms.id,
+          name: storerooms.name,
+          type: storerooms.type,
+          tempMin: storerooms.tempMin,
+          tempMax: storerooms.tempMax,
+        })
+        .from(storerooms)
+        .where(eq(storerooms.active, true))
+        .orderBy(asc(storerooms.name)),
+      // Latest temperature + humidity + overall latest reading per room.
+      db.execute(sql`
         SELECT DISTINCT ON (room_id, metric) room_id, metric, value, recorded_at
         FROM sensor_readings
         WHERE metric IN ('temperature', 'humidity')
         ORDER BY room_id, metric, recorded_at DESC
       `),
-    );
-    const latestAny = executeRows<{ room_id: string; recorded_at: Date }>(
-      await db.execute(sql`
+      db.execute(sql`
         SELECT DISTINCT ON (room_id) room_id, recorded_at
         FROM sensor_readings
         ORDER BY room_id, recorded_at DESC
       `),
-    );
+      db
+        .select({ roomId: alerts.roomId, count: sql<number>`count(*)` })
+        .from(alerts)
+        .where(inArray(alerts.state, ['active', 'acknowledged']))
+        .groupBy(alerts.roomId),
+    ]);
+    const latest = executeRows<{
+      room_id: string;
+      metric: string;
+      value: string;
+      recorded_at: Date;
+    }>(latestRes);
+    const latestAny = executeRows<{ room_id: string; recorded_at: Date }>(latestAnyRes);
     const tempMap = new Map<string, number>();
     const humMap = new Map<string, number>();
     for (const r of latest) {
@@ -154,12 +158,6 @@ export async function listRoomStatuses(): Promise<Result<RoomStatusDTO[]>> {
     const lastSeenMap = new Map(
       latestAny.map((r) => [r.room_id, new Date(r.recorded_at)]),
     );
-
-    const alertCounts = await db
-      .select({ roomId: alerts.roomId, count: sql<number>`count(*)` })
-      .from(alerts)
-      .where(inArray(alerts.state, ['active', 'acknowledged']))
-      .groupBy(alerts.roomId);
     const alertMap = new Map(alertCounts.map((r) => [r.roomId, Number(r.count)]));
 
     const now = Date.now();
@@ -266,6 +264,37 @@ export async function listAlerts(input: unknown): Promise<Result<AlertDTO[]>> {
   }
 }
 
+/** Fetch one alert as a DTO with room + acked-by names joined in. */
+async function alertDTOById(alertId: string): Promise<AlertDTO | null> {
+  const [row] = await db
+    .select({
+      alert: alerts,
+      roomName: storerooms.name,
+      ackedByName: profiles.fullName,
+    })
+    .from(alerts)
+    .leftJoin(storerooms, eq(alerts.roomId, storerooms.id))
+    .leftJoin(profiles, eq(alerts.ackedBy, profiles.id))
+    .where(eq(alerts.id, alertId))
+    .limit(1);
+  if (!row) return null;
+  const { alert: a, roomName, ackedByName } = row;
+  return {
+    id: a.id,
+    rule_id: a.ruleId,
+    room_id: a.roomId,
+    room_name: roomName,
+    metric: a.metric,
+    value: Number(a.value),
+    state: a.state,
+    opened_at: a.openedAt.toISOString(),
+    acked_by: a.ackedBy,
+    acked_by_name: ackedByName,
+    acked_at: a.ackedAt?.toISOString() ?? null,
+    resolved_at: a.resolvedAt?.toISOString() ?? null,
+  };
+}
+
 /** active → acknowledged. manager+. */
 export async function acknowledgeAlert(id: string): Promise<Result<AlertDTO>> {
   try {
@@ -290,24 +319,8 @@ export async function acknowledgeAlert(id: string): Promise<Result<AlertDTO>> {
     });
     if (!saved) return fail('Alert not found or not active', 'NOT_FOUND');
 
-    const res = await listAlerts({ room_id: saved.roomId, limit: 500 });
-    const dto = res.success ? res.data.find((a) => a.id === saved.id) : null;
-    return dto
-      ? ok(dto)
-      : ok({
-          id: saved.id,
-          rule_id: saved.ruleId,
-          room_id: saved.roomId,
-          room_name: null,
-          metric: saved.metric,
-          value: Number(saved.value),
-          state: saved.state,
-          opened_at: saved.openedAt.toISOString(),
-          acked_by: saved.ackedBy,
-          acked_by_name: null,
-          acked_at: saved.ackedAt?.toISOString() ?? null,
-          resolved_at: null,
-        });
+    const dto = await alertDTOById(saved.id);
+    return dto ? ok(dto) : fail('Alert not found', 'NOT_FOUND');
   } catch (err) {
     return actionError(err);
   }
@@ -338,24 +351,8 @@ export async function resolveAlert(id: string): Promise<Result<AlertDTO>> {
     });
     if (!saved) return fail('Alert not found or already resolved', 'NOT_FOUND');
 
-    const res = await listAlerts({ room_id: saved.roomId, limit: 500 });
-    const dto = res.success ? res.data.find((a) => a.id === saved.id) : null;
-    return dto
-      ? ok(dto)
-      : ok({
-          id: saved.id,
-          rule_id: saved.ruleId,
-          room_id: saved.roomId,
-          room_name: null,
-          metric: saved.metric,
-          value: Number(saved.value),
-          state: saved.state,
-          opened_at: saved.openedAt.toISOString(),
-          acked_by: saved.ackedBy,
-          acked_by_name: null,
-          acked_at: saved.ackedAt?.toISOString() ?? null,
-          resolved_at: saved.resolvedAt?.toISOString() ?? null,
-        });
+    const dto = await alertDTOById(saved.id);
+    return dto ? ok(dto) : fail('Alert not found', 'NOT_FOUND');
   } catch (err) {
     return actionError(err);
   }

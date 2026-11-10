@@ -1,6 +1,6 @@
 'use server';
 
-import { and, asc, desc, eq, isNull} from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull} from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 import { db } from '@/lib/db';
@@ -112,34 +112,38 @@ export async function checkOutTools(input: unknown): Promise<Result<{ count: num
         userId: ctx.user.id,
         impersonatorId: ctx.impersonating ? ctx.actor.id : null,
       });
-      let inserted = 0;
-      for (const toolId of data.tool_product_ids) {
-        const [product] = await tx
+
+      const ids = [...new Set(data.tool_product_ids)];
+      const [productRows, activeRows] = await Promise.all([
+        tx
           .select({ id: products.id, item_type: products.itemType })
           .from(products)
-          .where(eq(products.id, toolId))
-          .limit(1);
+          .where(inArray(products.id, ids)),
+        tx
+          .select({ tool_product_id: toolLoans.toolProductId })
+          .from(toolLoans)
+          .where(and(inArray(toolLoans.toolProductId, ids), isNull(toolLoans.returnedAt))),
+      ]);
+
+      const productById = new Map(productRows.map((p) => [p.id, p]));
+      for (const toolId of ids) {
+        const product = productById.get(toolId);
         if (!product) throw new Error('Product not found');
         if (product.item_type !== 'tool') throw new Error('Product is not a tool');
+      }
+      if (activeRows.length > 0) throw new Error('Tool is already checked out');
 
-        const [active] = await tx
-          .select({ id: toolLoans.id })
-          .from(toolLoans)
-          .where(and(eq(toolLoans.toolProductId, toolId), isNull(toolLoans.returnedAt)))
-          .limit(1);
-        if (active) throw new Error('Tool is already checked out');
-
-        await tx.insert(toolLoans).values({
+      await tx.insert(toolLoans).values(
+        ids.map((toolId) => ({
           toolProductId: toolId,
           workerProfileId: workerId,
           checkedOutByUserId: ctx.user.id,
           expectedReturnAt: expectedReturn,
           conditionOnCheckout: data.condition_on_checkout,
           notes: data.notes ?? null,
-        });
-        inserted += 1;
-      }
-      return inserted;
+        })),
+      );
+      return ids.length;
     });
 
     return ok({ count });
@@ -169,30 +173,31 @@ export async function returnTools(input: unknown): Promise<Result<{ count: numbe
         userId: ctx.user.id,
         impersonatorId: ctx.impersonating ? ctx.actor.id : null,
       });
-      let updated = 0;
-      for (const loanId of data.loan_ids) {
-        const [loan] = await tx
-          .select({
-            id: toolLoans.id,
-            worker_profile_id: toolLoans.workerProfileId,
-            returned_at: toolLoans.returnedAt,
-          })
-          .from(toolLoans)
-          .where(eq(toolLoans.id, loanId))
-          .limit(1);
+      const ids = [...new Set(data.loan_ids)];
+      const loans = await tx
+        .select({
+          id: toolLoans.id,
+          worker_profile_id: toolLoans.workerProfileId,
+          returned_at: toolLoans.returnedAt,
+        })
+        .from(toolLoans)
+        .where(inArray(toolLoans.id, ids));
+
+      const loanById = new Map(loans.map((l) => [l.id, l]));
+      for (const loanId of ids) {
+        const loan = loanById.get(loanId);
         if (!loan) throw new Error('Loan not found');
         if (loan.returned_at) throw new Error('Tool has already been returned');
         if (!canAny && loan.worker_profile_id !== ctx.user.id) {
           throw new Error('Cannot return a loan held by another user');
         }
-
-        await tx
-          .update(toolLoans)
-          .set({ returnedAt: new Date(), conditionOnReturn: data.condition_on_return })
-          .where(eq(toolLoans.id, loanId));
-        updated += 1;
       }
-      return updated;
+
+      await tx
+        .update(toolLoans)
+        .set({ returnedAt: new Date(), conditionOnReturn: data.condition_on_return })
+        .where(inArray(toolLoans.id, ids));
+      return ids.length;
     });
 
     return ok({ count });

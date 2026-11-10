@@ -106,6 +106,14 @@ checked; `vms-owner.json` is the real liveness signal.
   (longest-prefix) drives both proxy denies and nav visibility.
   Adding a builder surface? Add its prefix there — hiding nav alone is
   not enforcement. `/dashboard/forbidden` is the deny target.
+- **Query batching (Rust-port contract):** never query inside a row/item
+  loop — batch with `inArray()` + a multi-row `insert().values()` or one
+  `UPDATE/DELETE ... WHERE id IN (...)`, validating in memory first
+  (see `checkOutTools`/`returnTools` in lib/actions/tool-loans.ts).
+  Independent reads in one loader run in `Promise.all`, not sequential
+  awaits (see getDashboardStats, listRooms, listRoomStatuses, getKardex).
+  Narrow projections over `select *` — e.g. listUsers selects
+  `password_hash is not null` as a boolean rather than pulling hashes.
 - **Authentication copy**: `components/auth/LoginForm.tsx` seed-creds
   box must stay in sync with `scripts/seed.ts` accounts.
 

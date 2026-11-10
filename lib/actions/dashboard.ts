@@ -30,27 +30,25 @@ export async function getDashboardStats(): Promise<Result<DashboardStats>> {
     monthStart.setHours(0, 0, 0, 0);
     const overdueCutoff = new Date(Date.now() - 7 * 864e5); // matches UI's 7-day rule
 
-    const [productStats] = await db
-      .select({
-        total: sql<number>`count(*)`,
-        low: sql<number>`count(*) filter (where ${products.currentStock} <= ${products.minThreshold})`,
-      })
-      .from(products);
-
-    const [movementStats] = await db
-      .select({ total: sql<number>`count(*)` })
-      .from(stockMovements)
-      .where(gte(stockMovements.createdAt, monthStart));
-
-    const [loanStats] = await db
-      .select({
-        active: sql<number>`count(*)`,
-        overdue: sql<number>`count(*) filter (where ${toolLoans.checkedOutAt} < ${overdueCutoff})`,
-      })
-      .from(toolLoans)
-      .where(and(isNull(toolLoans.returnedAt)));
-
-    const recent = await db
+    const [[productStats], [movementStats], [loanStats], recent] = await Promise.all([
+      db
+        .select({
+          total: sql<number>`count(*)`,
+          low: sql<number>`count(*) filter (where ${products.currentStock} <= ${products.minThreshold})`,
+        })
+        .from(products),
+      db
+        .select({ total: sql<number>`count(*)` })
+        .from(stockMovements)
+        .where(gte(stockMovements.createdAt, monthStart)),
+      db
+        .select({
+          active: sql<number>`count(*)`,
+          overdue: sql<number>`count(*) filter (where ${toolLoans.checkedOutAt} < ${overdueCutoff})`,
+        })
+        .from(toolLoans)
+        .where(and(isNull(toolLoans.returnedAt))),
+      db
       .select({
         id: stockMovements.id,
         product_id: stockMovements.productId,
@@ -68,8 +66,9 @@ export async function getDashboardStats(): Promise<Result<DashboardStats>> {
       .from(stockMovements)
       .leftJoin(products, eq(stockMovements.productId, products.id))
       .leftJoin(profiles, eq(stockMovements.userId, profiles.id))
-      .orderBy(desc(stockMovements.createdAt))
-      .limit(5);
+        .orderBy(desc(stockMovements.createdAt))
+        .limit(5),
+    ]);
 
     return ok({
       total_products: Number(productStats?.total ?? 0),

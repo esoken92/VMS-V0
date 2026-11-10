@@ -10,6 +10,6 @@ await page.waitForFunction(() => !document.querySelector('button[type="submit"]'
 await page.keyboard.press('Enter')
 await new Promise(r => setTimeout(r, 8000))
 console.log('URL:', page.url())
-const err = await page.$eval('.bg-destructive/10, .text-destructive', el => el.textContent).catch(() => null)
+const err = await page.$eval('[class*="bg-destructive/10"], .text-destructive', el => el.textContent).catch(() => null)
 console.log('error:', err)
 await browser.close()

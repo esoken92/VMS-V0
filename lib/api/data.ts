@@ -543,39 +543,47 @@ export async function apiCheckoutTools(
       targets.push(...skuRows.map((r) => r.id));
     }
 
-    for (const toolId of targets) {
-      const [product] = await tx
+    const toolIds = [...new Set(targets)];
+    const [productRows, activeRows] = await Promise.all([
+      tx
         .select({ id: products.id, item_type: products.itemType })
         .from(products)
-        .where(eq(products.id, toolId))
-        .limit(1);
+        .where(inArray(products.id, toolIds)),
+      tx
+        .select({ tool_product_id: toolLoans.toolProductId })
+        .from(toolLoans)
+        .where(and(inArray(toolLoans.toolProductId, toolIds), isNull(toolLoans.returnedAt))),
+    ]);
+
+    const productById = new Map(productRows.map((p) => [p.id, p]));
+    for (const toolId of toolIds) {
+      const product = productById.get(toolId);
       if (!product) throw new ApiError('not_found', `Product ${toolId} not found`);
       if (product.item_type !== 'tool') {
         throw new ApiError('validation', `Product ${toolId} is not a tool`);
       }
+    }
+    if (activeRows.length > 0) {
+      throw new ApiError(
+        'conflict',
+        `Tool ${activeRows[0].tool_product_id} is already checked out`,
+      );
+    }
 
-      const [active] = await tx
-        .select({ id: toolLoans.id })
-        .from(toolLoans)
-        .where(and(eq(toolLoans.toolProductId, toolId), isNull(toolLoans.returnedAt)))
-        .limit(1);
-      if (active) {
-        throw new ApiError('conflict', `Tool ${toolId} is already checked out`);
-      }
-
-      const [loan] = await tx
-        .insert(toolLoans)
-        .values({
+    const inserted = await tx
+      .insert(toolLoans)
+      .values(
+        toolIds.map((toolId) => ({
           toolProductId: toolId,
           workerProfileId: workerId,
           checkedOutByUserId: principal.profileId,
           expectedReturnAt: expectedReturn,
           conditionOnCheckout: input.conditionOnCheckout,
           notes: input.notes ?? null,
-        })
-        .returning({ id: toolLoans.id });
-      loanIds.push(loan.id);
-    }
+        })),
+      )
+      .returning({ id: toolLoans.id });
+    loanIds.push(...inserted.map((l) => l.id));
     return { count: loanIds.length, loan_ids: loanIds };
   });
 }
@@ -622,17 +630,19 @@ export async function apiCheckinTools(
       userId: principal.profileId,
       impersonatorId: principal.impersonatorId,
     });
-    let updated = 0;
-    for (const loanId of loanIds) {
-      const [loan] = await tx
-        .select({
-          id: toolLoans.id,
-          worker_profile_id: toolLoans.workerProfileId,
-          returned_at: toolLoans.returnedAt,
-        })
-        .from(toolLoans)
-        .where(eq(toolLoans.id, loanId))
-        .limit(1);
+    const ids = [...new Set(loanIds)];
+    const loans = await tx
+      .select({
+        id: toolLoans.id,
+        worker_profile_id: toolLoans.workerProfileId,
+        returned_at: toolLoans.returnedAt,
+      })
+      .from(toolLoans)
+      .where(inArray(toolLoans.id, ids));
+
+    const loanById = new Map(loans.map((l) => [l.id, l]));
+    for (const loanId of ids) {
+      const loan = loanById.get(loanId);
       if (!loan) throw new ApiError('not_found', `Loan ${loanId} not found`);
       if (loan.returned_at) {
         throw new ApiError('conflict', `Loan ${loanId} already returned`);
@@ -640,14 +650,13 @@ export async function apiCheckinTools(
       if (!canAny && loan.worker_profile_id !== principal.profileId) {
         throw new ApiError('forbidden', 'Cannot return a loan held by another user');
       }
-
-      await tx
-        .update(toolLoans)
-        .set({ returnedAt: new Date(), conditionOnReturn: input.conditionOnReturn })
-        .where(eq(toolLoans.id, loanId));
-      updated += 1;
     }
-    return { count: updated };
+
+    await tx
+      .update(toolLoans)
+      .set({ returnedAt: new Date(), conditionOnReturn: input.conditionOnReturn })
+      .where(inArray(toolLoans.id, ids));
+    return { count: ids.length };
   });
 }
 

@@ -147,45 +147,49 @@ export async function getKardex(
     if (fromDate) entryConds.push(gte(stockMovements.createdAt, fromDate));
     if (toDate) entryConds.push(lte(stockMovements.createdAt, toDate));
 
-    const movementRows = await db
-      .select({
-        id: stockMovements.id,
-        product_id: stockMovements.productId,
-        product_sku: products.sku,
-        product_name: products.name,
-        product_unit: products.unitOfMeasure,
-        user_id: stockMovements.userId,
-        user_name: profiles.fullName,
-        type: stockMovements.type,
-        quantity: stockMovements.quantity,
-        reason: stockMovements.reason,
-        created_at: stockMovements.createdAt,
-      })
-      .from(stockMovements)
-      .leftJoin(products, eq(stockMovements.productId, products.id))
-      .leftJoin(profiles, eq(stockMovements.userId, profiles.id))
-      .where(entryConds.length ? and(...entryConds) : undefined)
-      .orderBy(asc(stockMovements.createdAt), asc(stockMovements.id))
-      .limit(ENTRY_LIMIT + 1);
+    // --- opening balances: signed sum of movements before `from` -------
+    const openConds = fromDate ? [lt(stockMovements.createdAt, fromDate)] : null;
+    if (openConds && productId) openConds.push(eq(stockMovements.productId, productId));
+
+    const [movementRows, openingRows, summaries] = await Promise.all([
+      db
+        .select({
+          id: stockMovements.id,
+          product_id: stockMovements.productId,
+          product_sku: products.sku,
+          product_name: products.name,
+          product_unit: products.unitOfMeasure,
+          user_id: stockMovements.userId,
+          user_name: profiles.fullName,
+          type: stockMovements.type,
+          quantity: stockMovements.quantity,
+          reason: stockMovements.reason,
+          created_at: stockMovements.createdAt,
+        })
+        .from(stockMovements)
+        .leftJoin(products, eq(stockMovements.productId, products.id))
+        .leftJoin(profiles, eq(stockMovements.userId, profiles.id))
+        .where(entryConds.length ? and(...entryConds) : undefined)
+        .orderBy(asc(stockMovements.createdAt), asc(stockMovements.id))
+        .limit(ENTRY_LIMIT + 1),
+      openConds
+        ? db
+            .select({
+              product_id: stockMovements.productId,
+              total: sql<string>`COALESCE(SUM(${stockMovements.quantity}), 0)`,
+            })
+            .from(stockMovements)
+            .where(and(...openConds))
+            .groupBy(stockMovements.productId)
+        : Promise.resolve([]),
+      buildSummaries(productId),
+    ]);
 
     const truncated = movementRows.length > ENTRY_LIMIT;
     if (truncated) movementRows.length = ENTRY_LIMIT;
 
-    // --- opening balances: signed sum of movements before `from` -------
     const openingByProduct = new Map<string, number>();
-    if (fromDate) {
-      const openConds = [lt(stockMovements.createdAt, fromDate)];
-      if (productId) openConds.push(eq(stockMovements.productId, productId));
-      const rows = await db
-        .select({
-          product_id: stockMovements.productId,
-          total: sql<string>`COALESCE(SUM(${stockMovements.quantity}), 0)`,
-        })
-        .from(stockMovements)
-        .where(and(...openConds))
-        .groupBy(stockMovements.productId);
-      for (const r of rows) openingByProduct.set(r.product_id, Number(r.total));
-    }
+    for (const r of openingRows) openingByProduct.set(r.product_id, Number(r.total));
 
     // --- running balance, per product ----------------------------------
     const balances = new Map<string, number>();
@@ -210,7 +214,6 @@ export async function getKardex(
       };
     });
 
-    const summaries = await buildSummaries(productId);
     const opening_balance = productId
       ? r4(openingByProduct.get(productId) ?? 0)
       : 0;

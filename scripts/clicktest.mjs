@@ -94,7 +94,7 @@ async function waitOutcome(page, successText, timeout = 15000) {
     .waitForFunction(
       (st) => {
         if (document.body.innerText.includes(st)) return 'success'
-        const err = document.querySelector('.bg-destructive/10')
+        const err = document.querySelector('[class*="bg-destructive/10"]')
         if (err && (err.textContent || '').trim()) return `error:${err.textContent.trim()}`
         return false
       },
@@ -276,7 +276,7 @@ if (page.url().includes('/auth/login')) {
     .waitForFunction(() => !location.pathname.includes('/auth/login'), { timeout: 30000 })
     .catch(() => null)
   const errText = await page
-    .$eval('.bg-destructive/10, .text-destructive', (el) => el.textContent)
+    .$eval('[class*="bg-destructive/10"], .text-destructive', (el) => el.textContent)
     .catch(() => null)
   if (errText) console.log('    login error text:', errText)
 }
@@ -441,11 +441,18 @@ if (WORKER_MODE) {
   await fillModalField(page, 'Unit of Measure', 'Each')
   await fillModalField(page, 'Issuing Unit', 'Each')
   await submitModal(page)
-  await sleep(2500)
-  const dupErr = await page.evaluate(() => {
-    const banner = document.querySelector('.bg-destructive/10')
-    return banner ? banner.textContent.trim() : null
-  })
+  const dupErr = await page
+    .waitForFunction(
+      () => {
+        const banner = document.querySelector('[class*="bg-destructive/10"]')
+        if (banner && banner.textContent.trim()) return banner.textContent.trim()
+        if (document.body.innerText.includes('already exists')) return 'duplicate rejected (text)'
+        return false
+      },
+      { timeout: 20000, polling: 300 },
+    )
+    .then((h) => h.jsonValue())
+    .catch(() => null)
   const crashText = await pageHasText(page, 'Internal Server Error')
   check('duplicate SKU → inline error (no 500)', !!dupErr && !crashText, dupErr || 'no error shown')
   await shot(page, 'product-dup-sku')
@@ -773,7 +780,7 @@ if (WORKER_MODE) {
   await sleep(800)
   const onRoomDetail = page.url().match(/\/dashboard\/rooms\/[0-9a-f-]{36}/) !== null
   const roomErr = await page.evaluate(() => {
-    const banner = document.querySelector('.bg-destructive/10')
+    const banner = document.querySelector('[class*="bg-destructive/10"]')
     return banner ? banner.textContent.trim() : null
   })
   check('storeroom create → redirects to room detail', onRoomDetail, page.url() + (roomErr ? ` err=${roomErr}` : ''))

@@ -138,32 +138,38 @@ async function upsertCounts(
     .where(inArray(products.id, ids));
   const stockById = new Map(productRows.map((p) => [p.id, Number(p.current_stock)]));
 
-  for (const c of counts) {
+  const now = new Date();
+  const rows = counts.flatMap((c) => {
     const systemQty = stockById.get(c.product_id);
-    if (systemQty === undefined) continue; // skip unknown products
+    if (systemQty === undefined) return []; // skip unknown products
     const variance = c.physical_qty === null ? null : c.physical_qty - systemQty;
-    await tx
-      .insert(stockTakeItems)
-      .values({
+    return [
+      {
         stockTakeId,
         productId: c.product_id,
         systemQty: String(systemQty),
         physicalQty: c.physical_qty === null ? null : String(c.physical_qty),
         variance: variance === null ? null : String(variance),
         countedBy,
-        countedAt: new Date(),
-      })
-      .onConflictDoUpdate({
-        target: [stockTakeItems.stockTakeId, stockTakeItems.productId],
-        set: {
-          systemQty: String(systemQty),
-          physicalQty: c.physical_qty === null ? null : String(c.physical_qty),
-          variance: variance === null ? null : String(variance),
-          countedBy,
-          countedAt: new Date(),
-        },
-      });
-  }
+        countedAt: now,
+      },
+    ];
+  });
+  if (rows.length === 0) return;
+
+  await tx
+    .insert(stockTakeItems)
+    .values(rows)
+    .onConflictDoUpdate({
+      target: [stockTakeItems.stockTakeId, stockTakeItems.productId],
+      set: {
+        systemQty: sql`excluded.system_qty`,
+        physicalQty: sql`excluded.physical_qty`,
+        variance: sql`excluded.variance`,
+        countedBy: sql`excluded.counted_by`,
+        countedAt: sql`excluded.counted_at`,
+      },
+    });
 }
 
 async function assertOpen(tx: Tx, id: string) {

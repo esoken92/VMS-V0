@@ -46,29 +46,30 @@ export async function GET() {
     await requireRole(['super_admin', 'admin', 'manager']);
 
     // Same product-snapshot query shape as getReportData (reports.ts).
-    const productRows = await db
-      .select({
-        id: products.id,
-        sku: products.sku,
-        name: products.name,
-        item_type: products.itemType,
-        current_stock: products.currentStock,
-        min_threshold: products.minThreshold,
-        average_cost: products.averageCost,
-        unit_of_measure: products.unitOfMeasure,
-        issuing_unit: products.issuingUnit,
-        zone: binLocations.zone,
-        bin_location: binLocations.binLocation,
-      })
-      .from(products)
-      .leftJoin(binLocations, eq(products.binLocationId, binLocations.id))
-      .orderBy(asc(products.sku));
-
-    const settingsRows = await db
-      .select({ value: systemSettings.value })
-      .from(systemSettings)
-      .where(eq(systemSettings.key, 'company_name'))
-      .limit(1);
+    const [productRows, settingsRows] = await Promise.all([
+      db
+        .select({
+          id: products.id,
+          sku: products.sku,
+          name: products.name,
+          item_type: products.itemType,
+          current_stock: products.currentStock,
+          min_threshold: products.minThreshold,
+          average_cost: products.averageCost,
+          unit_of_measure: products.unitOfMeasure,
+          issuing_unit: products.issuingUnit,
+          zone: binLocations.zone,
+          bin_location: binLocations.binLocation,
+        })
+        .from(products)
+        .leftJoin(binLocations, eq(products.binLocationId, binLocations.id))
+        .orderBy(asc(products.sku)),
+      db
+        .select({ value: systemSettings.value })
+        .from(systemSettings)
+        .where(eq(systemSettings.key, 'company_name'))
+        .limit(1),
+    ]);
     const orgName = settingsRows[0]?.value?.trim() || 'VMS Inventory';
 
     const groups = new Map<string, ValuationCategoryInput>();

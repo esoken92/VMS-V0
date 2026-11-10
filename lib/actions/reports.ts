@@ -16,25 +16,25 @@ export async function getReportData(days = 30): Promise<Result<ReportDataDTO>> {
     await requirePermission('reports:read');
     const since = new Date(Date.now() - Math.min(Math.max(days, 1), 365) * 864e5);
 
-    const productRows = await db
-      .select({
-        id: products.id,
-        sku: products.sku,
-        name: products.name,
-        item_type: products.itemType,
-        current_stock: products.currentStock,
-        min_threshold: products.minThreshold,
-        average_cost: products.averageCost,
-        unit_of_measure: products.unitOfMeasure,
-        issuing_unit: products.issuingUnit,
-        zone: binLocations.zone,
-        bin_location: binLocations.binLocation,
-      })
-      .from(products)
-      .leftJoin(binLocations, eq(products.binLocationId, binLocations.id))
-      .orderBy(asc(products.sku));
-
-    const movementRows = await db
+    const [productRows, movementRows] = await Promise.all([
+      db
+        .select({
+          id: products.id,
+          sku: products.sku,
+          name: products.name,
+          item_type: products.itemType,
+          current_stock: products.currentStock,
+          min_threshold: products.minThreshold,
+          average_cost: products.averageCost,
+          unit_of_measure: products.unitOfMeasure,
+          issuing_unit: products.issuingUnit,
+          zone: binLocations.zone,
+          bin_location: binLocations.binLocation,
+        })
+        .from(products)
+        .leftJoin(binLocations, eq(products.binLocationId, binLocations.id))
+        .orderBy(asc(products.sku)),
+      db
       .select({
         id: stockMovements.id,
         type: stockMovements.type,
@@ -49,9 +49,10 @@ export async function getReportData(days = 30): Promise<Result<ReportDataDTO>> {
       .from(stockMovements)
       .leftJoin(products, eq(stockMovements.productId, products.id))
       .leftJoin(profiles, eq(stockMovements.userId, profiles.id))
-      .where(and(gte(stockMovements.createdAt, since)))
-      .orderBy(desc(stockMovements.createdAt))
-      .limit(2000);
+        .where(and(gte(stockMovements.createdAt, since)))
+        .orderBy(desc(stockMovements.createdAt))
+        .limit(2000),
+    ]);
 
     return ok({
       products: productRows.map((p) => ({

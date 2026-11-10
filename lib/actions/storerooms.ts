@@ -96,72 +96,77 @@ export async function listRooms(): Promise<Result<RoomListItemDTO[]>> {
     await requireUser();
     const parent = alias(storerooms, 'parent');
 
-    const rooms = await db
-      .select({ room: storerooms, parentName: parent.name })
-      .from(storerooms)
-      .leftJoin(parent, eq(storerooms.parentId, parent.id))
-      .orderBy(asc(storerooms.name));
-
-    // Child counts
-    const childCounts = await db
-      .select({
-        parentId: storerooms.parentId,
-        count: sql<number>`count(*)`,
-      })
-      .from(storerooms)
-      .where(sql`${storerooms.parentId} IS NOT NULL`)
-      .groupBy(storerooms.parentId);
+    const [rooms, childCounts, binCounts, stockRows, latestTempsRes, alertCounts] =
+      await Promise.all([
+        db
+          .select({ room: storerooms, parentName: parent.name })
+          .from(storerooms)
+          .leftJoin(parent, eq(storerooms.parentId, parent.id))
+          .orderBy(asc(storerooms.name)),
+        // Child counts
+        db
+          .select({
+            parentId: storerooms.parentId,
+            count: sql<number>`count(*)`,
+          })
+          .from(storerooms)
+          .where(sql`${storerooms.parentId} IS NOT NULL`)
+          .groupBy(storerooms.parentId),
+        // Bin counts per room
+        db
+          .select({
+            roomId: binLocationRooms.roomId,
+            count: sql<number>`count(*)`,
+          })
+          .from(binLocationRooms)
+          .where(sql`${binLocationRooms.roomId} IS NOT NULL`)
+          .groupBy(binLocationRooms.roomId),
+        // Product counts + stock units via products.bin_location_id → room_id
+        db
+          .select({
+            roomId: binLocationRooms.roomId,
+            productCount: sql<number>`count(${products.id})`,
+            stockUnits: sql<string>`coalesce(sum(${products.currentStock}), 0)`,
+          })
+          .from(products)
+          .innerJoin(
+            binLocationRooms,
+            eq(products.binLocationId, binLocationRooms.id),
+          )
+          .where(sql`${binLocationRooms.roomId} IS NOT NULL`)
+          .groupBy(binLocationRooms.roomId),
+        // Latest temperature reading per room (DISTINCT ON is Postgres-native).
+        // db.execute() returns array rows on postgres.js but {rows} on the
+        // PGlite socket path — normalize both shapes.
+        db.execute<{
+          room_id: string;
+          value: string;
+          recorded_at: Date;
+        }>(sql`
+          SELECT DISTINCT ON (room_id) room_id, value, recorded_at
+          FROM sensor_readings
+          WHERE metric = 'temperature'
+          ORDER BY room_id, recorded_at DESC
+        `),
+        // Open (active|acknowledged) alert counts per room
+        db
+          .select({ roomId: alerts.roomId, count: sql<number>`count(*)` })
+          .from(alerts)
+          .where(inArray(alerts.state, ['active', 'acknowledged']))
+          .groupBy(alerts.roomId),
+      ]);
     const childMap = new Map(
       childCounts.map((r) => [r.parentId as string, Number(r.count)]),
     );
-
-    // Bin counts per room
-    const binCounts = await db
-      .select({
-        roomId: binLocationRooms.roomId,
-        count: sql<number>`count(*)`,
-      })
-      .from(binLocationRooms)
-      .where(sql`${binLocationRooms.roomId} IS NOT NULL`)
-      .groupBy(binLocationRooms.roomId);
     const binMap = new Map(
       binCounts.map((r) => [r.roomId as string, Number(r.count)]),
     );
-
-    // Product counts + stock units via products.bin_location_id → room_id
-    const stockRows = await db
-      .select({
-        roomId: binLocationRooms.roomId,
-        productCount: sql<number>`count(${products.id})`,
-        stockUnits: sql<string>`coalesce(sum(${products.currentStock}), 0)`,
-      })
-      .from(products)
-      .innerJoin(
-        binLocationRooms,
-        eq(products.binLocationId, binLocationRooms.id),
-      )
-      .where(sql`${binLocationRooms.roomId} IS NOT NULL`)
-      .groupBy(binLocationRooms.roomId);
     const stockMap = new Map(
       stockRows.map((r) => [
         r.roomId as string,
         { count: Number(r.productCount), units: Number(r.stockUnits) },
       ]),
     );
-
-    // Latest temperature reading per room (DISTINCT ON is Postgres-native).
-    // db.execute() returns array rows on postgres.js but {rows} on the
-    // PGlite socket path — normalize both shapes.
-    const latestTempsRes = await db.execute<{
-      room_id: string;
-      value: string;
-      recorded_at: Date;
-    }>(sql`
-      SELECT DISTINCT ON (room_id) room_id, value, recorded_at
-      FROM sensor_readings
-      WHERE metric = 'temperature'
-      ORDER BY room_id, recorded_at DESC
-    `);
     const latestTemps = executeRows<{
       room_id: string;
       value: string;
@@ -173,13 +178,6 @@ export async function listRooms(): Promise<Result<RoomListItemDTO[]>> {
         { value: Number(r.value), at: new Date(r.recorded_at) },
       ]),
     );
-
-    // Open (active|acknowledged) alert counts per room
-    const alertCounts = await db
-      .select({ roomId: alerts.roomId, count: sql<number>`count(*)` })
-      .from(alerts)
-      .where(inArray(alerts.state, ['active', 'acknowledged']))
-      .groupBy(alerts.roomId);
     const alertMap = new Map(
       alertCounts.map((r) => [r.roomId, Number(r.count)]),
     );

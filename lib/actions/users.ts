@@ -1,7 +1,7 @@
 'use server';
 
 import argon2 from 'argon2';
-import { asc, eq } from 'drizzle-orm';
+import { asc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { authUsers, profiles } from '@/drizzle/schema';
@@ -29,7 +29,7 @@ export async function listUsers(): Promise<Result<UserListItemDTO[]>> {
         email: authUsers.email,
         last_sign_in_at: authUsers.lastSignInAt,
         created_at: profiles.createdAt,
-        password_hash: profiles.passwordHash,
+        has_password: sql<boolean>`${profiles.passwordHash} is not null and ${profiles.passwordHash} <> ''`,
       })
       .from(profiles)
       .innerJoin(authUsers, eq(profiles.id, authUsers.id))
@@ -41,7 +41,7 @@ export async function listUsers(): Promise<Result<UserListItemDTO[]>> {
         full_name: r.full_name,
         role: r.role,
         email: r.email,
-        has_password: r.password_hash !== null && r.password_hash.length > 0,
+        has_password: r.has_password,
         last_sign_in_at: r.last_sign_in_at?.toISOString() ?? null,
         created_at: r.created_at?.toISOString() ?? null,
       })),

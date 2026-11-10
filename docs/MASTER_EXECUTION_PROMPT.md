@@ -636,7 +636,7 @@ Grocy ~28 granular permissions, Snipe-IT permission groups.*
 249. Roadmap page — public, signals active project.
 250. README final pass: screenshots embedded, badges, quickstart <5min,
     MCP/API highlights front-and-center, license block.
-251. `SETUP_DATABASE.md` + `.env.example` final consistency check.
+251. `docs/SETUP_DATABASE.md` + `.env.example` final consistency check.
 252. Final security re-review: secrets scan, RLS coverage, API auth on every
     route, Zod at every boundary, service-role server-only.
 253. Final verification: `npm ci` clean, tsc/lint/build green, `npm run dev`
