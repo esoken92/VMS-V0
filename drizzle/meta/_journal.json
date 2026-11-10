@@ -8,6 +8,20 @@
       "when": 0,
       "tag": "0000_local_auth",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 0,
+      "tag": "0001_scan",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1760000000000,
+      "tag": "0003_storerooms",
+      "breakpoints": true
     }
   ]
 }

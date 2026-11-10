@@ -53,6 +53,30 @@ export const navigationConfig: NavigationItem[] = [
     icon: '🗺️',
     description: 'Visual warehouse layout',
   },
+  {
+    label: 'Scan',
+    href: '/dashboard/scan',
+    icon: '📷',
+    description: 'Scan-first receive, issue & lookup',
+  },
+  {
+    label: 'Storerooms',
+    href: '/dashboard/rooms',
+    icon: '🏠',
+    description: 'Rooms, zones & access rules',
+  },
+  {
+    label: 'Monitoring',
+    href: '/dashboard/monitoring',
+    icon: '🌡️',
+    description: 'Sensors, climate & alerts',
+  },
+  {
+    label: 'Integrations',
+    href: '/dashboard/integrations',
+    icon: '🔌',
+    description: 'MCP, API keys & docs',
+  },
 ];
 
 export const adminOnlyNavigation: NavigationItem[] = [

@@ -20,6 +20,8 @@ an audit trail that never forgets.
 [Integrations](docs/INTEGRATIONS.md) ·
 [Report an issue](https://github.com/esoken92/VMS-Demo-V0/issues)
 
+![VMS landing page](public/screenshots/landing.png)
+
 </div>
 
 ---
@@ -41,19 +43,42 @@ research behind it in [docs/research/](docs/research/).
 
 ## ⚡ Quickstart — under 5 minutes
 
-**Prerequisites:** Node.js 18+ and Docker.
+**Option A — zero install (Node.js 18+ only, no Docker):**
+
+```bash
+cp .env.example .env          # set AUTH_SECRET (openssl rand -base64 32)
+npm install
+npm run dev:standalone        # → http://localhost:3000
+```
+
+`dev:standalone` uses an **embedded Postgres** (PGlite) stored in
+`./.vms-data` — on first run it bootstraps the full schema and demo
+dataset automatically, then starts Next.js. Nothing else to install.
+
+How it works: one process owns the embedded postgres and serves it over a
+localhost socket (`vms-owner.json` inside `.vms-data` is the claim file);
+every Next dev worker — and plain `npm run dev`, `npm run db:bootstrap`,
+`npm run db:seed` when `DATABASE_URL` is unset — attaches to it
+automatically, so a single `npm run dev` also works with zero services.
+Re-run `npm run db:bootstrap` to apply newly added migrations, and
+`npm run db:reset` to wipe + rebuild the store (recovery for a corrupted
+`.vms-data` — refuse while a dev server owns it).
+
+**Option B — Docker Postgres (full parity):**
 
 ```bash
 docker compose up -d        # Postgres 16 — schema auto-initialises
-cp .env.example .env        # set AUTH_SECRET (openssl rand -base64 32)
+cp .env.example .env        # set AUTH_SECRET + DATABASE_URL
 npm install && npm run dev  # → http://localhost:3000
 ```
 
 `docker-compose.yml` mounts `supabase/migrations/` into the Postgres
 container, so the schema builds itself on first boot. Load the demo
-dataset (`supabase/seed.sql`) to sign in with the accounts below — it
+dataset (`npm run db:seed`) to sign in with the accounts below — it
 seeds users, bin locations, suppliers, products, movements, tool loans,
-and stock takes.
+and stock takes. With `DATABASE_URL` set, the app always uses the real
+server (`lib/db/driver.ts` picks the driver); embedded mode is what runs
+when it's unset.
 
 > ⚠️ The seed creates **well-known public credentials**. Demos and local
 > development only — never on data you care about.
@@ -72,12 +97,13 @@ as a super admin.
 
 ## 📸 Screenshots
 
-> Real captures land in `docs/screenshots/` as the template ships —
-> the landing page already shows the frames these will fill.
+| Landing | Sign in |
+|---|---|
+| ![Landing](public/screenshots/landing.png) | ![Sign in](public/screenshots/login.png) |
 
 | Dashboard | Scan-first | Stock take |
 |---|---|---|
-| *screenshot coming soon* | *screenshot coming soon* | *screenshot coming soon* |
+| *coming soon* | *coming soon* | *coming soon* |
 | Stat cards, alerts, activity feed — every number deep-links to where you act | Camera / wedge / RFID — one scan is one action | Blind counts, variance review, cycle counts |
 
 ## ✨ Features
@@ -125,6 +151,7 @@ Narrative walkthrough: [docs/LOGIC_CHAIN.md](docs/LOGIC_CHAIN.md)
 
 | Path | What you do | Best for |
 |---|---|---|
+| **Embedded (PGlite)** | `npm run dev:standalone` — zero install, DB in `./.vms-data` | Instant evaluation, laptops without Docker |
 | **Local Docker** | `docker compose up -d` + `npm run dev` | Demos, evaluation, development |
 | **Self-hosted server** | Postgres + `npm run build && npm start` on an entry-level box (~i5/8 GB); reverse proxy for TLS | Real deployments — site servers, LAN, air-gapped |
 | **Vercel + hosted Postgres** | Deploy to Vercel, point `DATABASE_URL` at Supabase/Neon/RDS (pooler URL) | Hosted demos, teams that want managed infra |

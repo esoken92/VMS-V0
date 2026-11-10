@@ -1,0 +1,75 @@
+# VMS — Vehicle Workshop Stores / Inventory Management
+
+> Self-hosted inventory system (Next.js 14 + Postgres). This document is
+> the machine-readable manifest of its agent-facing surface. A live
+> version (with your deployment's real base URL and the current tool
+> registry) is always available at `GET /api/llms`; the OpenAPI 3.0 spec
+> is at `GET /api/v1/openapi.json`.
+
+Base URL below assumes the local default `http://localhost:3000`.
+
+## Authentication
+
+Two credentials, checked in order:
+
+1. **API key** — `Authorization: Bearer vms_…`. Scoped keys are issued at
+   `/dashboard/integrations` (create/list/revoke). The plaintext key is
+   shown once; the server stores a sha256 hash. Scopes: read | write |
+   admin — a read key cannot POST and cannot call write MCP tools.
+2. **Dashboard session cookie** — same identity, implicitly fully scoped.
+
+Either way, the owner's ROLE governs what is actually allowed (the
+permission matrix is re-checked server-side on every request).
+
+Rate limit: 60 requests/minute per key (per user for sessions);
+429 + Retry-After on excess. Error envelope:
+`{ "error": { "code": "unauthenticated|forbidden|forbidden_scope|validation|not_found|conflict|rate_limited|internal", "message": "…" } }`
+
+## MCP endpoint
+
+`POST /api/mcp` — JSON-RPC 2.0, single HTTP POST transport (no SSE).
+Methods: `initialize`, `tools/list`, `tools/call`, `resources/list`,
+`resources/read`, `ping`. Batch requests supported; notifications → 202.
+
+Tools (read = read scope; write = write scope; role matrix still applies):
+
+- `search_products` (read) — search catalog by SKU/name
+- `get_stock_level` (read) — on-hand level for one product
+- `get_product_by_barcode` (read) — lookup by code (SKU until barcode table lands)
+- `list_low_stock` (read) — everything at/below min_threshold
+- `list_loans` (read) — tool custody list
+- `list_stock_takes` (read) — stock takes with progress
+- `get_stock_take_items` (read) — counted items for a take
+- `list_storerooms` (read) — graceful not-yet-implemented (returns bin locations)
+- `run_report` (read) — stock_summary | low_stock | movements | loans
+- `post_stock_movement` (write) — append a ledger row
+- `checkout_tool` (write) — create a tool loan
+- `checkin_tool` (write) — return a tool loan
+- `start_stock_take` (write) — open a count
+
+## REST API v1
+
+Base: `/api/v1` — spec: `/api/v1/openapi.json`
+
+| Route | Methods | Scope | Notes |
+|---|---|---|---|
+| /health | GET | none | liveness + DB probe |
+| /products | GET, POST | read / write | ?q= ?item_type= ?limit= ?offset= |
+| /products/{idOrSku} | GET, PATCH | read / write | |
+| /stock | GET | read | ?product_id= ?sku= ?only_low=1 |
+| /movements | GET, POST | read / write | ledger; own rows unless read:all role |
+| /loans | GET, POST | read / write | POST ?action=return to check in |
+| /takes | GET, POST | read / write | ?id=<uuid> returns take items |
+| /low-stock | GET | read | at/below min_threshold |
+| /audit | GET | admin | + admin/super_admin role |
+| /openapi.json | GET | none | OpenAPI 3.0 spec |
+
+Quickstart:
+
+```bash
+curl -H "Authorization: Bearer vms_…" http://localhost:3000/api/v1/stock
+curl -X POST http://localhost:3000/api/mcp \
+  -H "Authorization: Bearer vms_…" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```

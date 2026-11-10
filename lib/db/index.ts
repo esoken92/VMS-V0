@@ -1,31 +1,11 @@
 /**
- * lib/db — postgres.js driver + drizzle client.
+ * lib/db — unified database client.
  *
- * postgres.js works in both Node and edge runtimes (used by server actions
- * and — if ever needed — edge middleware). The pool is shared per-process.
+ * Driver selection lives in ./driver.ts: postgres.js when DATABASE_URL is
+ * set, embedded PGlite (./.vms-data) otherwise. Both expose the same
+ * surface — `db` (drizzle) and `sqlClient`/`sql` (template tag) — so
+ * existing imports keep working unchanged. The pool/client is a
+ * per-process singleton shared across dev hot-reloads.
  */
-
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import * as schema from '@/drizzle/schema';
-
-const databaseUrl =
-  process.env.DATABASE_URL ??
-  'postgresql://vms:vms_local_dev@localhost:5432/vms';
-
-// Global singleton so Next dev hot-reloads don't exhaust connections.
-const globalForDb = globalThis as unknown as { __vmsPg?: postgres.Sql };
-
-export const sqlClient =
-  globalForDb.__vmsPg ??
-  (globalForDb.__vmsPg = postgres(databaseUrl, {
-    max: 10,
-    prepare: true,
-    idle_timeout: 20,
-    connect_timeout: 10,
-  }));
-
-export const db = drizzle(sqlClient, { schema });
-
-export { schema };
-export type DB = typeof db;
+export { db, sqlClient, sql, schema, dbDriver } from './driver';
+export type { DB, DbDriver, Schema } from './driver';

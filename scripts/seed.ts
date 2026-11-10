@@ -1,14 +1,19 @@
 /**
  * scripts/seed.ts — demo dataset for local development.
  *
- *   npm run db:seed
+ *   npm run db:seed        (targets DATABASE_URL when set, else the
+ *                           embedded PGlite store at ./.vms-data)
  *
  * What it does:
  *   1. Executes supabase/seed.sql (demo users' identity rows, bin locations,
- *      suppliers, products, stock movements, tool loans, stock takes).
- *      The file is fully idempotent (ON CONFLICT DO NOTHING / DO UPDATE).
+ *      suppliers, products, stock movements, tool loans, stock takes) — but
+ *      only on an empty dataset: parts of the file are not conflict-safe,
+ *      so it is skipped entirely when demo data is already present.
  *   2. Sets profiles.password_hash to an argon2id hash for each demo user
  *      — plain SQL cannot produce argon2, so this happens here.
+ *
+ * `runSeed(executor)` is exported so scripts/bootstrap.ts can run the exact
+ * same logic against the embedded PGlite instance it just migrated.
  *
  * SECURITY: these are well-known demo credentials. Never seed a
  * sensitive environment with them.
@@ -16,7 +21,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import argon2 from 'argon2';
-import postgres from 'postgres';
+import { createExecutor, type SqlExecutor } from './db-executor';
 
 const SEED_SQL = join(__dirname, '..', 'supabase', 'seed.sql');
 
@@ -27,40 +32,61 @@ const DEMO_USERS: Array<{ email: string; password: string }> = [
   { email: 'demo.worker@vms-demo.com', password: 'DemoWorker123!' },
 ];
 
-const url =
-  process.env.DATABASE_URL ??
-  'postgresql://vms:vms_local_dev@localhost:5432/vms';
+export async function runSeed(executor: SqlExecutor) {
+  // Idempotency guard: seed.sql is NOT fully conflict-safe (the suppliers
+  // insert has no ON CONFLICT, so a second run duplicates rows and the
+  // products' (SELECT id FROM suppliers WHERE name=...) subqueries then
+  // fail with "more than one row"). Skip the bulk file when demo data is
+  // already present — the argon2 password-hash refresh below is itself
+  // idempotent and always runs.
+  const seeded = await executor
+    .query<{ n: number | string }>('SELECT count(*) AS n FROM public.suppliers')
+    .then((rows) => Number(rows[0]?.n ?? 0) > 0)
+    .catch(() => false);
+
+  if (seeded) {
+    console.log('Demo dataset already present — skipping seed.sql (refreshing hashes only).');
+  } else {
+    console.log('Applying supabase/seed.sql ...');
+    await executor.exec(readFileSync(SEED_SQL, 'utf8'));
+  }
+
+  console.log('Setting argon2id password hashes ...');
+  for (const { email, password } of DEMO_USERS) {
+    const hash = await argon2.hash(password, { type: argon2.argon2id });
+    const updated = await executor.query<{ id: string }>(
+      `UPDATE public.profiles p
+       SET password_hash = $1
+       FROM auth.users u
+       WHERE u.email = $2 AND p.id = u.id
+       RETURNING p.id`,
+      [hash, email],
+    );
+    if (updated.length === 0) {
+      console.warn(`  ! no profile found for ${email} — was seed.sql applied?`);
+    } else {
+      console.log(`  ok  ${email}`);
+    }
+  }
+
+  console.log('Seed complete.');
+}
 
 async function main() {
-  const sql = postgres(url, { max: 1 });
+  const { executor, kind } = await createExecutor();
+  console.log(`Seed target: ${kind === 'pglite' ? 'embedded PGlite' : 'postgres.js (DATABASE_URL)'}`);
   try {
-    console.log('Applying supabase/seed.sql ...');
-    await sql.unsafe(readFileSync(SEED_SQL, 'utf8'));
-
-    console.log('Setting argon2id password hashes ...');
-    for (const { email, password } of DEMO_USERS) {
-      const hash = await argon2.hash(password, { type: argon2.argon2id });
-      const updated = await sql`
-        UPDATE public.profiles p
-        SET password_hash = ${hash}
-        FROM auth.users u
-        WHERE u.email = ${email} AND p.id = u.id
-        RETURNING p.id
-      `;
-      if (updated.count === 0) {
-        console.warn(`  ! no profile found for ${email} — was seed.sql applied?`);
-      } else {
-        console.log(`  ok  ${email}`);
-      }
-    }
-
-    console.log('Seed complete.');
+    await runSeed(executor);
   } finally {
-    await sql.end();
+    await executor.close();
   }
 }
 
-main().catch((err) => {
-  console.error('Seed failed:', err);
-  process.exit(1);
-});
+// Only run when invoked directly (`npm run db:seed` → tsx scripts/seed.ts),
+// not when imported by scripts/bootstrap.ts.
+if (process.argv[1] && /seed\.(ts|js|mjs|cjs)$/.test(process.argv[1])) {
+  main().catch((err) => {
+    console.error('Seed failed:', err);
+    process.exit(1);
+  });
+}

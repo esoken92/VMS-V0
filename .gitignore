@@ -49,3 +49,7 @@ supabase/.temp
 
 # local uploads (self-hosted storage replacement)
 uploads/
+
+# embedded PGlite database (zero-install standalone mode)
+.vms-data/
+.pglite-test/

@@ -48,11 +48,32 @@ Unset env → feature disables gracefully, UI shows "not configured".
 ## Commands
 
 ```bash
+# Zero-install path (no Docker, no Postgres): embedded PGlite at ./.vms-data
+npm run dev:standalone        # bootstraps .vms-data on first run, then next dev
+npm run db:bootstrap          # apply pending migrations + refresh demo hashes
+npm run db:reset              # wipe .vms-data + rebuild (recovery path)
+
+# Postgres path (Docker or installed server — DATABASE_URL in .env)
 docker compose up -d          # Postgres 16 (+ auto-applies migrations)
 npm install                   # after supabase deps removed
 npm run dev                   # app at localhost:3000
 npm run type-check && npm run lint && npm run build
 ```
+
+Driver selection lives in `lib/db/driver.ts`: `DATABASE_URL` set →
+postgres.js pool; unset → embedded PGlite (`./.vms-data`, gitignored).
+Both expose the same `db`/`sqlClient` surface from `@/lib/db`.
+
+Embedded multi-process ownership (`lib/db/pglite-factory.ts`): exactly one
+process owns `.vms-data` via an atomic `vms-owner.json` claim file and
+serves it on a localhost socket (@electric-sql/pglite-socket); every other
+context/process attaches over postgres.js. `next dev` runs several worker
+processes, so NEVER open a second raw `new PGlite()` on the same data dir —
+two concurrent postgres backends corrupt the WAL (observed: PANIC "could
+not locate a valid checkpoint record" → `npm run db:reset` to recover).
+For the same reason do not delete `.vms-data/postmaster.pid` while a dev
+server might be running — its pid (-42) is fake and cannot be liveness-
+checked; `vms-owner.json` is the real liveness signal.
 
 ## Definition of done
 
