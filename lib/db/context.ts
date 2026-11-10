@@ -5,8 +5,12 @@
  * rows by reading these custom settings at write time:
  *   - request.jwt.claim.sub       → activity_logs.user_id
  *   - app.impersonated_by         → activity_logs.impersonated_by_user_id
- *   - request.headers.x-client-ip → activity_logs.ip_address
- *   - request.headers.x-user-agent→ activity_logs.user_agent
+ *   - request.headers.x_client_ip → activity_logs.ip_address
+ *   - request.headers.x_user_agent→ activity_logs.user_agent
+ *
+ * NOTE: Postgres custom GUC names must be simple identifiers separated by
+ * dots — hyphens are rejected ("invalid configuration parameter name"), so
+ * these use underscores, not the literal header names.
  *
  * Supabase used to populate them from the JWT; on plain Postgres the app sets
  * them via set_config(..., is_local := true) at the start of every mutating
@@ -49,6 +53,6 @@ export async function setAuditContext(tx: Tx, actor: AuditActor) {
   await tx.execute(
     sql`SELECT set_config('app.impersonated_by', ${actor.impersonatorId ?? ''}, true)`,
   );
-  await tx.execute(sql`SELECT set_config('request.headers.x-client-ip', ${ip ?? ''}, true)`);
-  await tx.execute(sql`SELECT set_config('request.headers.x-user-agent', ${ua ?? ''}, true)`);
+  await tx.execute(sql`SELECT set_config('request.headers.x_client_ip', ${ip ?? ''}, true)`);
+  await tx.execute(sql`SELECT set_config('request.headers.x_user_agent', ${ua ?? ''}, true)`);
 }

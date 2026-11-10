@@ -47,8 +47,9 @@ BEGIN
       WHEN TG_OP IN ('INSERT', 'UPDATE') THEN to_jsonb(NEW) 
       ELSE NULL 
     END,
-    current_setting('request.headers.x-client-ip', true),
-    current_setting('request.headers.x-user-agent', true)
+    -- Custom GUC names must be dot-separated simple identifiers (no hyphens).
+    current_setting('request.headers.x_client_ip', true),
+    current_setting('request.headers.x_user_agent', true)
   );
   
   RETURN COALESCE(NEW, OLD);

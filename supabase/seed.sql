@@ -194,3 +194,17 @@ SET completed_at = NOW() - INTERVAL '3 days'
 WHERE status = 'completed';
   END IF;
 END $$;
+
+-- Demo storerooms (idempotent)
+INSERT INTO storerooms (id, name, type, description, temp_min, temp_max, capacity_units, access_level, allowed_roles, item_allowlist, feature_toggles, quarantine, active)
+VALUES
+  ('a1000000-0000-4000-8000-000000000001', 'Cold Room A', 'cold', 'Chilled goods — vaccines, perishables', 2, 8, 500, 'restricted', ARRAY['super_admin','admin','manager'], ARRAY['fluids','consumables'], '{"threshold_alerts":true,"scan_required":true,"photo_on_entry":false,"sensor_monitoring":true,"quarantine_hold":false,"access_log":true,"climate_chart":true,"door_sensor":true,"capacity_alerts":true}'::jsonb, false, true),
+  ('a1000000-0000-4000-8000-000000000002', 'Main Store', 'general', 'Primary dry-goods storeroom', NULL, NULL, 2000, 'open', ARRAY['super_admin','admin','manager','staff'], '{}', '{"threshold_alerts":false,"scan_required":false,"photo_on_entry":false,"sensor_monitoring":false,"quarantine_hold":false,"access_log":false,"climate_chart":false,"door_sensor":false,"capacity_alerts":true}'::jsonb, false, true),
+  ('a1000000-0000-4000-8000-000000000003', 'Secure Cage', 'secure', 'High-value items — controlled access', 15, 25, 100, 'locked', ARRAY['super_admin','admin'], ARRAY['tools'], '{"threshold_alerts":true,"scan_required":true,"photo_on_entry":true,"sensor_monitoring":true,"quarantine_hold":false,"access_log":true,"climate_chart":true,"door_sensor":true,"capacity_alerts":true}'::jsonb, false, true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Link a couple of bins into Cold Room A + Main Store for occupancy demo
+UPDATE bin_locations SET room_id = 'a1000000-0000-4000-8000-000000000001'
+WHERE bin_location LIKE 'A%' OR bin_location LIKE 'C%';
+UPDATE bin_locations SET room_id = 'a1000000-0000-4000-8000-000000000002'
+WHERE room_id IS NULL;

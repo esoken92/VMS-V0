@@ -149,7 +149,9 @@ export async function listRooms(): Promise<Result<RoomListItemDTO[]>> {
     );
 
     // Latest temperature reading per room (DISTINCT ON is Postgres-native).
-    const latestTemps = await db.execute<{
+    // db.execute() returns array rows on postgres.js but {rows} on the
+    // PGlite socket path — normalize both shapes.
+    const latestTempsRes = await db.execute<{
       room_id: string;
       value: string;
       recorded_at: Date;
@@ -159,6 +161,9 @@ export async function listRooms(): Promise<Result<RoomListItemDTO[]>> {
       WHERE metric = 'temperature'
       ORDER BY room_id, recorded_at DESC
     `);
+    const latestTemps = Array.isArray(latestTempsRes)
+      ? latestTempsRes
+      : ((latestTempsRes as { rows?: typeof latestTempsRes })?.rows ?? []);
     const tempMap = new Map(
       latestTemps.map((r) => [
         r.room_id,

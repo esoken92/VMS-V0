@@ -257,15 +257,15 @@ export default function LoginForm() {
         <div className="space-y-2 text-xs">
           <div className="flex justify-between items-center">
             <span className="text-purple-800 font-medium">Admin:</span>
-            <span className="text-purple-700">admin@vms.local / admin123</span>
+            <span className="text-purple-700">demo.admin@vms-demo.com / DemoAdmin123!</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-purple-800 font-medium">Manager:</span>
-            <span className="text-purple-700">manager@vms.local / manager123</span>
+            <span className="text-purple-700">demo.manager@vms-demo.com / DemoManager123!</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-purple-800 font-medium">Staff:</span>
-            <span className="text-purple-700">staff@vms.local / staff123</span>
+            <span className="text-purple-700">demo.worker@vms-demo.com / DemoWorker123!</span>
           </div>
         </div>
         <p className="text-xs text-purple-600 mt-3 italic">

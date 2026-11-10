@@ -124,25 +124,30 @@ export async function listRoomStatuses(): Promise<Result<RoomStatusDTO[]>> {
       .orderBy(asc(storerooms.name));
 
     // Latest temperature + humidity + overall latest reading per room.
-    const latest = await db.execute<{
+    // db.execute() returns array rows on postgres.js but {rows} on the
+    // PGlite socket path — normalize both shapes.
+    const rows = <T>(res: unknown): T[] =>
+      Array.isArray(res) ? (res as T[]) : ((res as { rows?: T[] })?.rows ?? []);
+    const latest = rows<{
       room_id: string;
       metric: string;
       value: string;
       recorded_at: Date;
-    }>(sql`
-      SELECT DISTINCT ON (room_id, metric) room_id, metric, value, recorded_at
-      FROM sensor_readings
-      WHERE metric IN ('temperature', 'humidity')
-      ORDER BY room_id, metric, recorded_at DESC
-    `);
-    const latestAny = await db.execute<{
-      room_id: string;
-      recorded_at: Date;
-    }>(sql`
-      SELECT DISTINCT ON (room_id) room_id, recorded_at
-      FROM sensor_readings
-      ORDER BY room_id, recorded_at DESC
-    `);
+    }>(
+      await db.execute(sql`
+        SELECT DISTINCT ON (room_id, metric) room_id, metric, value, recorded_at
+        FROM sensor_readings
+        WHERE metric IN ('temperature', 'humidity')
+        ORDER BY room_id, metric, recorded_at DESC
+      `),
+    );
+    const latestAny = rows<{ room_id: string; recorded_at: Date }>(
+      await db.execute(sql`
+        SELECT DISTINCT ON (room_id) room_id, recorded_at
+        FROM sensor_readings
+        ORDER BY room_id, recorded_at DESC
+      `),
+    );
     const tempMap = new Map<string, number>();
     const humMap = new Map<string, number>();
     for (const r of latest) {

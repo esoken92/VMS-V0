@@ -78,6 +78,12 @@
 |---|---|---|---|---|---|
 | 1 | | | | | |
 
+## Automated playtest log
+
+| Date | Scope | Findings | Fixes | Result |
+|---|---|---|---|---|
+| 2025-11-10 | Headless-Edge screenshot sweep of 12 routes as `demo.admin` on embedded PGlite | (1) `/dashboard/monitoring` crashed with `latest is not iterable` — `db.execute` returns `{rows}` on the PGlite socket path vs array on postgres.js; (2) same shape bug crashed `/dashboard/rooms` (`latestTemps.map`); (3) `POST /api/sensors/simulate` 500'd — `set_config('request.headers.x-client-ip')` uses a hyphen, rejected by Postgres GUC name rules ("two or more simple identifiers"); same invalid name read by `002_audit_triggers.sql`; (4) login page demo-creds box showed stale `admin@vms.local` accounts that don't exist in the seed; (5) Reports page shipped a literal "Chart placeholder" div; (6) headless typing raced React hydration — controlled inputs wiped on hydrate, submit never enabled | rows-normalized `db.execute` results in `lib/actions/sensors.ts` + `lib/actions/storerooms.ts`; renamed GUCs to `x_client_ip`/`x_user_agent` in `lib/db/context.ts` + audit migration; updated `LoginForm` creds to seeded accounts; real Recharts stacked-area trend chart on Reports; retry-loop in `scripts/screenshot.mjs` | 12/12 routes captured with real data; monitoring shows live temps + 24h chart; console error count 0 after fixes |
+
 ## Notes for the facilitator
 
 - Don't explain the UI beforehand — note where the tester hesitates.

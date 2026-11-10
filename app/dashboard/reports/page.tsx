@@ -1,6 +1,16 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { Calendar, TrendingUp, Package, AlertTriangle, Download, BarChart3, FileText } from 'lucide-react';
 import { getReportData } from '@/lib/actions/reports';
 import type { ReportMovementDTO, ReportProductDTO } from '@/lib/types';
@@ -90,6 +100,38 @@ export default function ReportsPage() {
 
   const topProducts = getTopProducts();
   const maxMovementCount = topProducts.length > 0 ? topProducts[0].movementCount : 1;
+
+  // Group movements per day × type for the trend chart.
+  const trendData = useMemo(() => {
+    const days = parseInt(dateRange === '1y' ? '365' : dateRange);
+    const byDay = new Map<string, { day: string; inbound: number; outbound: number; scrap: number; adjustment: number }>();
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86_400_000);
+      const key = d.toISOString().slice(0, 10);
+      byDay.set(key, { day: key.slice(5), inbound: 0, outbound: 0, scrap: 0, adjustment: 0 });
+    }
+    for (const m of movements) {
+      if (!m.created_at) continue;
+      const key = m.created_at.slice(0, 10);
+      const row = byDay.get(key);
+      if (!row) continue;
+      const t = m.type as 'inbound' | 'outbound' | 'scrap' | 'adjustment';
+      if (t in row) row[t] += Math.abs(m.quantity);
+    }
+    const data = [...byDay.values()];
+    // For year views thin out the x-axis noise — monthly buckets.
+    if (days > 90) {
+      const byMonth = new Map<string, (typeof data)[number]>();
+      for (const r of data) {
+        const key = r.day.slice(0, 2); // MM from MM-DD
+        const m = byMonth.get(key) ?? { day: key, inbound: 0, outbound: 0, scrap: 0, adjustment: 0 };
+        m.inbound += r.inbound; m.outbound += r.outbound; m.scrap += r.scrap; m.adjustment += r.adjustment;
+        byMonth.set(key, m);
+      }
+      return [...byMonth.values()];
+    }
+    return data;
+  }, [movements, dateRange]);
 
   return (
     <div className="space-y-6">
@@ -185,8 +227,33 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Stock Movement Trends</h2>
-          <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-            <p className="text-gray-500">Chart placeholder - Stock movement over time</p>
+          <div className="h-64">
+            {loading ? (
+              <div className="h-full bg-gray-50 rounded-lg flex items-center justify-center">
+                <p className="text-gray-500">Loading…</p>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trendData} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis
+                    dataKey="day"
+                    tick={{ fontSize: 11, fill: '#6b7280' }}
+                    tickLine={false}
+                    interval="preserveStartEnd"
+                  />
+                  <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} tickLine={false} axisLine={false} allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <Area type="monotone" dataKey="inbound" stackId="1" stroke="#16a34a" fill="#bbf7d0" name="Inbound" />
+                  <Area type="monotone" dataKey="outbound" stackId="1" stroke="#2563eb" fill="#bfdbfe" name="Outbound" />
+                  <Area type="monotone" dataKey="adjustment" stackId="1" stroke="#d97706" fill="#fde68a" name="Adjustment" />
+                  <Area type="monotone" dataKey="scrap" stackId="1" stroke="#dc2626" fill="#fecaca" name="Scrap" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
