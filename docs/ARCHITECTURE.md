@@ -31,6 +31,8 @@ No telemetry, no analytics SDKs, nothing phones home.
 │   ├── auth/                 # login, signup, forgot/reset password
 │   ├── dashboard/            # Protected app — one route per feature area
 │   │   ├── inventory/  stock-movements/  stock-takes/  tool-loans/
+│   │   ├── transfers/          # Bin↔bin docs + kits (014: product_stock,
+│   │   │                       #   IN-TRANSIT bin, paired ledger legs)
 │   │   ├── bin-locations/  zone-map/  suppliers/  reports/
 │   │   ├── users/  audit-log/  settings/  impersonate/  profile/
 │   │   └── layout.tsx        # Shell: Sidebar + TopBar + impersonation banner

@@ -62,6 +62,12 @@ export const navigationConfig: NavigationItem[] = [
     roles: BUILDER_ROLES, // getKardex requires stock_movements:read:all (manager+)
   },
   {
+    label: 'Transfers & Kits',
+    href: '/dashboard/transfers',
+    icon: '🚚',
+    description: 'Bin-to-bin moves and kit assembly',
+  },
+  {
     label: 'Stock Takes',
     href: '/dashboard/stock-takes',
     icon: '📋',

@@ -27,7 +27,10 @@ import {
   timestamp,
   jsonb,
   unique,
+  uniqueIndex,
   index,
+  primaryKey,
+  check,
   pgEnum,
 } from 'drizzle-orm/pg-core';
 
@@ -57,6 +60,16 @@ export const movementTypeEnum = pgEnum('movement_type', [
   'scrap',
   'tool_checkout',
   'receiving',
+  'transfer',
+  'kit_consume',
+  'kit_produce',
+]);
+
+export const transferStatusEnum = pgEnum('transfer_status', [
+  'draft',
+  'dispatched',
+  'received',
+  'cancelled',
 ]);
 
 export const stockTakeStatusEnum = pgEnum('stock_take_status', [
@@ -285,6 +298,13 @@ export const stockMovements = pgTable(
     toolLoanId: uuid('tool_loan_id').references(() => toolLoans.id, {
       onDelete: 'set null',
     }),
+    binLocationId: uuid('bin_location_id').references(() => binLocations.id, {
+      onDelete: 'set null',
+    }),
+    transferItemId: uuid('transfer_item_id').references(
+      () => transferItems.id,
+      { onDelete: 'set null' },
+    ),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   },
   (t) => [
@@ -292,6 +312,8 @@ export const stockMovements = pgTable(
     index('idx_stock_movements_user').on(t.userId),
     index('idx_stock_movements_type').on(t.type),
     index('idx_stock_movements_created_at').on(t.createdAt),
+    index('idx_stock_movements_bin').on(t.binLocationId),
+    index('idx_stock_movements_transfer_item').on(t.transferItemId),
   ],
 );
 
@@ -383,5 +405,115 @@ export const impersonationSessions = pgTable(
     index('idx_impersonation_sessions_active')
       .on(t.endedAt)
       .where(sql`${t.endedAt} IS NULL`),
+  ],
+);
+
+// ============================================================================
+// 014 — transfers + kits (per-bin projection + documents + BOM)
+// ============================================================================
+
+export const productStock = pgTable(
+  'product_stock',
+  {
+    productId: uuid('product_id')
+      .notNull()
+      .references(() => products.id, { onDelete: 'cascade' }),
+    binLocationId: uuid('bin_location_id')
+      .notNull()
+      .references(() => binLocations.id, { onDelete: 'cascade' }),
+    quantity: numeric('quantity', { precision: 15, scale: 4 })
+      .notNull()
+      .default('0'),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.productId, t.binLocationId] }),
+    index('idx_product_stock_bin').on(t.binLocationId),
+  ],
+);
+
+export const transfers = pgTable(
+  'transfers',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    transferNumber: text('transfer_number')
+      .notNull()
+      .default(sql`('TRF-' || lpad(nextval('transfer_number_seq')::text, 6, '0'))`),
+    status: transferStatusEnum('status').notNull().default('draft'),
+    fromBinLocationId: uuid('from_bin_location_id')
+      .notNull()
+      .references(() => binLocations.id),
+    toBinLocationId: uuid('to_bin_location_id')
+      .notNull()
+      .references(() => binLocations.id),
+    notes: text('notes'),
+    createdBy: uuid('created_by')
+      .notNull()
+      .references(() => profiles.id),
+    dispatchedBy: uuid('dispatched_by').references(() => profiles.id),
+    dispatchedAt: timestamp('dispatched_at', { withTimezone: true }),
+    receivedBy: uuid('received_by').references(() => profiles.id),
+    receivedAt: timestamp('received_at', { withTimezone: true }),
+    cancelledBy: uuid('cancelled_by').references(() => profiles.id),
+    cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+    cancelReason: text('cancel_reason'),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  },
+  (t) => [
+    unique().on(t.transferNumber),
+    check('transfers_bins_differ', sql`${t.fromBinLocationId} <> ${t.toBinLocationId}`),
+    index('idx_transfers_status').on(t.status),
+    index('idx_transfers_from').on(t.fromBinLocationId),
+    index('idx_transfers_to').on(t.toBinLocationId),
+  ],
+);
+
+export const transferItems = pgTable(
+  'transfer_items',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    transferId: uuid('transfer_id')
+      .notNull()
+      .references(() => transfers.id, { onDelete: 'cascade' }),
+    productId: uuid('product_id')
+      .notNull()
+      .references(() => products.id),
+    quantity: numeric('quantity', { precision: 15, scale: 4 }).notNull(),
+    dispatchedQuantity: numeric('dispatched_quantity', {
+      precision: 15,
+      scale: 4,
+    })
+      .notNull()
+      .default('0'),
+    receivedQuantity: numeric('received_quantity', {
+      precision: 15,
+      scale: 4,
+    })
+      .notNull()
+      .default('0'),
+  },
+  (t) => [
+    index('idx_transfer_items_transfer').on(t.transferId),
+    index('idx_transfer_items_product').on(t.productId),
+  ],
+);
+
+export const productComponents = pgTable(
+  'product_components',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    kitProductId: uuid('kit_product_id')
+      .notNull()
+      .references(() => products.id, { onDelete: 'cascade' }),
+    componentProductId: uuid('component_product_id')
+      .notNull()
+      .references(() => products.id, { onDelete: 'cascade' }),
+    quantity: numeric('quantity', { precision: 15, scale: 4 }).notNull(),
+  },
+  (t) => [
+    uniqueIndex('product_components_pair_key').on(t.kitProductId, t.componentProductId),
+    check('product_components_not_self', sql`${t.kitProductId} <> ${t.componentProductId}`),
+    index('idx_product_components_component').on(t.componentProductId),
   ],
 );

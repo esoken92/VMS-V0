@@ -92,7 +92,11 @@ export async function recordStockMovement(input: unknown): Promise<
       });
 
       const [product] = await tx
-        .select({ id: products.id, current_stock: products.currentStock })
+        .select({
+          id: products.id,
+          current_stock: products.currentStock,
+          bin_location_id: products.binLocationId,
+        })
         .from(products)
         .where(eq(products.id, data.product_id))
         .for('update')
@@ -112,6 +116,8 @@ export async function recordStockMovement(input: unknown): Promise<
           quantity: String(signedQty),
           reason: data.reason || null,
           scrapImageUrl: data.scrap_image_url || null,
+          // Home bin keeps the per-bin projection (product_stock) truthful.
+          binLocationId: product.bin_location_id,
         })
         .returning({ id: stockMovements.id });
 

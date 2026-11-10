@@ -5,11 +5,13 @@
  * columns arrive as strings; actions convert them to `number` here.
  */
 
-import type { UserRole, MovementType } from '@/lib/auth/roles';
+import type { UserRole } from '@/lib/auth/roles';
 
 export type { UserRole };
 export { USER_ROLES } from '@/lib/auth/roles';
 export type { ItemType, MovementType, StockTakeStatus } from '@/lib/auth/roles';
+import type { DbMovementType } from '@/lib/auth/roles';
+export type { DbMovementType };
 
 /** profiles row as consumed by the client (includes email from auth.users). */
 export interface ProfileDTO {
@@ -84,7 +86,7 @@ export interface StockMovementDTO {
   product_unit: string | null;
   user_id: string;
   user_name: string | null;
-  type: 'inbound' | 'outbound' | 'adjustment' | 'scrap' | 'tool_checkout' | 'receiving';
+  type: DbMovementType;
   quantity: number;
   reason: string | null;
   scrap_image_url: string | null;
@@ -215,7 +217,7 @@ export interface KardexEntryDTO {
   product_unit: string | null;
   user_id: string;
   user_name: string | null;
-  type: MovementType;
+  type: DbMovementType;
   quantity: number;
   running_balance: number;
   reason: string | null;
@@ -246,6 +248,8 @@ export interface ReconciliationDTO {
   adjustment: number;
   receiving: number;
   tool_checkout: number;
+  /** kit_consume + kit_produce combined (transfer legs net to zero). */
+  kit: number;
   movements_total: number;
   expected_closing: number;
   actual_stock: number;
@@ -265,4 +269,73 @@ export interface KardexDTO {
    * as GET /api/v1/reconciliation) — filtered to product_id when given.
    */
   summaries: ReconciliationDTO[];
+}
+
+// ---- Transfers + kits (014) ----
+
+export type TransferStatus = 'draft' | 'dispatched' | 'received' | 'cancelled';
+
+/** One product's quantity at a bin — the product_stock projection row. */
+export interface BinStockDTO {
+  product_id: string;
+  product_sku: string | null;
+  product_name: string | null;
+  product_unit: string | null;
+  quantity: number;
+}
+
+export interface TransferDTO {
+  id: string;
+  transfer_number: string;
+  status: TransferStatus;
+  from_bin_location_id: string;
+  from_bin_label: string | null;
+  to_bin_location_id: string;
+  to_bin_label: string | null;
+  notes: string | null;
+  created_by: string;
+  created_by_name: string | null;
+  dispatched_by: string | null;
+  dispatched_by_name: string | null;
+  dispatched_at: string | null;
+  received_by: string | null;
+  received_by_name: string | null;
+  received_at: string | null;
+  cancelled_at: string | null;
+  cancel_reason: string | null;
+  item_count: number;
+  created_at: string | null;
+}
+
+export interface TransferItemDTO {
+  id: string;
+  transfer_id: string;
+  product_id: string;
+  product_sku: string | null;
+  product_name: string | null;
+  product_unit: string | null;
+  quantity: number;
+  dispatched_quantity: number;
+  received_quantity: number;
+}
+
+/** One BOM row — component + required qty per kit unit. */
+export interface KitComponentDTO {
+  component_product_id: string;
+  product_sku: string | null;
+  product_name: string | null;
+  product_unit: string | null;
+  quantity: number;
+  component_stock: number;
+}
+
+/** A kit product + how many units current component stock can build. */
+export interface KitDTO {
+  product_id: string;
+  product_sku: string | null;
+  product_name: string | null;
+  product_unit: string | null;
+  current_stock: number;
+  component_count: number;
+  buildable: number;
 }

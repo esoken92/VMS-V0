@@ -74,6 +74,9 @@ export default function LedgerPage() {
       case 'tool_checkout': return 'bg-info/10 text-info';
       case 'scrap': return 'bg-destructive/10 text-destructive';
       case 'adjustment': return 'bg-warning/15 text-warning';
+      case 'transfer': return 'bg-primary/10 text-primary';
+      case 'kit_consume': return 'bg-warning/15 text-warning';
+      case 'kit_produce': return 'bg-success/10 text-success';
       default: return 'bg-muted text-foreground';
     }
   };
@@ -312,7 +315,7 @@ export default function LedgerPage() {
                       {fmt(s.scrap)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-muted-foreground">
-                      {fmt(s.adjustment + s.tool_checkout)}
+                      {fmt(s.adjustment + s.tool_checkout + s.kit)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-foreground">
                       {s.expected_closing}

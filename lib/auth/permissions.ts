@@ -56,7 +56,15 @@ export type Permission =
   | 'users:delete'
   | 'users:grant_super_admin'
   | 'impersonation:use'
-  | 'reports:read';
+  | 'reports:read'
+  | 'transfers:read'
+  | 'transfers:create'
+  | 'transfers:dispatch'
+  | 'transfers:receive'
+  | 'transfers:cancel'
+  | 'kits:read'
+  | 'kits:write'
+  | 'kits:assemble';
 
 export const ALL_MOVEMENT_PERMS = [
   'stock_movements:create:inbound',
@@ -77,6 +85,8 @@ const BASE_READ: Permission[] = [
   'stock_takes:read',
   'activity_logs:read',
   'receiving:read',
+  'transfers:read',
+  'kits:read',
 ];
 
 const ADMIN_PERMS: Permission[] = [
@@ -100,6 +110,12 @@ const ADMIN_PERMS: Permission[] = [
   'users:create',
   'users:update',
   'reports:read',
+  'transfers:create',
+  'transfers:dispatch',
+  'transfers:receive',
+  'transfers:cancel',
+  'kits:write',
+  'kits:assemble',
 ];
 
 const PERMISSION_MATRIX: Record<UserRole, Permission[]> = {
@@ -123,6 +139,12 @@ const PERMISSION_MATRIX: Record<UserRole, Permission[]> = {
     'receiving:write',
     'stock_movements:read:all',
     'stock_takes:write',
+    'transfers:create',
+    'transfers:dispatch',
+    'transfers:receive',
+    'transfers:cancel',
+    'kits:write',
+    'kits:assemble',
   ],
   fleet_dispatch: [
     ...BASE_READ,
@@ -135,6 +157,7 @@ const PERMISSION_MATRIX: Record<UserRole, Permission[]> = {
     'tool_loans:create', // self-checkout only (no :for_other)
     'receiving:write',
     'stock_takes:write',
+    'transfers:create', // requestor — a manager/admin dispatches it
   ],
 };
 

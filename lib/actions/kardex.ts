@@ -76,6 +76,7 @@ async function buildSummaries(productId?: string): Promise<ReconciliationDTO[]> 
       adjustment: sql<string>`COALESCE(SUM(${qty}) FILTER (WHERE ${type} = 'adjustment'), 0)`,
       receiving: sql<string>`COALESCE(SUM(${qty}) FILTER (WHERE ${type} = 'receiving'), 0)`,
       tool_checkout: sql<string>`COALESCE(SUM(${qty}) FILTER (WHERE ${type} = 'tool_checkout'), 0)`,
+      kit: sql<string>`COALESCE(SUM(${qty}) FILTER (WHERE ${type} IN ('kit_consume','kit_produce')), 0)`,
       total: sql<string>`COALESCE(SUM(${qty}), 0)`,
     })
     .from(stockMovements)
@@ -101,6 +102,7 @@ async function buildSummaries(productId?: string): Promise<ReconciliationDTO[]> 
       adjustment: r4(Number(a?.adjustment ?? 0)),
       receiving: r4(Number(a?.receiving ?? 0)),
       tool_checkout: r4(Number(a?.tool_checkout ?? 0)),
+      kit: r4(Number(a?.kit ?? 0)),
       movements_total: expected,
       expected_closing: expected,
       actual_stock: actual,

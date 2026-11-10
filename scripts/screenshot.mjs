@@ -29,6 +29,7 @@ const SHOTS = [
   ['rooms', '/dashboard/rooms'],
   ['monitoring', '/dashboard/monitoring'],
   ['stock-takes', '/dashboard/stock-takes'],
+  ['transfers', '/dashboard/transfers'],
   ['tool-loans', '/dashboard/tool-loans'],
   ['zone-map', '/dashboard/zone-map'],
   ['ledger', '/dashboard/ledger'],

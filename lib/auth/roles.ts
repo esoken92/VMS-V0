@@ -25,6 +25,16 @@ export const MOVEMENT_TYPES = [
 ] as const;
 export type MovementType = (typeof MOVEMENT_TYPES)[number];
 
+// System-written legs — created by transfer/kit flows, never by the manual
+// record-movement form (recordSchema stays limited to MOVEMENT_TYPES).
+export const SYSTEM_MOVEMENT_TYPES = [
+  'transfer',
+  'kit_consume',
+  'kit_produce',
+] as const;
+export type SystemMovementType = (typeof SYSTEM_MOVEMENT_TYPES)[number];
+export type DbMovementType = MovementType | SystemMovementType;
+
 export const STOCK_TAKE_STATUSES = ['open', 'completed'] as const;
 export type StockTakeStatus = (typeof STOCK_TAKE_STATUSES)[number];
 

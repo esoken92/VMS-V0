@@ -1274,7 +1274,7 @@ Status legend: ✅ verified live · ⏳ owner/hardware-gated · 🚧 roadmap ·
 | 1a–1b research | ✅ done (docs/research + logic-chain) |
 | 2a tech debt | ✅ done — as Phase 0 reboot: Postgres+Drizzle+Auth.js |
 | 2b stock engine | ✅ ledger + Kardex + reconciliation (41/41 in click audit) |
-| 2c workflows | 🚧 partial — core receive/issue/count/loan; transfers/kits pending |
+| 2c workflows | 🚧 partial — receive/issue/count/loan done; ✅ transfer docs + kits/BOM + transit bin + bulk move (migration 014); PO/issue-slips/returns/pick-lists pending |
 | 2d UX | 🚧 partial — responsive, provisioning banner, re-themed |
 | 2e labels/scan | ✅ scan engine + HMAC labels + scan UX |
 | 2f docs/PDF | ✅ Typst valuation report; more report types pending |

@@ -74,6 +74,59 @@ async function main(): Promise<number> {
     }
 
     console.log('OK — every product reconciles: opening + movements = current stock.');
+
+    // Second invariant (014 migration): the per-bin projection must agree —
+    // Σ product_stock.quantity per product == current_stock, and no bin may
+    // hold negative stock. Skipped when the table doesn't exist yet.
+    const hasProjection = await executor.query<{ exists: boolean }>(`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = 'product_stock'
+      ) AS exists
+    `);
+    if (hasProjection[0]?.exists) {
+      // Products with a home bin must have ALL stock located; products
+      // without one are legitimately unlocated (no product_stock rows).
+      const binRows = await executor.query<LedgerRow>(`
+        SELECT p.sku,
+               p.name,
+               COALESCE(SUM(s.quantity), 0)::float8 AS movements_total,
+               p.current_stock::float8              AS actual_stock
+        FROM public.products p
+        LEFT JOIN public.product_stock s ON s.product_id = p.id
+        WHERE p.bin_location_id IS NOT NULL
+        GROUP BY p.id, p.sku, p.name, p.current_stock
+        ORDER BY p.sku
+      `);
+      const unlocated = await executor.query<{ sku: string }>(`
+        SELECT p.sku FROM public.product_stock s
+        JOIN public.products p ON p.id = s.product_id
+        WHERE p.bin_location_id IS NULL AND s.quantity <> 0
+      `);
+      const binDrift = binRows
+        .map((r) => ({
+          sku: r.sku,
+          name: r.name,
+          bin_total: r4(Number(r.movements_total)),
+          actual_stock: r4(Number(r.actual_stock)),
+          drift: r4(Number(r.actual_stock) - Number(r.movements_total)),
+        }))
+        .filter((r) => r.drift !== 0);
+      const negative = await executor.query<{ sku: string; bin: string; quantity: number }>(`
+        SELECT p.sku, s.bin_location_id::text AS bin, s.quantity::float8 AS quantity
+        FROM public.product_stock s JOIN public.products p ON p.id = s.product_id
+        WHERE s.quantity < 0
+      `);
+      if (binDrift.length > 0 || negative.length > 0 || unlocated.length > 0) {
+        if (binDrift.length > 0) console.table(binDrift);
+        if (negative.length > 0) console.table(negative);
+        if (unlocated.length > 0) console.table(unlocated);
+        console.error('BIN-LEVEL DRIFT DETECTED — product_stock disagrees with the ledger.');
+        return 1;
+      }
+      console.log(`OK — per-bin projection reconciles (${binRows.length} located products), no negative bins.`);
+    }
+
     return 0;
   } finally {
     await executor.close();

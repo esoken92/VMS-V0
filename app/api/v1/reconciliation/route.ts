@@ -135,6 +135,9 @@ export const GET = withApi('read', async (req, principal) => {
     windowSql
       ? sql<string>`COALESCE(SUM(${qty}) FILTER (WHERE ${type} = ${t} AND ${windowSql}), 0)`
       : sql<string>`COALESCE(SUM(${qty}) FILTER (WHERE ${type} = ${t}), 0)`;
+  const kitSql = windowSql
+    ? sql<string>`COALESCE(SUM(${qty}) FILTER (WHERE ${type} IN ('kit_consume','kit_produce') AND ${windowSql}), 0)`
+    : sql<string>`COALESCE(SUM(${qty}) FILTER (WHERE ${type} IN ('kit_consume','kit_produce')), 0)`;
 
   const aggRows = await db
     .select({
@@ -148,6 +151,7 @@ export const GET = withApi('read', async (req, principal) => {
       adjustment: typeSum('adjustment'),
       receiving: typeSum('receiving'),
       tool_checkout: typeSum('tool_checkout'),
+      kit: kitSql,
       movements_total: windowSql
         ? sql<string>`COALESCE(SUM(${qty}) FILTER (WHERE ${windowSql}), 0)`
         : sql<string>`COALESCE(SUM(${qty}), 0)`,
@@ -177,6 +181,7 @@ export const GET = withApi('read', async (req, principal) => {
       adjustment: r4(Number(a?.adjustment ?? 0)),
       receiving: r4(Number(a?.receiving ?? 0)),
       tool_checkout: r4(Number(a?.tool_checkout ?? 0)),
+      kit: r4(Number(a?.kit ?? 0)),
       movements_total: movements,
       expected_closing: expected,
       actual_stock: actual,
