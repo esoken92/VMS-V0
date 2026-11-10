@@ -47,6 +47,7 @@ export const INDUSTRY_LABELS: Record<IndustryId, string> = {
 
 export const STOCK_CHARACTERISTICS = [
   'perishable',
+  'temperature_sensitive',
   'serialized',
   'hazmat',
   'tools_loanable',
@@ -57,6 +58,7 @@ export type StockCharacteristic = (typeof STOCK_CHARACTERISTICS)[number];
 
 export const STOCK_CHARACTERISTIC_LABELS: Record<StockCharacteristic, string> = {
   perishable: 'Perishable / expiry-tracked',
+  temperature_sensitive: 'Temperature-sensitive (cold chain)',
   serialized: 'Serialized items',
   hazmat: 'Hazmat / regulated',
   tools_loanable: 'Loanable tools & equipment',
@@ -132,6 +134,7 @@ export const PACKS = [
   'tool_crib',
   'industrial_stock',
   'asset_issue',
+  'cold_chain',
 ] as const;
 export type PackId = (typeof PACKS)[number];
 
@@ -143,13 +146,19 @@ export const PACK_LABELS: Record<PackId, string> = {
   tool_crib: 'Tool crib (checkout/return custody)',
   industrial_stock: 'Industrial stock (MRO & raw material)',
   asset_issue: 'Asset issue (departmental issuing)',
+  cold_chain: 'Cold chain (temperature-monitored storage)',
 };
 
 const INDUSTRY_PACKS: Record<IndustryId, readonly PackId[]> = {
   general_retail: ['stock_control'],
-  food_beverage: ['stock_control', 'perishables'],
-  pharma_medical: ['stock_control', 'perishables', 'regulated_items'],
-  automotive_fleet: ['fleet_parts', 'tool_crib'],
+  // HACCP/receiving-temp verification is M-tier for food service
+  // (docs/research/04 §9) → cold_chain.
+  food_beverage: ['stock_control', 'perishables', 'cold_chain'],
+  // Pharma needs temperature-zone mapping (§1) on top of expiry+regulated.
+  pharma_medical: ['stock_control', 'perishables', 'regulated_items', 'cold_chain'],
+  // Fleet operations run a real storeroom: bins, counts and consumables
+  // (fluids/filters) alongside parts + tools → stock_control included.
+  automotive_fleet: ['stock_control', 'fleet_parts', 'tool_crib'],
   tools_equipment: ['tool_crib'],
   agriculture: ['stock_control', 'perishables'],
   manufacturing: ['stock_control', 'industrial_stock'],
@@ -169,6 +178,11 @@ export const FEATURE_FLAGS = [
   'vehicle_parts',
   'consumables',
   'stock_takes',
+  'cold_chain',
+  'quarantine',
+  'work_order_ref',
+  'asset_lifecycle',
+  'funding_codes',
 ] as const;
 export type FeatureFlag = (typeof FEATURE_FLAGS)[number];
 
@@ -181,6 +195,11 @@ export const FEATURE_FLAG_LABELS: Record<FeatureFlag, string> = {
   vehicle_parts: 'Vehicle parts',
   consumables: 'Consumables',
   stock_takes: 'Stock takes',
+  cold_chain: 'Cold chain monitoring',
+  quarantine: 'Quarantine workflow',
+  work_order_ref: 'Job / work-order references',
+  asset_lifecycle: 'Asset lifecycle & warranty',
+  funding_codes: 'Funding / grant codes',
 };
 
 // ============================================================================
@@ -238,6 +257,22 @@ export function packsForIndustries(industries: readonly IndustryId[]): PackId[] 
 }
 
 /**
+ * Effective packs for a full provisioning input — the industry-derived set
+ * plus any pack a stock declaration implies. Declaring temperature-sensitive
+ * stock activates the cold_chain bundle (monitored cold/frozen storerooms,
+ * excursion reporting) even when no picked industry implies it — e.g. a
+ * general retailer stocking chilled goods.
+ */
+export function packsForInput(
+  industries: readonly IndustryId[],
+  stock: { temperature_sensitive?: boolean },
+): PackId[] {
+  const set = new Set<PackId>(packsForIndustries(industries));
+  if (stock.temperature_sensitive) set.add('cold_chain');
+  return [...set].sort();
+}
+
+/**
  * Compute the enabled feature-flag set for a provisioning config.
  * Pass `null` (unprovisioned) to get every flag — the template ships
  * fully enabled until the wizard narrows it.
@@ -251,15 +286,17 @@ export function deriveFeatures(
   if (!config) return new Set(FEATURE_FLAGS);
 
   const packs = new Set<PackId>(
-    config.packs ?? packsForIndustries(config.industries ?? []),
+    config.packs ?? packsForInput(config.industries ?? [], config.stock),
   );
   const { stock, policies } = config;
   const flags = new Set<FeatureFlag>();
 
   const expiry =
     stock.perishable ||
+    stock.temperature_sensitive || // cold-chain stock is perishable (§1.6, §9.1)
     packs.has('perishables') ||
     packs.has('regulated_items') ||
+    packs.has('cold_chain') ||
     policies.expiry_policy !== 'none';
   if (expiry) flags.add('expiry');
 
@@ -274,7 +311,8 @@ export function deriveFeatures(
   if (
     stock.serialized ||
     packs.has('regulated_items') ||
-    packs.has('fleet_parts')
+    packs.has('fleet_parts') ||
+    packs.has('industrial_stock') // critical spares are serial+lot tracked (§6.5)
   ) {
     flags.add('serialization');
   }
@@ -287,7 +325,13 @@ export function deriveFeatures(
     flags.add('hazmat');
   }
 
-  if (stock.tools_loanable || packs.has('tool_crib')) {
+  if (
+    stock.tools_loanable ||
+    packs.has('tool_crib') ||
+    // Departmental/member issue is the same checkout-return machinery —
+    // school equipment lending (§3.1) and gov custody (§4.1) ride on it.
+    packs.has('asset_issue')
+  ) {
     flags.add('tool_loans');
   }
 
@@ -318,6 +362,50 @@ export function deriveFeatures(
     flags.add('stock_takes');
   }
 
+  // ---- Phase-2m vertical depth (M-priority items in docs/research/04) ----
+
+  // Cold chain: temperature-monitored zones + excursion evidence.
+  // M for pharma (§1.7), healthcare vaccine storage (§2.5), food
+  // receiving-temp + HACCP (§9.3–4), labs storage classes (§8.3).
+  if (packs.has('cold_chain') || stock.temperature_sensitive) {
+    flags.add('cold_chain');
+  }
+
+  // Quarantine → release gating. M for pharma (§1.5), food
+  // reject-at-receipt (§9.3), hazmat holds; the enforce+quarantine expiry
+  // policy explicitly asks for it.
+  if (
+    packs.has('regulated_items') ||
+    stock.hazmat ||
+    policies.expiry_policy === 'enforce_fefo_quarantine'
+  ) {
+    flags.add('quarantine');
+  }
+
+  // Job / work-order reference on issues — cost attribution. M for fleet
+  // (item 165), construction job allocation (§5.1–2), MRO WO lifecycle
+  // (§6.3); also the project-costing dimension (item 333).
+  if (
+    packs.has('fleet_parts') ||
+    packs.has('industrial_stock') ||
+    stock.vehicle_parts
+  ) {
+    flags.add('work_order_ref');
+  }
+
+  // Asset lifecycle states + warranty/service tracking. M for education
+  // (§3.5), gov property book (§4.1), fleet service contracts (items
+  // 179–181).
+  if (packs.has('asset_issue') || packs.has('fleet_parts')) {
+    flags.add('asset_lifecycle');
+  }
+
+  // Funding-source tagging on receipts/issues + by-grant reporting.
+  // M for education grants (§3.4, GASB 34) and gov property (§4.6).
+  if (packs.has('asset_issue')) {
+    flags.add('funding_codes');
+  }
+
   return flags;
 }
 
@@ -335,6 +423,11 @@ export const REPORT_PACKS = [
   'tool_custody',
   'hazmat_register',
   'fleet_usage',
+  'temp_excursion',
+  'quarantine_register',
+  'job_costing',
+  'asset_register',
+  'funding_report',
 ] as const;
 export type ReportPackId = (typeof REPORT_PACKS)[number];
 
@@ -346,6 +439,11 @@ export const REPORT_PACK_LABELS: Record<ReportPackId, string> = {
   tool_custody: 'Tool custody & overdue loans',
   hazmat_register: 'Hazmat / regulated register',
   fleet_usage: 'Fleet parts usage',
+  temp_excursion: 'Temperature excursion log',
+  quarantine_register: 'Quarantine & disposition register',
+  job_costing: 'Job / work-order costing',
+  asset_register: 'Asset & property register',
+  funding_report: 'Funding source report',
 };
 
 export function deriveReportPacks(
@@ -360,6 +458,12 @@ export function deriveReportPacks(
   if (flags.has('tool_loans')) packs.add('tool_custody');
   if (flags.has('hazmat')) packs.add('hazmat_register');
   if (flags.has('vehicle_parts')) packs.add('fleet_usage');
+  // Vertical report families (docs/research/04, M-priority):
+  if (flags.has('cold_chain')) packs.add('temp_excursion'); // §1.7, §9.4
+  if (flags.has('quarantine')) packs.add('quarantine_register'); // §1.5, §9.3
+  if (flags.has('work_order_ref')) packs.add('job_costing'); // §5.1, item 333
+  if (flags.has('asset_lifecycle')) packs.add('asset_register'); // §3.5, §4.1
+  if (flags.has('funding_codes')) packs.add('funding_report'); // §3.4
   return [...packs];
 }
 
@@ -374,6 +478,26 @@ export interface ProvisioningNavChange {
   visible: boolean;
 }
 
+/**
+ * A storeroom row the apply step proposes to create — resolved from
+ * storeroomPresetsFor(packs) in lib/industry-presets (type/temp defaults
+ * come from lib/storerooms/room-types). `exists` = a same-named room
+ * (case-insensitive) is already present and will be skipped on apply.
+ * Kept structurally loose (string enums) so this file stays dependency-free.
+ */
+export interface ProvisioningStoreroomPreset {
+  name: string;
+  /** storerooms.type enum value (cold, frozen, dock, …). */
+  type: string;
+  type_label: string;
+  description: string;
+  temp_min: number | null;
+  temp_max: number | null;
+  access_level: string;
+  quarantine: boolean;
+  exists: boolean;
+}
+
 export interface ProvisioningPreview {
   /** Normalized config (packs derived) — what Apply would store. */
   config: Omit<ProvisioningConfig, 'applied_at'>;
@@ -382,6 +506,17 @@ export interface ProvisioningPreview {
   /** Feature-gated nav items and their resulting visibility. */
   nav: ProvisioningNavChange[];
   report_packs: ReportPackId[];
+  /** Storerooms the apply step will create (skipped when `exists`). */
+  storeroom_presets: ProvisioningStoreroomPreset[];
+}
+
+/** applyProvisioning() result — the stored config plus what it seeded. */
+export interface ApplyProvisioningResult {
+  config: ProvisioningConfig;
+  /** Names of storerooms created by this apply (pack-derived presets). */
+  storerooms_created: string[];
+  /** Preset names skipped because a same-named room already existed. */
+  storerooms_skipped: string[];
 }
 
 // ============================================================================

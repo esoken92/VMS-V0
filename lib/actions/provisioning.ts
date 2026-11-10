@@ -5,13 +5,19 @@
  *
  *   getProvisioning()          → stored ProvisioningConfig | null
  *                                (null = unprovisioned → "Finish setup" banner)
- *   getProvisioningPreview(in) → the computed flag/nav/report diff the
- *                                Review step renders — writes NOTHING.
- *   applyProvisioning(in)      → validates, derives packs, upserts the
- *                                'provisioning' row in instance_config.
- *                                The instance_config audit trigger writes
- *                                the activity_logs entry (with the actor
- *                                set via setAuditContext in the same tx).
+ *   getProvisioningPreview(in) → the computed flag/nav/report/storeroom
+ *                                diff the Review step renders — writes NOTHING.
+ *   applyProvisioning(in)      → validates, derives packs (incl. the
+ *                                cold_chain pack for temperature-sensitive
+ *                                stock), upserts the 'provisioning' row in
+ *                                instance_config, and — in the same
+ *                                transaction — creates the pack-derived
+ *                                storeroom presets, skipping rooms whose
+ *                                name already exists (case-insensitive, so
+ *                                re-runs and seed rooms stay idempotent).
+ *                                The instance_config + storerooms audit
+ *                                triggers write the activity_logs entries
+ *                                (actor set via setAuditContext in the tx).
  *   getFeatureFlags()          → derived FeatureFlag[] for consumers
  *                                (nav, product form). null = unprovisioned.
  *   get/saveProductTracking    → per-product tracking attributes the
@@ -28,11 +34,12 @@
  *                      writes follow product permissions, not config ones.
  */
 
-import { eq } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { instanceConfig } from '@/drizzle/instance-config-schema';
-import { setAuditContext } from '@/lib/db/context';
+import { storerooms } from '@/drizzle/storerooms-schema';
+import { setAuditContext, type Tx } from '@/lib/db/context';
 import {
   requirePermission,
   requireRole,
@@ -41,10 +48,11 @@ import {
 import { BUILDER_ROLES } from '@/lib/persona';
 import { actionError, fail, ok, type Result } from '@/lib/result';
 import { navigationConfig } from '@/lib/navigation-config';
+import { storeroomPresetsFor } from '@/lib/industry-presets';
 import {
   deriveFeatures,
   deriveReportPacks,
-  packsForIndustries,
+  packsForInput,
   EXPIRY_POLICIES,
   FEATURE_FLAGS,
   INDUSTRIES,
@@ -52,6 +60,7 @@ import {
   PICKING_ENFORCEMENTS,
   PICKING_STRATEGIES,
   VALUATION_METHODS,
+  type ApplyProvisioningResult,
   type FeatureFlag,
   type ProductTrackingAttributes,
   type ProvisioningConfig,
@@ -68,6 +77,9 @@ const TRACKING_KEY_PREFIX = 'product_tracking.';
 
 const stockSchema = z.object({
   perishable: z.boolean(),
+  // Optional with default so configs stored before this characteristic
+  // existed still parse (older rows simply default to false).
+  temperature_sensitive: z.boolean().default(false),
   serialized: z.boolean(),
   hazmat: z.boolean(),
   tools_loanable: z.boolean(),
@@ -167,7 +179,7 @@ export async function getProvisioningPreview(
     await requireUser();
     const data = provisioningInputSchema.parse(input);
 
-    const packs = packsForIndustries(data.industries);
+    const packs = packsForInput(data.industries, data.stock);
     const flags = deriveFeatures({ stock: data.stock, policies: data.policies, packs });
     const enabledFlags = FEATURE_FLAGS.filter((f) => flags.has(f));
     const disabledFlags = FEATURE_FLAGS.filter((f) => !flags.has(f));
@@ -179,6 +191,11 @@ export async function getProvisioningPreview(
         href: item.href,
         visible: flags.has(item.feature!),
       }));
+
+    // Proposed storerooms — mark which already exist so Apply is
+    // honest about what it will actually create (idempotent by name).
+    const roomPresets = storeroomPresetsFor(packs);
+    const existing = await existingRoomNames(roomPresets.map((r) => r.name));
 
     return ok({
       config: {
@@ -192,6 +209,17 @@ export async function getProvisioningPreview(
       disabled_flags: disabledFlags,
       nav,
       report_packs: deriveReportPacks(flags),
+      storeroom_presets: roomPresets.map((r) => ({
+        name: r.name,
+        type: r.type,
+        type_label: r.type_label,
+        description: r.description,
+        temp_min: r.temp_min,
+        temp_max: r.temp_max,
+        access_level: r.access_level,
+        quarantine: r.quarantine,
+        exists: existing.has(r.name.trim().toLowerCase()),
+      })),
     });
   } catch (err) {
     return actionError(err);
@@ -199,24 +227,49 @@ export async function getProvisioningPreview(
 }
 
 // ============================================================================
-// APPLY — upsert the 'provisioning' row. Audit trigger logs the write.
+// APPLY — upsert the 'provisioning' row + create pack-proposed storerooms.
+// Audit triggers log both writes. Room creation is additive and idempotent:
+// a preset whose name (case-insensitive) already exists is skipped, never
+// overwritten — user-created or previously seeded rooms are left untouched.
 // ============================================================================
+
+/** A queryable scope — the db client or an open transaction. */
+type Queryable = Pick<typeof db, 'select'> | Tx;
+
+/** Lower-cased names of existing rooms among `names` (one batched query). */
+async function existingRoomNames(
+  names: readonly string[],
+  q: Queryable = db,
+): Promise<Set<string>> {
+  if (names.length === 0) return new Set();
+  const lowered = names.map((n) => n.trim().toLowerCase());
+  const rows = await q
+    .select({ name: storerooms.name })
+    .from(storerooms)
+    .where(inArray(sql`lower(${storerooms.name})`, lowered));
+  return new Set(rows.map((r) => r.name.trim().toLowerCase()));
+}
 
 export async function applyProvisioning(
   input: unknown,
-): Promise<Result<ProvisioningConfig>> {
+): Promise<Result<ApplyProvisioningResult>> {
   try {
     const ctx = await requireRole([...BUILDER_ROLES]);
     const data = provisioningInputSchema.parse(input);
 
+    const packs = packsForInput(data.industries, data.stock);
     const config: ProvisioningConfig = {
       v: 1,
       industries: data.industries,
-      packs: packsForIndustries(data.industries),
+      packs,
       stock: data.stock,
       policies: data.policies,
       applied_at: new Date().toISOString(),
     };
+
+    const roomPresets = storeroomPresetsFor(packs);
+    const storeroomsCreated: string[] = [];
+    const storeroomsSkipped: string[] = [];
 
     await db.transaction(async (tx) => {
       await setAuditContext(tx, {
@@ -239,9 +292,45 @@ export async function applyProvisioning(
             updatedAt: new Date(),
           },
         });
+
+      // Seed the pack-proposed storerooms — same name check the preview
+      // reported, re-evaluated inside the transaction.
+      const existing = await existingRoomNames(
+        roomPresets.map((r) => r.name),
+        tx,
+      );
+      const toInsert = roomPresets.filter((r) => {
+        if (existing.has(r.name.trim().toLowerCase())) {
+          storeroomsSkipped.push(r.name);
+          return false;
+        }
+        storeroomsCreated.push(r.name);
+        return true;
+      });
+      if (toInsert.length > 0) {
+        await tx.insert(storerooms).values(
+          toInsert.map((r) => ({
+            name: r.name,
+            type: r.type,
+            description: r.description,
+            tempMin: r.temp_min === null ? null : String(r.temp_min),
+            tempMax: r.temp_max === null ? null : String(r.temp_max),
+            accessLevel: r.access_level,
+            allowedRoles: r.allowed_roles,
+            featureToggles: r.feature_toggles,
+            quarantine: r.quarantine,
+            active: true,
+            updatedAt: new Date(),
+          })),
+        );
+      }
     });
 
-    return ok(config);
+    return ok({
+      config,
+      storerooms_created: storeroomsCreated,
+      storerooms_skipped: storeroomsSkipped,
+    });
   } catch (err) {
     return actionError(err);
   }

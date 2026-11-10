@@ -5,10 +5,14 @@
  * by ROUTE_ACCESS in lib/persona.ts + middleware).
  *
  * Steps: Industry → What you stock → Stock policies → Review & apply.
+ * Step 0 opens with one-click presets (lib/industry-presets) that prefill
+ * every downstream answer — all fields stay editable afterwards.
  * The Review step renders getProvisioningPreview() — a server-computed
- * diff of flags/nav/report packs — and Apply writes via
- * applyProvisioning(). Re-running the wizard pre-fills from the stored
- * config. Disabling a feature hides UI only; no data is ever deleted.
+ * diff of flags/nav/report packs/storerooms — and Apply writes via
+ * applyProvisioning(), which also creates the proposed storerooms
+ * (same-named rooms are skipped). Re-running the wizard pre-fills from
+ * the stored config. Disabling a feature hides UI only; no data is ever
+ * deleted.
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -44,7 +48,7 @@ import {
   STOCK_CHARACTERISTIC_LABELS,
   VALUATION_METHODS,
   VALUATION_METHOD_LABELS,
-  packsForIndustries,
+  packsForInput,
   type ExpiryPolicy,
   type IndustryId,
   type PickingEnforcement,
@@ -54,11 +58,17 @@ import {
   type StockCharacteristics,
   type ValuationMethod,
 } from '@/lib/features';
+import {
+  PRESET_DEFINITIONS,
+  type IndustryPreset,
+  type PresetId,
+} from '@/lib/industry-presets';
 
 const STEPS = ['Industry', 'What you stock', 'Stock policies', 'Review & apply'] as const;
 
 const EMPTY_STOCK: StockCharacteristics = {
   perishable: false,
+  temperature_sensitive: false,
   serialized: false,
   hazmat: false,
   tools_loanable: false,
@@ -79,12 +89,14 @@ export default function SetupWizardPage() {
   const [industries, setIndustries] = useState<IndustryId[]>([]);
   const [stock, setStock] = useState<StockCharacteristics>(EMPTY_STOCK);
   const [policies, setPolicies] = useState<ProvisioningInput['policies']>(DEFAULT_POLICIES);
+  const [selectedPreset, setSelectedPreset] = useState<PresetId | null>(null);
   const [loading, setLoading] = useState(true);
   const [previouslyAppliedAt, setPreviouslyAppliedAt] = useState<string | null>(null);
   const [preview, setPreview] = useState<ProvisioningPreview | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [applying, setApplying] = useState(false);
   const [applied, setApplied] = useState(false);
+  const [createdRooms, setCreatedRooms] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const input: ProvisioningInput = useMemo(
@@ -93,8 +105,8 @@ export default function SetupWizardPage() {
   );
 
   const impliedPacks = useMemo(
-    () => packsForIndustries(industries),
-    [industries],
+    () => packsForInput(industries, stock),
+    [industries, stock],
   );
 
   // Pre-fill from the stored config when the wizard is re-run.
@@ -151,6 +163,14 @@ export default function SetupWizardPage() {
       cur.includes(id) ? cur.filter((i) => i !== id) : [...cur, id],
     );
 
+  // A preset is just a pre-filled answer-set — every answer stays editable.
+  const applyPresetAnswers = (preset: IndustryPreset) => {
+    setSelectedPreset(preset.id);
+    setIndustries([...preset.industries]);
+    setStock({ ...EMPTY_STOCK, ...preset.stock });
+    setPolicies({ ...DEFAULT_POLICIES, ...preset.policies });
+  };
+
   const toggleStock = (key: keyof StockCharacteristics) =>
     setStock((cur) => ({ ...cur, [key]: !cur[key] }));
 
@@ -168,7 +188,8 @@ export default function SetupWizardPage() {
       }
       // Publish the new flag set so nav/forms reflect it immediately
       // (visibleNavItems reads the client cache on next render).
-      setClientFeatures([...deriveFeatures(res.data)]);
+      setClientFeatures([...deriveFeatures(res.data.config)]);
+      setCreatedRooms(res.data.storerooms_created);
       setApplied(true);
       router.refresh();
     } catch {
@@ -197,6 +218,11 @@ export default function SetupWizardPage() {
             reflect your selections — nothing was deleted; re-run the wizard
             any time to change it.
           </p>
+          {createdRooms.length > 0 && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Storerooms created: {createdRooms.join(' · ')}
+            </p>
+          )}
           <div className="mt-6 flex items-center justify-center gap-3">
             <Link
               href="/dashboard"
@@ -261,6 +287,38 @@ export default function SetupWizardPage() {
       <div className="bg-card rounded-lg border border-border shadow-sm p-6">
         {step === 0 && (
           <div>
+            <h2 className="text-lg font-semibold text-foreground mb-1">
+              Start from a preset
+            </h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Optional — one click fills in every answer below. You can
+              adjust anything afterwards.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+              {PRESET_DEFINITIONS.map((preset) => {
+                const active = selectedPreset === preset.id;
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => applyPresetAnswers(preset)}
+                    className={`text-left p-3 rounded-lg border transition-colors ${
+                      active
+                        ? 'border-primary bg-info/10'
+                        : 'border-border hover:bg-muted'
+                    }`}
+                  >
+                    <div className="text-sm font-medium text-foreground">
+                      {preset.label}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {preset.description}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
             <h2 className="text-lg font-semibold text-foreground mb-1">
               Which industries does this deployment serve?
             </h2>
@@ -522,6 +580,37 @@ export default function SetupWizardPage() {
                       </span>
                     ))}
                   </div>
+                </div>
+                <div>
+                  <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
+                    Storerooms
+                  </h3>
+                  {preview.storeroom_presets.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      No storerooms proposed for this selection.
+                    </p>
+                  ) : (
+                    <ul className="text-sm space-y-1">
+                      {preview.storeroom_presets.map((r) => (
+                        <li key={r.name} className="flex items-center gap-2">
+                          <span
+                            className={`h-2 w-2 rounded-full ${r.exists ? 'bg-input' : 'bg-success'}`}
+                          />
+                          <span className={r.exists ? 'text-muted-foreground' : 'text-foreground'}>
+                            {r.name}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {r.type_label}
+                            {r.temp_min !== null && r.temp_max !== null
+                              ? ` · ${r.temp_min}–${r.temp_max} °C`
+                              : ''}
+                            {' · '}
+                            {r.exists ? 'already exists — kept as-is' : 'will be created'}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
                 <div className="text-sm text-muted-foreground bg-muted rounded-lg p-3">
                   <p>
