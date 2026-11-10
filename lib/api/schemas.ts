@@ -52,6 +52,7 @@ export const createMovementBody = z
     quantity: z.number().positive('Quantity must be positive'),
     reason: z.string().max(1000).nullable().optional(),
     scrap_image_url: z.string().max(1000).nullable().optional(),
+    client_ref: z.string().trim().min(1).max(64).nullable().optional(),
   })
   .refine((v) => v.product_id || v.sku, {
     message: 'Provide product_id or sku',

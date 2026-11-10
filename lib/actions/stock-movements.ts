@@ -84,6 +84,9 @@ export async function recordStockMovement(input: unknown): Promise<
       data.type === 'inbound' || data.type === 'receiving' || data.type === 'adjustment'
         ? Math.abs(data.quantity)
         : -Math.abs(data.quantity);
+    // tool_checkout is a custody audit record (custody lives on tool_loans):
+    // it never changes owned stock — same semantics as scanToolToggle.
+    const isCustody = data.type === 'tool_checkout';
 
     const result = await db.transaction(async (tx) => {
       await setAuditContext(tx, {
@@ -104,7 +107,7 @@ export async function recordStockMovement(input: unknown): Promise<
       if (!product) throw new Error('Product not found');
 
       const newStock = Number(product.current_stock) + signedQty;
-      if (newStock < 0) throw new Error('Insufficient stock');
+      if (!isCustody && newStock < 0) throw new Error('Insufficient stock');
 
       const [movement] = await tx
         .insert(stockMovements)
@@ -121,15 +124,17 @@ export async function recordStockMovement(input: unknown): Promise<
         })
         .returning({ id: stockMovements.id });
 
-      await tx
-        .update(products)
-        .set({
-          currentStock: String(newStock),
-          lastMovementDate: new Date(),
-        })
-        .where(eq(products.id, data.product_id));
+      if (!isCustody) {
+        await tx
+          .update(products)
+          .set({
+            currentStock: String(newStock),
+            lastMovementDate: new Date(),
+          })
+          .where(eq(products.id, data.product_id));
+      }
 
-      return { movement_id: movement.id, new_stock: newStock };
+      return { movement_id: movement.id, new_stock: isCustody ? Number(product.current_stock) : newStock };
     });
 
     return ok(result);

@@ -12,6 +12,9 @@
  *   opening (0 at the epoch) + Σ stock_movements.quantity
  *     == products.current_stock
  *
+ * tool_checkout legs are excluded from the sum: they are custody audit
+ * records (custody lives on tool_loans) and never move stock.
+ *
  * — the same math as GET /api/v1/reconciliation and lib/actions/kardex.ts.
  * Prints a table of products with drift != 0 and exits non-zero, so it can
  * gate CI: any stock write that bypasses stock_movements (or a movement
@@ -38,7 +41,7 @@ async function main(): Promise<number> {
     const rows = await executor.query<LedgerRow>(`
       SELECT p.sku,
              p.name,
-             COALESCE(SUM(m.quantity), 0)::float8 AS movements_total,
+             COALESCE(SUM(m.quantity) FILTER (WHERE m.type <> 'tool_checkout'), 0)::float8 AS movements_total,
              p.current_stock::float8              AS actual_stock
       FROM public.products p
       LEFT JOIN public.stock_movements m ON m.product_id = p.id

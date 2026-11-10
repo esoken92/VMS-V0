@@ -166,6 +166,13 @@ export function buildOpenApiSpec(baseUrl: string) {
             quantity: { type: 'number', exclusiveMinimum: 0 },
             reason: { type: 'string', nullable: true },
             scrap_image_url: { type: 'string', nullable: true },
+            client_ref: {
+              type: 'string',
+              maxLength: 64,
+              nullable: true,
+              description:
+                'Caller idempotency key: a retry with the same value returns the original movement instead of posting twice.',
+            },
           },
         },
         ProductUpsert: {

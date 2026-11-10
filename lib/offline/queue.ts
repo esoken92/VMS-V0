@@ -90,6 +90,9 @@ export async function flushOne(m: QueuedMovement): Promise<'ok' | 'permanent' | 
         type: m.type,
         quantity: m.quantity,
         reason: m.reason,
+        // Idempotency: a retry after a lost response returns the original
+        // movement instead of double-posting (server dedupes by client_ref).
+        client_ref: m.id,
       }),
     });
     if (res.ok) return 'ok';

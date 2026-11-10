@@ -34,6 +34,7 @@ export const POST = withApi('write', async (req, principal) => {
     quantity: body.quantity,
     reason: body.reason,
     scrapImageUrl: body.scrap_image_url,
+    clientRef: body.client_ref,
   });
   return apiJson({ data: result }, { status: 201 });
 });

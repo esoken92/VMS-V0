@@ -305,6 +305,7 @@ export const stockMovements = pgTable(
       () => transferItems.id,
       { onDelete: 'set null' },
     ),
+    clientRef: text('client_ref'),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   },
   (t) => [
@@ -314,6 +315,9 @@ export const stockMovements = pgTable(
     index('idx_stock_movements_created_at').on(t.createdAt),
     index('idx_stock_movements_bin').on(t.binLocationId),
     index('idx_stock_movements_transfer_item').on(t.transferItemId),
+    uniqueIndex('ux_stock_movements_client_ref')
+      .on(t.clientRef)
+      .where(sql`client_ref is not null`),
   ],
 );
 

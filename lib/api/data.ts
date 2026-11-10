@@ -362,6 +362,7 @@ export interface CreateMovementInput {
   quantity: number;
   reason?: string | null;
   scrapImageUrl?: string | null;
+  clientRef?: string | null;
 }
 
 export async function apiCreateMovement(
@@ -382,6 +383,9 @@ export async function apiCreateMovement(
     input.type === 'inbound' || input.type === 'receiving' || input.type === 'adjustment'
       ? Math.abs(input.quantity)
       : -Math.abs(input.quantity);
+  // tool_checkout is a custody audit record (custody lives on tool_loans):
+  // it never changes owned stock — same semantics as the scan/loan paths.
+  const isCustody = input.type === 'tool_checkout';
 
   return db.transaction(async (tx) => {
     await setAuditContext(tx, {
@@ -390,7 +394,11 @@ export async function apiCreateMovement(
     });
 
     const [product] = await tx
-      .select({ id: products.id, current_stock: products.currentStock })
+      .select({
+        id: products.id,
+        current_stock: products.currentStock,
+        bin_location_id: products.binLocationId,
+      })
       .from(products)
       .where(
         input.productId
@@ -401,8 +409,21 @@ export async function apiCreateMovement(
       .limit(1);
     if (!product) throw new ApiError('not_found', 'Product not found');
 
+    // Idempotent replay: a retried write (e.g. the offline queue after a
+    // lost response) returns the original movement instead of double-posting.
+    if (input.clientRef) {
+      const [dup] = await tx
+        .select({ id: stockMovements.id })
+        .from(stockMovements)
+        .where(eq(stockMovements.clientRef, input.clientRef))
+        .limit(1);
+      if (dup) {
+        return { movement_id: dup.id, new_stock: Number(product.current_stock) };
+      }
+    }
+
     const newStock = Number(product.current_stock) + signedQty;
-    if (newStock < 0) throw new ApiError('conflict', 'Insufficient stock');
+    if (!isCustody && newStock < 0) throw new ApiError('conflict', 'Insufficient stock');
 
     const [movement] = await tx
       .insert(stockMovements)
@@ -414,15 +435,22 @@ export async function apiCreateMovement(
         quantity: String(signedQty),
         reason: input.reason || null,
         scrapImageUrl: input.scrapImageUrl || null,
+        binLocationId: product.bin_location_id,
+        clientRef: input.clientRef || null,
       })
       .returning({ id: stockMovements.id });
 
-    await tx
-      .update(products)
-      .set({ currentStock: String(newStock), lastMovementDate: new Date() })
-      .where(eq(products.id, product.id));
+    if (!isCustody) {
+      await tx
+        .update(products)
+        .set({ currentStock: String(newStock), lastMovementDate: new Date() })
+        .where(eq(products.id, product.id));
+    }
 
-    return { movement_id: movement.id, new_stock: newStock };
+    return {
+      movement_id: movement.id,
+      new_stock: isCustody ? Number(product.current_stock) : newStock,
+    };
   });
 }
 
