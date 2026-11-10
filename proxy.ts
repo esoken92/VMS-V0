@@ -47,6 +47,8 @@ const PUBLIC_ROUTES = [
   '/icon.svg',
   '/apple-icon.png',
   '/opengraph-image.png',
+  '/humans.txt',
+  '/.well-known/security.txt',
 ];
 
 const IMPERSONATION_COOKIE = 'vms_impersonation';

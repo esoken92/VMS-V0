@@ -1,0 +1,9 @@
+/* TEAM */
+Maintainer: Kurt Jonathan
+Contact: https://github.com/esoken92
+Org: ESO Industries
+
+/* SITE */
+Last update: 2026-11-10
+Stack: Next.js 16, React 19, Tailwind 4, Postgres + Drizzle, Auth.js
+License: CC BY-NC-SA 4.0

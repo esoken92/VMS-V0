@@ -31,6 +31,8 @@ export const metadata: Metadata = {
     template: '%s · VMS V0',
   },
   description: DESCRIPTION,
+  alternates: { canonical: '/' },
+  manifest: '/manifest.json',
   keywords: [
     'inventory management',
     'open source',

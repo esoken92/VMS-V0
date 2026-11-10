@@ -46,12 +46,33 @@ function SectionHeading({
   );
 }
 
+const JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareSourceCode',
+  name: 'VMS V0',
+  description:
+    'Free, open-source, self-hosted inventory management template: typed storerooms, scan-first barcode/QR/RFID workflows, an append-only ledger, RBAC, stock takes, tool loans, sensor monitoring, and a REST + MCP API.',
+  codeRepository: 'https://github.com/esoken92/VMS-V0',
+  license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+  programmingLanguage: 'TypeScript',
+  runtimePlatform: 'Node.js',
+  author: {
+    '@type': 'Person',
+    name: 'Kurt Jonathan',
+    url: 'https://github.com/esoken92',
+  },
+};
+
 export default function Home() {
   return (
     <ThemeScope
       id="vms-landing"
       className="min-h-screen bg-background text-foreground"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+      />
       <SiteNav />
 
       <main>
