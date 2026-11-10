@@ -113,6 +113,11 @@ as a super admin.
 | ![Storerooms](public/screenshots/rooms.png) | ![Monitoring](public/screenshots/monitoring.png) | ![Reports](public/screenshots/reports.png) |
 | Typed rooms — cold, secure, hazmat — with access levels and occupancy | Live temp/humidity telemetry, excursion alerts, sensor simulator | KPIs, movement trends, valuation, CSV export |
 
+| Transfers | Report builder | API docs |
+|---|---|---|
+| ![Transfers](public/screenshots/transfers.png) | ![Report builder](public/screenshots/report-builder.png) | ![API docs](public/screenshots/docs.png) |
+| Dispatch → in-transit → receive, with full custody chain | Eight datasets → table, CSV, or PDF in one screen | `/docs` — the live OpenAPI spec, rendered offline |
+
 | Stock ledger (Kardex) | Integrations & MCP |
 |---|---|
 | ![Ledger](public/screenshots/ledger.png) | ![Integrations](public/screenshots/integrations.png) |
@@ -160,16 +165,33 @@ color-blind-safe status pairs:
   `staff`; permission checks run server-side, always
 - **Stock takes** — blind counts, variance review before posting, cycle
   counting
+- **Transfers & kits** — bin-to-bin and storeroom moves with
+  dispatch/receive custody through an in-transit bin, bulk move-all,
+  and kit assembly/disassembly that posts component + kit legs
+  atomically (stock is never silently relocated)
 - **Tool loans** — check-out/check-in with condition logging and overdue
   tracking
 - **Sensor monitoring** — temp/humidity/door telemetry per room,
   threshold rules, excursion alerts, built-in sensor simulator
 - **REST API + MCP server** — scoped API keys; agents and assistants can
   query stock through MCP tools with the same permission checks
+- **Custom report builder** — eight datasets (snapshot, movements, low
+  stock, dead stock, takes, loans, transfers, audit) to table, CSV, or
+  Typst PDF, scoped by permission
+- **Guided provisioning** — a re-runnable setup wizard + six industry
+  presets (Pharmacy, Tool Library, Cold Storage…) provision menus,
+  fields, policies, and starter storerooms so nobody sees what they
+  don't need
+- **Browsable API docs** — `/docs` renders the live OpenAPI spec in-app:
+  zero external deps, air-gap safe
 - **Installable PWA + offline write-queue** — scans for receive/issue
   queue in IndexedDB when the network drops and replay through the REST
-  API on reconnect (idempotent, pending count on the scan page); the
-  Rust companion under `offline/` is the deep-offline target
+  API on reconnect (idempotent, pending count on the scan page)
+- **Rust offline companion** — `offline/` holds the dual-artifact
+  scaffold: an Axum + SQLite backend implementing the same `/api/v1`
+  contract for PCs with no usable server, plus the Tauri shell that
+  wraps this same frontend — see
+  [docs/OFFLINE-APP.md](docs/OFFLINE-APP.md) for the parity matrix
 - **Self-hosted** — Postgres + one Next.js app. No telemetry, no per-seat
   fees, your data stays yours
 
