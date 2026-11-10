@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url'
 const BASE = process.argv[2] || 'http://localhost:3000'
 const EMAIL = process.argv[3] || 'demo.admin@vms-demo.com'
 const PASSWORD = process.argv[4] || 'DemoAdmin123!'
+const PREFIX = process.argv[5] || '' // e.g. 'worker-' to capture a second persona without overwriting
 const OUT = fileURLToPath(new URL('../public/screenshots/', import.meta.url))
 
 const EDGE_CANDIDATES = [
@@ -105,8 +106,8 @@ for (const [name, path] of SHOTS) {
       await page.reload({ waitUntil: 'networkidle2' }).catch(() => null)
     }
     await new Promise((r) => setTimeout(r, 1200)) // charts/motion settle
-    await page.screenshot({ path: `${OUT}${name}.png` })
-    console.log(`✓ ${name}.png <- ${page.url()}`)
+    await page.screenshot({ path: `${OUT}${PREFIX}${name}.png` })
+    console.log(`✓ ${PREFIX}${name}.png <- ${page.url()}`)
   } catch (e) {
     console.log(`✗ ${name}: ${e.message}`)
   }

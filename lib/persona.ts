@@ -73,6 +73,7 @@ export const ROUTE_ACCESS: ReadonlyArray<{ prefix: string; roles: readonly UserR
   { prefix: '/dashboard/rooms', roles: BUILDER_ROLES },
   { prefix: '/dashboard/monitoring', roles: BUILDER_ROLES },
   { prefix: '/dashboard/reports', roles: BUILDER_ROLES },
+  { prefix: '/dashboard/ledger', roles: BUILDER_ROLES },
   { prefix: '/dashboard/suppliers', roles: BUILDER_ROLES },
   { prefix: '/dashboard/audit-log', roles: BUILDER_ROLES },
   // Admin-only surfaces — manager (builder-lite) excluded.

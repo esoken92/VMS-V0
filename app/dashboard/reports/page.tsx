@@ -165,6 +165,13 @@ export default function ReportsPage() {
             <Download className="h-4 w-4" />
             Export CSV
           </button>
+          <button
+            onClick={() => window.open('/api/reports/inventory-valuation', '_blank', 'noopener')}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <FileText className="h-4 w-4" />
+            Export PDF
+          </button>
         </div>
       </div>
 
