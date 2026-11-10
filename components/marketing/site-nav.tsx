@@ -22,12 +22,26 @@ export function SiteNav() {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur">
       <div className="container flex h-16 items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2" aria-label="VMS home">
-          <span
-            aria-hidden="true"
-            className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-sm font-bold text-primary-foreground"
-          >
-            V
-          </span>
+          <svg viewBox="0 0 64 64" className="h-8 w-8" aria-hidden="true">
+            <rect width="64" height="64" rx="14" fill="#1d4ed8" />
+            <path
+              d="M14 26 32 16l18 10v22a2 2 0 0 1-2 2H16a2 2 0 0 1-2-2Z"
+              fill="#fff"
+              opacity=".92"
+            />
+            <path
+              d="M20 30v16M28 30v16M36 30v16M44 30v16"
+              stroke="#1d4ed8"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+            <path
+              d="M14 26h36"
+              stroke="#bfdbfe"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+          </svg>
           <span className="text-lg font-bold tracking-tight">VMS</span>
           <span className="hidden rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground sm:inline">
             open source

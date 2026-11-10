@@ -3,6 +3,7 @@ import { IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 import { SiteFooter } from '@/components/marketing/site-footer'
 import { ServiceWorkerRegister } from '@/components/sw-register'
+import { SITE_URL } from '@/lib/site'
 
 const plexSans = IBM_Plex_Sans({
   subsets: ['latin'],
@@ -15,7 +16,7 @@ const plexMono = IBM_Plex_Mono({
   variable: '--font-plex-mono',
 })
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+const APP_URL = SITE_URL
 const DESCRIPTION =
   'VMS V0 is a free, open-source, self-hosted inventory management template: ' +
   'typed storerooms, scan-first barcode/QR/RFID workflows, an append-only ' +
@@ -52,10 +53,11 @@ export const metadata: Metadata = {
     locale: 'en_ZA',
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'VMS V0 — Inventory Management, Open Source',
     description: DESCRIPTION,
   },
+  verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
 }
 
 export const viewport: Viewport = {

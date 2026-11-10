@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="public/logo.svg" alt="VMS V0" width="200" />
+
 # VMS V0 — Inventory Management, Open Source
 
 **Inventory management that respects the people doing the work.**

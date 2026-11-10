@@ -34,7 +34,7 @@
       "name": "Stock Take",
       "short_name": "Stock Take",
       "description": "Start stock take session",
-      "url": "/stock-take",
+      "url": "/dashboard/stock-takes",
       "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
     }
   ]
