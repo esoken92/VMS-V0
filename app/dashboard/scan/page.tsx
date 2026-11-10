@@ -49,6 +49,9 @@ import type {
 } from '@/lib/scan/types';
 import { CameraScanner } from './camera-scanner';
 import { useHidWedge } from './use-hid-wedge';
+import { enqueueMovement } from '@/lib/offline/queue';
+import { useOfflineQueue } from '@/lib/offline/use-offline-queue';
+import { WifiOff } from 'lucide-react';
 
 interface HistoryRow {
   code: string;
@@ -87,6 +90,7 @@ export default function ScanDashboardPage() {
   /** Raw scan payload echoing the current result — sent back on writes. */
   const lastRaw = useRef<{ code: string; input_type: ScanInputType } | null>(null);
   const busyRef = useRef(false);
+  const offline = useOfflineQueue();
 
   // Station tag persists per-browser.
   useEffect(() => {
@@ -165,9 +169,12 @@ export default function ScanDashboardPage() {
 
   const runWrite = async (
     fn: () => Promise<{ success: true; data: { message: string; product?: ScanResolutionDTO['product']; active_loan?: ScanResolutionDTO['active_loan'] } } | { success: false; error: string }>,
+    queueFallback?: { type: 'inbound' | 'outbound' | 'receiving'; quantity: number },
   ) => {
     setBusy(true);
     try {
+      // Skip the dead request when the browser already knows it's offline.
+      if (queueFallback && !navigator.onLine) throw new Error('offline');
       const res = await fn();
       if (!res.success) {
         setFlash({ type: 'error', text: res.error });
@@ -177,6 +184,24 @@ export default function ScanDashboardPage() {
       if (result && res.data.product) {
         setResult({ ...result, product: res.data.product, active_loan: res.data.active_loan ?? result.active_loan });
       }
+    } catch {
+      // Network failure (or explicit offline) — queue the write for replay.
+      if (queueFallback && result?.product) {
+        await enqueueMovement({
+          product_id: result.product.id,
+          sku: result.product.sku,
+          type: queueFallback.type,
+          quantity: queueFallback.quantity,
+          reason: `Offline scan (${writeMeta().input_type})`,
+        });
+        void offline.refreshPending();
+        setFlash({
+          type: 'warn',
+          text: 'Offline — queued locally, will sync when the connection returns',
+        });
+        return;
+      }
+      setFlash({ type: 'error', text: 'Request failed — check your connection' });
     } finally {
       setBusy(false);
     }
@@ -184,14 +209,16 @@ export default function ScanDashboardPage() {
 
   const doReceive = () => {
     if (!result?.product) return;
-    void runWrite(() =>
-      scanQuickReceive({ product_id: result.product!.id, quantity: qty, ...writeMeta() }),
+    void runWrite(
+      () => scanQuickReceive({ product_id: result.product!.id, quantity: qty, ...writeMeta() }),
+      { type: 'receiving', quantity: qty },
     );
   };
   const doIssue = () => {
     if (!result?.product) return;
-    void runWrite(() =>
-      scanQuickIssue({ product_id: result.product!.id, quantity: qty, ...writeMeta() }),
+    void runWrite(
+      () => scanQuickIssue({ product_id: result.product!.id, quantity: qty, ...writeMeta() }),
+      { type: 'outbound', quantity: qty },
     );
   };
   const doToolToggle = () => {
@@ -316,6 +343,31 @@ export default function ScanDashboardPage() {
             }`}
           >
             {flash.text}
+          </div>
+        )}
+
+        {/* offline queue status */}
+        {(!offline.online || offline.pending > 0 || (offline.lastFlush?.failed ?? 0) > 0) && (
+          <div className="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm bg-muted/60 border border-border">
+            <WifiOff className={`h-4 w-4 ${offline.online ? 'text-muted-foreground' : 'text-warning'}`} />
+            <span className="text-muted-foreground">
+              {offline.online ? 'Back online' : 'Offline'} ·{' '}
+              <span className="text-foreground font-medium">{offline.pending}</span> movement
+              {offline.pending === 1 ? '' : 's'} queued
+            </span>
+            {(offline.lastFlush?.failed ?? 0) > 0 && (
+              <span className="text-destructive font-medium">
+                {offline.lastFlush!.failed} could not sync — check permissions
+              </span>
+            )}
+            {offline.online && offline.pending > 0 && (
+              <button
+                onClick={() => void offline.flush()}
+                className="ml-auto text-xs font-medium text-primary hover:underline"
+              >
+                Sync now
+              </button>
+            )}
           </div>
         )}
 

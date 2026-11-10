@@ -209,7 +209,10 @@ can run immediately with a world-class public presentation.
 49. "Info mode": scan → product card overlay, no navigation
 50. Avery/thermal label presets
 51. Auto-create-product-on-unknown-barcode flow
-52. Offline scan queue → sync on reconnect (restore minimal Dexie version)
+52. Offline scan queue → sync on reconnect — ✅ raw-IndexedDB queue
+     (lib/offline/, zero deps — Dexie stays out); receive/issue enqueue on
+     network failure, replay via POST /api/v1/movements on reconnect,
+     pending/failed chip on the scan page
 
 ### 2f. Documents, reports & PDFs
 
@@ -1288,5 +1291,5 @@ Status legend: ✅ verified live · ⏳ owner/hardware-gated · 🚧 roadmap ·
 | 2o personas/audit/reports | ✅ personas + append-only audit + verify-ledger + report builder (8 datasets → table/CSV/Typst-PDF; covers dead-stock 59 + audit-log export 61) |
 | 3 branding/go-live | ✅ README, screenshots, LICENSE, CI, templates |
 | 4 deployment | ✅ docker-compose + PGlite + Vercel/Supabase runbook (hosted copy needs owner's Supabase project) |
-| 5 mobile/PWA | 🚧 installable shell; offline write-queue + device test pending |
+| 5 mobile/PWA | 🚧 installable shell + ✅ offline scan queue (receive/issue, IDB-backed, replay via REST) — device test + remaining mutation types pending |
 | 6 Rust offline | 🚧 roadmap |
