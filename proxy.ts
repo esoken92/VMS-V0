@@ -49,6 +49,9 @@ const PUBLIC_ROUTES = [
   '/opengraph-image.png',
   '/humans.txt',
   '/.well-known/security.txt',
+  // Google Search Console ownership file — only verifies this deployment's
+  // domain; harmless for anyone who clones the template
+  '/google6ddf052c23bde653.html',
 ];
 
 const IMPERSONATION_COOKIE = 'vms_impersonation';
