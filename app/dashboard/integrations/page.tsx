@@ -394,11 +394,15 @@ export default function IntegrationsPage() {
       <Section
         icon={<Terminal className="h-5 w-5" />}
         title="REST API quickstart"
-        subtitle="The same surface as MCP, over plain HTTP — spec at /api/v1/openapi.json"
+        subtitle="The same surface as MCP, over plain HTTP — browsable reference at /docs"
       >
         <CodeBlock title="curl" code={curlExample} />
         <div className="text-sm text-sidebar-muted space-y-1">
           <p>
+            <a href="/docs" target="_blank" className="text-primary hover:underline">
+              API reference docs →
+            </a>
+            {' · '}
             <a href="/api/v1/openapi.json" target="_blank" className="text-primary hover:underline">
               OpenAPI 3.0 spec →
             </a>

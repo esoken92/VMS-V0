@@ -1278,7 +1278,7 @@ Status legend: ✅ verified live · ⏳ owner/hardware-gated · 🚧 roadmap ·
 | 2d UX | 🚧 partial — responsive, provisioning banner, re-themed |
 | 2e labels/scan | ✅ scan engine + HMAC labels + scan UX |
 | 2f docs/PDF | ✅ Typst valuation report; more report types pending |
-| 2g API/MCP | ✅ REST v1 + scoped keys + MCP + OpenAPI/llms.txt |
+| 2g API/MCP | ✅ REST v1 + scoped keys + MCP + OpenAPI/llms.txt + /docs reference page (item 65 — hand-rendered from the live spec, air-gap safe, no CDN) |
 | 2h auth/security | ✅ Auth.js + argon2id + append-only audit (DB-enforced) |
 | 2i storerooms | ✅ rooms, zones, sensors, thresholds, simulator |
 | 2j industry pain-points | 🚧 roadmap |
