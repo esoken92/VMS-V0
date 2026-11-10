@@ -213,6 +213,12 @@ const browser = await puppeteer.launch({
 })
 const page = await browser.newPage()
 await page.setViewport({ width: 1440, height: 900 })
+// Pin light theme — headless inherits the OS color scheme; marketing pages
+// honor prefers-color-scheme and would capture dark while most see light.
+await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }])
+await page.evaluateOnNewDocument(() => {
+  try { localStorage.setItem('vms-theme', 'light') } catch { /* noop */ }
+})
 page.on('console', (msg) => {
   if (msg.type() === 'error') {
     if (!consoleErrors.has(currentPage)) consoleErrors.set(currentPage, [])

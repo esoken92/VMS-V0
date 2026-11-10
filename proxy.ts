@@ -111,8 +111,9 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - icons, manifest.json, sw.js and workbox files (PWA assets)
+     * - screenshots (public product captures served on the landing page)
      * - llms.txt (public agent-discovery manifest, like robots.txt)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|icons|llms.txt|manifest.json|sw.js|workbox-).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|icons|llms.txt|manifest.json|screenshots|sw.js|workbox-).*)',
   ],
 };

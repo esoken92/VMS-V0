@@ -7,6 +7,7 @@
 import Link from 'next/link';
 import { Star } from 'lucide-react';
 import { GithubIcon } from '@/components/icons/github';
+import { ThemeToggle } from './theme-toggle';
 import { GITHUB_URL } from './site-footer';
 
 const anchors = [
@@ -46,6 +47,7 @@ export function SiteNav() {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <ThemeToggle />
           <a
             href={GITHUB_URL}
             target="_blank"

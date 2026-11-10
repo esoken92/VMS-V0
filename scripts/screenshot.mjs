@@ -44,6 +44,13 @@ const browser = await puppeteer.launch({
 })
 const page = await browser.newPage()
 await page.setViewport({ width: 1440, height: 900 })
+// Pin light theme — headless Chrome inherits the OS color scheme, so
+// marketing pages (which honor prefers-color-scheme) would otherwise
+// capture dark while most visitors see light.
+await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }])
+await page.evaluateOnNewDocument(() => {
+  try { localStorage.setItem('vms-theme', 'light') } catch { /* noop */ }
+})
 
 // Public pages first — landing + the login form itself.
 for (const [name, path] of [['landing', '/'], ['login', '/auth/login']]) {
@@ -58,35 +65,23 @@ for (const [name, path] of [['landing', '/'], ['login', '/auth/login']]) {
 }
 
 // Login via the real form
-await page.goto(`${BASE}/auth/login`, { waitUntil: 'networkidle2', timeout: 60000 })
-const emailSel = 'input[type="email"], input[name="email"], input#email'
-const passSel = 'input[type="password"], input[name="password"], input#password'
-await page.waitForSelector(emailSel, { timeout: 30000 })
-// Typing can race React hydration — controlled inputs get wiped on hydrate,
-// leaving the form empty and the submit disabled forever. Type, then verify
-// the value stuck; retry until it does.
-let enabled = false
-for (let attempt = 0; attempt < 6 && !enabled; attempt++) {
-  await page.click(emailSel, { clickCount: 3 })
-  await page.type(emailSel, EMAIL, { delay: 15 })
-  await page.click(passSel, { clickCount: 3 })
-  await page.type(passSel, PASSWORD, { delay: 15 })
-  enabled = await page
-    .waitForFunction(() => {
-      const b = document.querySelector('button[type="submit"]')
-      return b && !b.disabled
-    }, { timeout: 4000 })
-    .then(() => true)
-    .catch(() => false)
-  if (!enabled) console.log(`login attempt ${attempt + 1}: form not enabled — retrying`)
-}
-if (!enabled) console.log('WARN: submit button never enabled')
-await page.keyboard.press('Enter') // native form submit — works when button enabled
-await page.waitForFunction(() => !location.pathname.includes('/auth/login'), { timeout: 45000 }).catch(() => null)
-await new Promise((r) => setTimeout(r, 2500))
-console.log('post-login URL:', page.url())
-const errText = await page.$eval('[class*="bg-destructive/10"], .text-destructive', (el) => el.textContent).catch(() => null)
-if (errText) console.log('login error text:', errText)
+// Login via Auth.js REST endpoints — deterministic; the form's submit
+// button is gated on useSession() resolving, which can stall while dev
+// compiles in the background, and typing races hydration anyway.
+await page.goto(`${BASE}/auth/login`, { waitUntil: 'domcontentloaded', timeout: 60000 })
+const loginResult = await page.evaluate(async (email, password) => {
+  const { csrfToken } = await fetch('/api/auth/csrf').then((r) => r.json())
+  const res = await fetch('/api/auth/callback/credentials', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ csrfToken, email, password, callbackUrl: '/dashboard' }),
+    redirect: 'manual',
+  })
+  const session = await fetch('/api/auth/session').then((r) => r.json())
+  return { status: res.status || res.type, user: session?.user?.email ?? null }
+}, EMAIL, PASSWORD)
+console.log('login:', loginResult.user ? `authenticated as ${loginResult.user}` : `FAILED (${loginResult.status})`)
+await new Promise((r) => setTimeout(r, 1000))
 
 // Give the monitoring page real telemetry: click "Seed 24h history" once.
 const clickButtonByText = async (text) => {
@@ -105,6 +100,14 @@ for (const [name, path] of SHOTS) {
       await new Promise((r) => setTimeout(r, 4000)) // readings + charts populate
       await page.reload({ waitUntil: 'networkidle2' }).catch(() => null)
     }
+    // Wait for client data fetches to settle — "Loading …" placeholders
+    // should be gone before capture (up to 15s, then shoot anyway).
+    await page
+      .waitForFunction(
+        () => !document.body.innerText.match(/Loading [a-z ]+\.\.\./i),
+        { timeout: 15000 },
+      )
+      .catch(() => null)
     await new Promise((r) => setTimeout(r, 1200)) // charts/motion settle
     await page.screenshot({ path: `${OUT}${PREFIX}${name}.png` })
     console.log(`✓ ${PREFIX}${name}.png <- ${page.url()}`)
