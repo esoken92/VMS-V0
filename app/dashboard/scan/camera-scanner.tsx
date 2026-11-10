@@ -105,19 +105,19 @@ export function CameraScanner({
   }, [active]);
 
   return (
-    <div className="relative w-full aspect-square max-h-[52vh] bg-black rounded-2xl overflow-hidden">
+    <div className="relative w-full aspect-square max-h-[52vh] bg-sidebar rounded-2xl overflow-hidden">
       <div id={REGION_ID} className="absolute inset-0" />
       {!running && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-gray-500">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-muted-foreground">
           <CameraOff className="h-12 w-12" />
           <p className="text-sm">Starting camera…</p>
         </div>
       )}
       {/* corner markers */}
-      <div className="pointer-events-none absolute top-4 left-4 w-10 h-10 border-t-4 border-l-4 border-emerald-400 rounded-tl-lg" />
-      <div className="pointer-events-none absolute top-4 right-4 w-10 h-10 border-t-4 border-r-4 border-emerald-400 rounded-tr-lg" />
-      <div className="pointer-events-none absolute bottom-4 left-4 w-10 h-10 border-b-4 border-l-4 border-emerald-400 rounded-bl-lg" />
-      <div className="pointer-events-none absolute bottom-4 right-4 w-10 h-10 border-b-4 border-r-4 border-emerald-400 rounded-br-lg" />
+      <div className="pointer-events-none absolute top-4 left-4 w-10 h-10 border-t-4 border-l-4 border-success-bright/40 rounded-tl-lg" />
+      <div className="pointer-events-none absolute top-4 right-4 w-10 h-10 border-t-4 border-r-4 border-success-bright/40 rounded-tr-lg" />
+      <div className="pointer-events-none absolute bottom-4 left-4 w-10 h-10 border-b-4 border-l-4 border-success-bright/40 rounded-bl-lg" />
+      <div className="pointer-events-none absolute bottom-4 right-4 w-10 h-10 border-b-4 border-r-4 border-success-bright/40 rounded-br-lg" />
     </div>
   );
 }

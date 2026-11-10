@@ -260,12 +260,12 @@ export default function ScanDashboardPage() {
   const has = (a: ScanAction) => result?.allowed_actions.includes(a) ?? false;
 
   return (
-    <div className="-m-6 min-h-[calc(100vh-4rem)] bg-gray-900 text-gray-100">
+    <div className="-m-6 min-h-[calc(100vh-4rem)] bg-sidebar text-sidebar-foreground">
       <div className="mx-auto max-w-6xl p-4 md:p-6 space-y-4">
         {/* header strip */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <ScanLine className="h-6 w-6 text-emerald-400" />
+            <ScanLine className="h-6 w-6 text-success-bright" />
             <h1 className="text-xl font-bold">Scan Station</h1>
           </div>
           <div className="flex-1" />
@@ -273,22 +273,22 @@ export default function ScanDashboardPage() {
             value={deviceLabel}
             onChange={(e) => saveDeviceLabel(e.target.value)}
             placeholder="Device label (e.g. bay-2)"
-            className="w-44 rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-44 rounded-lg bg-sidebar border border-sidebar-border px-3 py-2 text-sm placeholder-sidebar-muted focus:outline-none focus:ring-2 focus:ring-success"
           />
           {location ? (
-            <span className="flex items-center gap-1.5 rounded-lg bg-emerald-900/60 border border-emerald-700 px-3 py-2 text-sm font-medium">
-              <MapPin className="h-4 w-4 text-emerald-400" />
+            <span className="flex items-center gap-1.5 rounded-lg bg-success/20/60 border border-success/40 px-3 py-2 text-sm font-medium">
+              <MapPin className="h-4 w-4 text-success-bright" />
               {location}
               <button
                 onClick={() => setLocation(null)}
-                className="ml-1 text-emerald-300 hover:text-white"
+                className="ml-1 text-success-bright hover:text-sidebar-foreground"
                 aria-label="Clear location"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 rounded-lg bg-gray-800 border border-gray-700 px-3 py-2 text-sm text-gray-400">
+            <span className="flex items-center gap-1.5 rounded-lg bg-sidebar border border-sidebar-border px-3 py-2 text-sm text-sidebar-muted">
               <MapPin className="h-4 w-4" />
               No location — scan a bin
             </span>
@@ -296,7 +296,7 @@ export default function ScanDashboardPage() {
           <button
             onClick={() => setCameraOn((v) => !v)}
             className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              cameraOn ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-gray-800 border border-gray-700 hover:bg-gray-700'
+              cameraOn ? 'bg-success hover:bg-success/90' : 'bg-sidebar border border-sidebar-border hover:bg-sidebar/80'
             }`}
           >
             <Camera className="h-4 w-4" />
@@ -309,10 +309,10 @@ export default function ScanDashboardPage() {
           <div
             className={`rounded-lg px-4 py-3 text-sm font-medium ${
               flash.type === 'success'
-                ? 'bg-emerald-900/50 text-emerald-200 border border-emerald-800'
+                ? 'bg-success/20/50 text-success-bright border border-success/40'
                 : flash.type === 'warn'
-                  ? 'bg-amber-900/50 text-amber-200 border border-amber-800'
-                  : 'bg-red-900/50 text-red-200 border border-red-800'
+                  ? 'bg-warning/20 text-warning border border-warning/40'
+                  : 'bg-destructive/20/50 text-destructive-bright border border-destructive/40'
             }`}
           >
             {flash.text}
@@ -332,12 +332,12 @@ export default function ScanDashboardPage() {
                 }}
               />
             ) : (
-              <div className="relative w-full aspect-square max-h-[52vh] bg-gray-800/60 rounded-2xl border-2 border-dashed border-gray-700 flex flex-col items-center justify-center gap-4">
-                <QrCode className={`h-20 w-20 ${busy ? 'text-emerald-400 animate-pulse' : 'text-gray-600'}`} />
-                <p className="text-lg font-medium text-gray-300">
+              <div className="relative w-full aspect-square max-h-[52vh] bg-sidebar/60 rounded-2xl border-2 border-dashed border-sidebar-border flex flex-col items-center justify-center gap-4">
+                <QrCode className={`h-20 w-20 ${busy ? 'text-success-bright animate-pulse' : 'text-sidebar-muted'}`} />
+                <p className="text-lg font-medium text-sidebar-foreground">
                   {busy ? 'Resolving…' : 'Ready to scan'}
                 </p>
-                <p className="text-sm text-gray-500 text-center px-8">
+                <p className="text-sm text-sidebar-muted text-center px-8">
                   Aim a USB/Bluetooth scanner at this window, enable the
                   camera, or type a code below.
                 </p>
@@ -345,8 +345,8 @@ export default function ScanDashboardPage() {
             )}
 
             {/* manual entry */}
-            <div className="rounded-2xl bg-gray-800/60 border border-gray-700 p-4 space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-300">
+            <div className="rounded-2xl bg-sidebar/60 border border-sidebar-border p-4 space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-sidebar-foreground">
                 <Keyboard className="h-4 w-4" />
                 Manual entry
               </label>
@@ -356,32 +356,32 @@ export default function ScanDashboardPage() {
                   onChange={(e) => setManualCode(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && submitManual()}
                   placeholder="TYPE:ID or SKU…"
-                  className="flex-1 rounded-lg bg-gray-900 border border-gray-700 px-3 py-2.5 text-sm font-mono placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="flex-1 rounded-lg bg-sidebar border border-sidebar-border px-3 py-2.5 text-sm font-mono placeholder-sidebar-muted focus:outline-none focus:ring-2 focus:ring-success"
                 />
                 <button
                   onClick={submitManual}
                   disabled={busy || !manualCode.trim()}
-                  className="rounded-lg bg-gray-700 px-4 py-2.5 text-sm font-medium hover:bg-gray-600 disabled:opacity-40 transition-colors"
+                  className="rounded-lg bg-sidebar-border px-4 py-2.5 text-sm font-medium hover:bg-sidebar-border/80 disabled:opacity-40 transition-colors"
                 >
                   Log entry
                 </button>
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-sidebar-muted">
                 Manual entries are rate-limited and every one is logged.
               </p>
             </div>
 
             {/* history strip */}
             {history.length > 0 && (
-              <div className="rounded-2xl bg-gray-800/40 border border-gray-800 p-3">
-                <p className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">Recent scans</p>
+              <div className="rounded-2xl bg-sidebar/40 border border-sidebar-border p-3">
+                <p className="text-xs font-medium text-sidebar-muted mb-2 uppercase tracking-wide">Recent scans</p>
                 <ul className="space-y-1">
                   {history.map((h, i) => (
-                    <li key={`${h.at}-${i}`} className="flex items-center gap-2 text-xs text-gray-400">
-                      {h.flagged && <AlertTriangle className="h-3 w-3 text-amber-400" />}
-                      <span className="text-gray-500">{INPUT_TYPE_LABEL[h.input_type]}</span>
+                    <li key={`${h.at}-${i}`} className="flex items-center gap-2 text-xs text-sidebar-muted">
+                      {h.flagged && <AlertTriangle className="h-3 w-3 text-warning" />}
+                      <span className="text-sidebar-muted">{INPUT_TYPE_LABEL[h.input_type]}</span>
                       <span className="font-mono truncate">{h.label}</span>
-                      <span className="ml-auto text-gray-600">
+                      <span className="ml-auto text-sidebar-muted">
                         {new Date(h.at).toLocaleTimeString()}
                       </span>
                     </li>
@@ -392,9 +392,9 @@ export default function ScanDashboardPage() {
           </div>
 
           {/* right — status panel */}
-          <div className="rounded-2xl bg-gray-800/60 border border-gray-700 p-5 space-y-4 min-h-[24rem]">
+          <div className="rounded-2xl bg-sidebar/60 border border-sidebar-border p-5 space-y-4 min-h-[24rem]">
             {!result ? (
-              <div className="h-full flex flex-col items-center justify-center text-center gap-3 text-gray-500">
+              <div className="h-full flex flex-col items-center justify-center text-center gap-3 text-sidebar-muted">
                 <ScanLine className="h-10 w-10" />
                 <p className="font-medium">No scan yet</p>
                 <p className="text-sm">The last scanned code and what it resolved to will appear here.</p>
@@ -402,68 +402,68 @@ export default function ScanDashboardPage() {
             ) : (
               <>
                 <div className="flex items-center justify-between">
-                  <p className="text-xs uppercase tracking-widest text-gray-500">
+                  <p className="text-xs uppercase tracking-widest text-sidebar-muted">
                     {INPUT_TYPE_LABEL[result.input_type]} scan
                   </p>
                   {result.scan_event_id && (
-                    <p className="text-xs text-gray-600 font-mono">#{result.scan_event_id.slice(0, 8)}</p>
+                    <p className="text-xs text-sidebar-muted font-mono">#{result.scan_event_id.slice(0, 8)}</p>
                   )}
                 </div>
 
                 {result.manual_logged && (
-                  <div className="flex items-center gap-2 rounded-lg bg-amber-900/50 border border-amber-700 px-3 py-2 text-sm text-amber-200">
+                  <div className="flex items-center gap-2 rounded-lg bg-warning/20 border border-warning/40 px-3 py-2 text-sm text-warning">
                     <BadgeAlert className="h-4 w-4 shrink-0" />
                     Manual entry logged
                   </div>
                 )}
 
                 {result.flag_reason && (
-                  <div className="flex items-center gap-2 rounded-lg bg-amber-900/50 border border-amber-700 px-3 py-2 text-sm text-amber-200">
+                  <div className="flex items-center gap-2 rounded-lg bg-warning/20 border border-warning/40 px-3 py-2 text-sm text-warning">
                     <AlertTriangle className="h-4 w-4 shrink-0" />
                     {flagText[result.flag_reason] ?? `Flagged: ${result.flag_reason}`}
                   </div>
                 )}
 
                 {!result.ok ? (
-                  <div className="rounded-xl bg-red-900/40 border border-red-800 p-4">
-                    <p className="font-semibold text-red-200">Scan failed</p>
-                    <p className="text-sm text-red-300 mt-1">{result.error}</p>
-                    <p className="mt-3 font-mono text-xs text-gray-500 break-all">{result.code}</p>
+                  <div className="rounded-xl bg-destructive/20/40 border border-destructive/40 p-4">
+                    <p className="font-semibold text-destructive-bright">Scan failed</p>
+                    <p className="text-sm text-destructive-bright mt-1">{result.error}</p>
+                    <p className="mt-3 font-mono text-xs text-sidebar-muted break-all">{result.code}</p>
                   </div>
                 ) : result.entity ? (
-                  <div className="rounded-xl bg-gray-900/70 border border-gray-700 p-5 space-y-3">
+                  <div className="rounded-xl bg-sidebar/70 border border-sidebar-border p-5 space-y-3">
                     <div className="flex items-center gap-3">
-                      <div className="p-2.5 rounded-lg bg-emerald-900/60">
+                      <div className="p-2.5 rounded-lg bg-success/20/60">
                         {result.entity.type === 'tool' ? (
-                          <Wrench className="h-6 w-6 text-emerald-400" />
+                          <Wrench className="h-6 w-6 text-success-bright" />
                         ) : result.entity.type === 'bin' ? (
-                          <MapPin className="h-6 w-6 text-emerald-400" />
+                          <MapPin className="h-6 w-6 text-success-bright" />
                         ) : result.entity.type === 'take' ? (
-                          <ClipboardList className="h-6 w-6 text-emerald-400" />
+                          <ClipboardList className="h-6 w-6 text-success-bright" />
                         ) : (
-                          <Package className="h-6 w-6 text-emerald-400" />
+                          <Package className="h-6 w-6 text-success-bright" />
                         )}
                       </div>
                       <div>
-                        <p className="text-xs uppercase tracking-wide text-emerald-400 font-medium">
+                        <p className="text-xs uppercase tracking-wide text-success-bright font-medium">
                           {result.entity.type === 'take' ? 'Stock take' : result.entity.type}
                         </p>
                         <p className="text-2xl font-bold leading-tight">{result.entity.label}</p>
                       </div>
                     </div>
-                    {result.entity.detail && <p className="text-sm text-gray-400">{result.entity.detail}</p>}
+                    {result.entity.detail && <p className="text-sm text-sidebar-muted">{result.entity.detail}</p>}
 
                     {result.product && (
                       <div className="grid grid-cols-2 gap-2 text-sm pt-1">
-                        <div className="rounded-lg bg-gray-800/80 p-3">
-                          <p className="text-xs text-gray-500">On hand</p>
+                        <div className="rounded-lg bg-sidebar/80 p-3">
+                          <p className="text-xs text-sidebar-muted">On hand</p>
                           <p className="text-lg font-semibold">
                             {result.product.current_stock}{' '}
-                            <span className="text-sm font-normal text-gray-400">{result.product.unit_of_measure}</span>
+                            <span className="text-sm font-normal text-sidebar-muted">{result.product.unit_of_measure}</span>
                           </p>
                         </div>
-                        <div className="rounded-lg bg-gray-800/80 p-3">
-                          <p className="text-xs text-gray-500">Bin</p>
+                        <div className="rounded-lg bg-sidebar/80 p-3">
+                          <p className="text-xs text-sidebar-muted">Bin</p>
                           <p className="text-lg font-semibold">
                             {result.product_bin ? `${result.product_bin.zone}-${result.product_bin.bin_location}` : '—'}
                           </p>
@@ -472,7 +472,7 @@ export default function ScanDashboardPage() {
                     )}
 
                     {result.active_loan && (
-                      <p className="text-sm text-amber-300">
+                      <p className="text-sm text-warning-bright">
                         On loan to {result.active_loan.worker_name ?? 'someone'}
                         {result.active_loan.checked_out_at
                           ? ` since ${new Date(result.active_loan.checked_out_at).toLocaleString()}`
@@ -485,7 +485,7 @@ export default function ScanDashboardPage() {
                       {has('view') && result.product && (
                         <button
                           onClick={() => setShowCard(true)}
-                          className="rounded-lg bg-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-600 transition-colors"
+                          className="rounded-lg bg-sidebar-border px-3 py-2 text-sm font-medium hover:bg-sidebar-border/80 transition-colors"
                         >
                           View card
                         </button>
@@ -494,7 +494,7 @@ export default function ScanDashboardPage() {
                         <button
                           onClick={doReceive}
                           disabled={busy}
-                          className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium hover:bg-emerald-500 disabled:opacity-40 transition-colors"
+                          className="flex items-center gap-1.5 rounded-lg bg-success px-3 py-2 text-sm font-medium hover:bg-success/90 disabled:opacity-40 transition-colors"
                         >
                           <ArrowDownToLine className="h-4 w-4" /> Receive
                         </button>
@@ -533,7 +533,7 @@ export default function ScanDashboardPage() {
                             setLocation(result.entity!.label);
                             setFlash({ type: 'success', text: `Location set to ${result.entity!.label}` });
                           }}
-                          className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium hover:bg-emerald-500 transition-colors"
+                          className="flex items-center gap-1.5 rounded-lg bg-success px-3 py-2 text-sm font-medium hover:bg-success/90 transition-colors"
                         >
                           <MapPin className="h-4 w-4" /> Set as location
                         </button>
@@ -546,7 +546,7 @@ export default function ScanDashboardPage() {
                           href={`/api/labels/${result.entity.type}/${result.entity.id}.svg`}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex items-center gap-1.5 rounded-lg bg-gray-700 px-3 py-2 text-sm font-medium hover:bg-gray-600 transition-colors"
+                          className="flex items-center gap-1.5 rounded-lg bg-sidebar-border px-3 py-2 text-sm font-medium hover:bg-sidebar-border/80 transition-colors"
                         >
                           <Printer className="h-4 w-4" /> Label
                         </a>
@@ -555,35 +555,35 @@ export default function ScanDashboardPage() {
 
                     {(has('receive') || has('issue')) && (
                       <div className="flex items-center gap-2 pt-1">
-                        <label className="text-xs text-gray-500">Qty</label>
+                        <label className="text-xs text-sidebar-muted">Qty</label>
                         <input
                           type="number"
                           min={0.01}
                           step="0.01"
                           value={qty}
                           onChange={(e) => setQty(Math.max(0.01, Number(e.target.value) || 1))}
-                          className="w-24 rounded-lg bg-gray-900 border border-gray-700 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-24 rounded-lg bg-sidebar border border-sidebar-border px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-success"
                         />
                       </div>
                     )}
                   </div>
                 ) : (
                   /* unresolved */
-                  <div className="rounded-xl bg-gray-900/70 border border-gray-700 p-5 space-y-3">
-                    <p className="font-semibold text-gray-200">Unrecognized code</p>
-                    <p className="font-mono text-sm text-gray-400 break-all">{result.code}</p>
+                  <div className="rounded-xl bg-sidebar/70 border border-sidebar-border p-5 space-y-3">
+                    <p className="font-semibold text-sidebar-foreground">Unrecognized code</p>
+                    <p className="font-mono text-sm text-sidebar-muted break-all">{result.code}</p>
                     {has('create_product') ? (
                       <button
                         onClick={() => {
                           setCreateForm((f) => ({ ...f, sku: result.suggested_sku ?? result.code }));
                           setShowCreate(true);
                         }}
-                        className="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium hover:bg-emerald-500 transition-colors"
+                        className="rounded-lg bg-success px-3 py-2 text-sm font-medium hover:bg-success/90 transition-colors"
                       >
                         Create product “{result.suggested_sku}”
                       </button>
                     ) : (
-                      <p className="text-sm text-gray-500">No matching product, bin, take or tool.</p>
+                      <p className="text-sm text-sidebar-muted">No matching product, bin, take or tool.</p>
                     )}
                   </div>
                 )}
@@ -591,7 +591,7 @@ export default function ScanDashboardPage() {
                 {result.stock_take && (
                   <Link
                     href="/dashboard/stock-takes"
-                    className="inline-flex items-center gap-2 text-sm text-blue-300 hover:text-blue-200"
+                    className="inline-flex items-center gap-2 text-sm text-info-bright hover:text-info-bright"
                   >
                     Open Stock Takes page →
                   </Link>
@@ -599,11 +599,11 @@ export default function ScanDashboardPage() {
               </>
             )}
 
-            <div className="pt-2 border-t border-gray-800">
+            <div className="pt-2 border-t border-sidebar-border">
               <button
                 onClick={() => void doStartTake()}
                 disabled={busy}
-                className="text-xs text-gray-500 hover:text-gray-300 disabled:opacity-40"
+                className="text-xs text-sidebar-muted hover:text-sidebar-foreground disabled:opacity-40"
               >
                 + Start a new stock take
               </button>
@@ -614,37 +614,37 @@ export default function ScanDashboardPage() {
 
       {/* product card overlay */}
       {showCard && result?.product && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-gray-800 border border-gray-700 p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-sidebar/70 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-sidebar border border-sidebar-border p-6 space-y-4">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs uppercase tracking-wide text-emerald-400">
+                <p className="text-xs uppercase tracking-wide text-success-bright">
                   {result.product.item_type}
                 </p>
                 <h2 className="text-2xl font-bold">{result.product.sku}</h2>
-                <p className="text-gray-400">{result.product.name}</p>
+                <p className="text-sidebar-muted">{result.product.name}</p>
               </div>
-              <button onClick={() => setShowCard(false)} className="text-gray-500 hover:text-white">
+              <button onClick={() => setShowCard(false)} className="text-sidebar-muted hover:text-sidebar-foreground">
                 <X className="h-5 w-5" />
               </button>
             </div>
             <dl className="grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-lg bg-gray-900/70 p-3">
-                <dt className="text-xs text-gray-500">On hand</dt>
+              <div className="rounded-lg bg-sidebar/70 p-3">
+                <dt className="text-xs text-sidebar-muted">On hand</dt>
                 <dd className="text-xl font-semibold">
                   {result.product.current_stock} {result.product.unit_of_measure}
                 </dd>
               </div>
-              <div className="rounded-lg bg-gray-900/70 p-3">
-                <dt className="text-xs text-gray-500">Min threshold</dt>
+              <div className="rounded-lg bg-sidebar/70 p-3">
+                <dt className="text-xs text-sidebar-muted">Min threshold</dt>
                 <dd className="text-xl font-semibold">{result.product.min_threshold}</dd>
               </div>
-              <div className="rounded-lg bg-gray-900/70 p-3">
-                <dt className="text-xs text-gray-500">Avg cost</dt>
+              <div className="rounded-lg bg-sidebar/70 p-3">
+                <dt className="text-xs text-sidebar-muted">Avg cost</dt>
                 <dd className="text-xl font-semibold">{result.product.average_cost}</dd>
               </div>
-              <div className="rounded-lg bg-gray-900/70 p-3">
-                <dt className="text-xs text-gray-500">Bin</dt>
+              <div className="rounded-lg bg-sidebar/70 p-3">
+                <dt className="text-xs text-sidebar-muted">Bin</dt>
                 <dd className="text-xl font-semibold">
                   {result.product_bin ? `${result.product_bin.zone}-${result.product_bin.bin_location}` : '—'}
                 </dd>
@@ -657,13 +657,13 @@ export default function ScanDashboardPage() {
                 step="0.01"
                 value={qty}
                 onChange={(e) => setQty(Math.max(0.01, Number(e.target.value) || 1))}
-                className="w-24 rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-24 rounded-lg bg-sidebar border border-sidebar-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-success"
               />
               {has('receive') && (
                 <button
                   onClick={doReceive}
                   disabled={busy}
-                  className="flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium hover:bg-emerald-500 disabled:opacity-40"
+                  className="flex-1 rounded-lg bg-success px-3 py-2 text-sm font-medium hover:bg-success/90 disabled:opacity-40"
                 >
                   Receive {qty}
                 </button>
@@ -684,40 +684,40 @@ export default function ScanDashboardPage() {
 
       {/* create-product prefill modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-gray-800 border border-gray-700 p-6 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-sidebar/70 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-sidebar border border-sidebar-border p-6 space-y-4">
             <div className="flex items-start justify-between">
               <h2 className="text-xl font-bold">New product from scan</h2>
-              <button onClick={() => setShowCreate(false)} className="text-gray-500 hover:text-white">
+              <button onClick={() => setShowCreate(false)} className="text-sidebar-muted hover:text-sidebar-foreground">
                 <X className="h-5 w-5" />
               </button>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-gray-500">SKU</label>
+                <label className="text-xs text-sidebar-muted">SKU</label>
                 <input
                   value={createForm.sku}
                   onChange={(e) => setCreateForm({ ...createForm, sku: e.target.value })}
-                  className="mt-1 w-full rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="mt-1 w-full rounded-lg bg-sidebar border border-sidebar-border px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-success"
                 />
               </div>
               <div>
-                <label className="text-xs text-gray-500">Name</label>
+                <label className="text-xs text-sidebar-muted">Name</label>
                 <input
                   value={createForm.name}
                   onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })}
-                  className="mt-1 w-full rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="mt-1 w-full rounded-lg bg-sidebar border border-sidebar-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-success"
                 />
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="text-xs text-gray-500">Type</label>
+                  <label className="text-xs text-sidebar-muted">Type</label>
                   <select
                     value={createForm.item_type}
                     onChange={(e) =>
                       setCreateForm({ ...createForm, item_type: e.target.value as (typeof ITEM_TYPES)[number] })
                     }
-                    className="mt-1 w-full rounded-lg bg-gray-900 border border-gray-700 px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="mt-1 w-full rounded-lg bg-sidebar border border-sidebar-border px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-success"
                   >
                     {ITEM_TYPES.map((t) => (
                       <option key={t} value={t}>
@@ -727,19 +727,19 @@ export default function ScanDashboardPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500">Unit</label>
+                  <label className="text-xs text-sidebar-muted">Unit</label>
                   <input
                     value={createForm.unit_of_measure}
                     onChange={(e) => setCreateForm({ ...createForm, unit_of_measure: e.target.value })}
-                    className="mt-1 w-full rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="mt-1 w-full rounded-lg bg-sidebar border border-sidebar-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-success"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500">Issuing unit</label>
+                  <label className="text-xs text-sidebar-muted">Issuing unit</label>
                   <input
                     value={createForm.issuing_unit}
                     onChange={(e) => setCreateForm({ ...createForm, issuing_unit: e.target.value })}
-                    className="mt-1 w-full rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="mt-1 w-full rounded-lg bg-sidebar border border-sidebar-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-success"
                   />
                 </div>
               </div>
@@ -747,7 +747,7 @@ export default function ScanDashboardPage() {
             <button
               onClick={() => void doCreateProduct()}
               disabled={busy || !createForm.sku.trim() || !createForm.name.trim()}
-              className="w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium hover:bg-emerald-500 disabled:opacity-40 transition-colors"
+              className="w-full rounded-lg bg-success px-4 py-2.5 text-sm font-medium hover:bg-success/90 disabled:opacity-40 transition-colors"
             >
               Create product
             </button>

@@ -54,15 +54,15 @@ export default function RoomsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Storerooms</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl font-bold text-foreground">Storerooms</h1>
+          <p className="text-muted-foreground mt-1">
             Room hierarchy, access control and environmental config
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Link
             href="/dashboard/monitoring"
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+            className="flex items-center gap-2 px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors text-sm"
           >
             <Thermometer className="h-4 w-4" />
             Monitoring
@@ -70,7 +70,7 @@ export default function RoomsPage() {
           {canEdit && (
             <Link
               href="/dashboard/rooms/new"
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
               <Plus className="h-4 w-4" />
               Add Room
@@ -80,70 +80,70 @@ export default function RoomsPage() {
       </div>
 
       {error && (
-        <div className="p-4 rounded-lg bg-red-50 text-red-800">{error}</div>
+        <div className="p-4 rounded-lg bg-destructive/10 text-destructive">{error}</div>
       )}
 
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search rooms…"
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full pl-10 pr-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading rooms…</div>
+          <div className="p-8 text-center text-muted-foreground">Loading rooms…</div>
         ) : (
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-muted border-b border-border">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Room
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Type
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Access
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Occupancy
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Temp
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Alerts
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border">
               {filtered.map((r) => {
                 const pct = occupancyPct(r);
                 return (
-                  <tr key={r.id} className="hover:bg-gray-50">
+                  <tr key={r.id} className="hover:bg-muted">
                     <td className="px-6 py-4">
                       <Link
                         href={`/dashboard/rooms/${r.id}`}
                         className="flex items-center gap-2 text-sm font-medium text-primary hover:underline"
                       >
-                        <Warehouse className="h-4 w-4 text-gray-400" />
+                        <Warehouse className="h-4 w-4 text-muted-foreground" />
                         {r.name}
                         {!r.active && (
-                          <span className="text-xs text-gray-400">(inactive)</span>
+                          <span className="text-xs text-muted-foreground">(inactive)</span>
                         )}
                         {r.quarantine && (
-                          <span className="px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-800 text-xs">
+                          <span className="px-1.5 py-0.5 rounded bg-warning/15 text-warning text-xs">
                             quarantine
                           </span>
                         )}
                       </Link>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs text-muted-foreground mt-0.5">
                         {r.parent_name ? `in ${r.parent_name} · ` : ''}
                         {r.child_count > 0 ? `${r.child_count} sub-room${r.child_count > 1 ? 's' : ''}` : 'top level'}
                       </p>
@@ -156,25 +156,25 @@ export default function RoomsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {pct === null ? (
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           {r.product_count} item{r.product_count === 1 ? '' : 's'}
                         </span>
                       ) : (
                         <div className="w-32">
-                          <div className="flex justify-between text-xs text-gray-600 mb-1">
+                          <div className="flex justify-between text-xs text-muted-foreground mb-1">
                             <span>{pct}%</span>
                             <span>
                               {r.stock_units}/{r.capacity_units}
                             </span>
                           </div>
-                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div className="h-2 bg-input rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full ${
                                 pct >= 90
-                                  ? 'bg-red-500'
+                                  ? 'bg-destructive/100'
                                   : pct >= 70
-                                    ? 'bg-amber-500'
-                                    : 'bg-green-500'
+                                    ? 'bg-warning/100'
+                                    : 'bg-success'
                               }`}
                               style={{ width: `${pct}%` }}
                             />
@@ -189,30 +189,30 @@ export default function RoomsPage() {
                           <span
                             className={
                               r.temp_status === 'ok'
-                                ? 'text-gray-900'
-                                : 'text-red-600 font-medium'
+                                ? 'text-foreground'
+                                : 'text-destructive font-medium'
                             }
                           >
                             {r.latest_temp.toFixed(1)}°C
                           </span>
                         ) : (
-                          <span className="text-gray-400">—</span>
+                          <span className="text-muted-foreground">—</span>
                         )}
                       </div>
                       {(r.temp_min !== null || r.temp_max !== null) && (
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-muted-foreground">
                           {r.temp_min ?? '−∞'}…{r.temp_max ?? '+∞'}°C
                         </p>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {r.open_alert_count > 0 ? (
-                        <span className="inline-flex items-center gap-1 text-sm text-red-600 font-medium">
+                        <span className="inline-flex items-center gap-1 text-sm text-destructive font-medium">
                           <AlertTriangle className="h-4 w-4" />
                           {r.open_alert_count}
                         </span>
                       ) : (
-                        <span className="text-sm text-gray-400">0</span>
+                        <span className="text-sm text-muted-foreground">0</span>
                       )}
                     </td>
                   </tr>
@@ -220,7 +220,7 @@ export default function RoomsPage() {
               })}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">
                     No rooms found
                   </td>
                 </tr>

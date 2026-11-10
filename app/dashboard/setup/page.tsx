@@ -180,7 +180,7 @@ export default function SetupWizardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 text-gray-500 p-8">
+      <div className="flex items-center gap-2 text-muted-foreground p-8">
         <Loader2 className="h-5 w-5 animate-spin" /> Loading setup…
       </div>
     );
@@ -189,10 +189,10 @@ export default function SetupWizardPage() {
   if (applied) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8 text-center">
-          <PackageCheck className="h-12 w-12 text-green-600 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900">Setup applied</h1>
-          <p className="text-gray-600 mt-2">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-8 text-center">
+          <PackageCheck className="h-12 w-12 text-success mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-foreground">Setup applied</h1>
+          <p className="text-muted-foreground mt-2">
             This instance is now configured. Menus, fields and report packs
             reflect your selections — nothing was deleted; re-run the wizard
             any time to change it.
@@ -200,7 +200,7 @@ export default function SetupWizardPage() {
           <div className="mt-6 flex items-center justify-center gap-3">
             <Link
               href="/dashboard"
-              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
               Go to dashboard
             </Link>
@@ -209,7 +209,7 @@ export default function SetupWizardPage() {
                 setApplied(false);
                 setStep(0);
               }}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
             >
               Re-run wizard
             </button>
@@ -222,8 +222,8 @@ export default function SetupWizardPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Instance setup</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Instance setup</h1>
+        <p className="text-muted-foreground mt-1">
           {previouslyAppliedAt
             ? `This instance was last configured ${new Date(previouslyAppliedAt).toLocaleString()} — your previous answers are pre-filled.`
             : 'Tell us what this deployment stocks and how it works — we enable the menus, fields and workflows to match.'}
@@ -237,16 +237,16 @@ export default function SetupWizardPage() {
             <span
               className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-medium ${
                 i < step
-                  ? 'bg-primary text-white'
+                  ? 'bg-primary text-primary-foreground'
                   : i === step
-                    ? 'bg-blue-100 text-blue-700 ring-2 ring-primary'
-                    : 'bg-gray-100 text-gray-500'
+                    ? 'bg-info/10 text-info ring-2 ring-primary'
+                    : 'bg-muted text-muted-foreground'
               }`}
             >
               {i < step ? <Check className="h-4 w-4" /> : i + 1}
             </span>
             <span
-              className={`text-sm ${i === step ? 'font-medium text-gray-900' : 'text-gray-500'} hidden sm:inline`}
+              className={`text-sm ${i === step ? 'font-medium text-foreground' : 'text-muted-foreground'} hidden sm:inline`}
             >
               {label}
             </span>
@@ -255,16 +255,16 @@ export default function SetupWizardPage() {
       </ol>
 
       {error && (
-        <div className="p-4 rounded-lg bg-red-50 text-red-800">{error}</div>
+        <div className="p-4 rounded-lg bg-destructive/10 text-destructive">{error}</div>
       )}
 
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
         {step === 0 && (
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">
+            <h2 className="text-lg font-semibold text-foreground mb-1">
               Which industries does this deployment serve?
             </h2>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Pick all that apply — each enables a set of capability packs.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -275,8 +275,8 @@ export default function SetupWizardPage() {
                     key={id}
                     className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                       checked
-                        ? 'border-primary bg-blue-50'
-                        : 'border-gray-200 hover:bg-gray-50'
+                        ? 'border-primary bg-info/10'
+                        : 'border-border hover:bg-muted'
                     }`}
                   >
                     <input
@@ -285,7 +285,7 @@ export default function SetupWizardPage() {
                       onChange={() => toggleIndustry(id)}
                       className="h-4 w-4 text-primary rounded"
                     />
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-foreground">
                       {INDUSTRY_LABELS[id]}
                     </span>
                   </label>
@@ -294,14 +294,14 @@ export default function SetupWizardPage() {
             </div>
             {impliedPacks.length > 0 && (
               <div className="mt-4">
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
                   Capability packs enabled
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {impliedPacks.map((p) => (
                     <span
                       key={p}
-                      className="px-2 py-1 text-xs rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200"
+                      className="px-2 py-1 text-xs rounded-full bg-info/10 text-info border border-info/30"
                     >
                       {PACK_LABELS[p]}
                     </span>
@@ -314,10 +314,10 @@ export default function SetupWizardPage() {
 
         {step === 1 && (
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">
+            <h2 className="text-lg font-semibold text-foreground mb-1">
               What do you stock?
             </h2>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               These characteristics turn on the matching fields and screens.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -326,8 +326,8 @@ export default function SetupWizardPage() {
                   key={key}
                   className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                     stock[key]
-                      ? 'border-primary bg-blue-50'
-                      : 'border-gray-200 hover:bg-gray-50'
+                      ? 'border-primary bg-info/10'
+                      : 'border-border hover:bg-muted'
                   }`}
                 >
                   <input
@@ -336,7 +336,7 @@ export default function SetupWizardPage() {
                     onChange={() => toggleStock(key)}
                     className="h-4 w-4 text-primary rounded"
                   />
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-foreground">
                     {STOCK_CHARACTERISTIC_LABELS[key]}
                   </span>
                 </label>
@@ -347,12 +347,12 @@ export default function SetupWizardPage() {
 
         {step === 2 && (
           <div className="space-y-5">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-foreground">
               Stock policies
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Picking strategy
                 </label>
                 <select
@@ -363,7 +363,7 @@ export default function SetupWizardPage() {
                       picking_strategy: e.target.value as PickingStrategy,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   {PICKING_STRATEGIES.map((v) => (
                     <option key={v} value={v}>
@@ -373,7 +373,7 @@ export default function SetupWizardPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Picking enforcement
                 </label>
                 <select
@@ -385,7 +385,7 @@ export default function SetupWizardPage() {
                         .value as PickingEnforcement,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   {PICKING_ENFORCEMENTS.map((v) => (
                     <option key={v} value={v}>
@@ -395,7 +395,7 @@ export default function SetupWizardPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Valuation method
                 </label>
                 <select
@@ -406,7 +406,7 @@ export default function SetupWizardPage() {
                       valuation_method: e.target.value as ValuationMethod,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   {VALUATION_METHODS.map((v) => (
                     <option key={v} value={v}>
@@ -416,7 +416,7 @@ export default function SetupWizardPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Expiry policy
                 </label>
                 <select
@@ -427,7 +427,7 @@ export default function SetupWizardPage() {
                       expiry_policy: e.target.value as ExpiryPolicy,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   {EXPIRY_POLICIES.map((v) => (
                     <option key={v} value={v}>
@@ -439,7 +439,7 @@ export default function SetupWizardPage() {
             </div>
             {(policies.expiry_policy === 'enforce_fefo' ||
               policies.expiry_policy === 'enforce_fefo_quarantine') && (
-              <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <p className="text-sm text-warning bg-warning/10 border border-warning/30 rounded-lg p-3">
                 Enforcing FEFO implies expiry tracking and FEFO picking —
                 the corresponding features will be switched on automatically.
               </p>
@@ -449,28 +449,28 @@ export default function SetupWizardPage() {
 
         {step === 3 && (
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">
+            <h2 className="text-lg font-semibold text-foreground mb-1">
               Review &amp; apply
             </h2>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               This is exactly what changes. Disabling a feature hides its UI
               only — existing data is never deleted.
             </p>
             {previewLoading ? (
-              <div className="flex items-center gap-2 text-gray-500 py-8 justify-center">
+              <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
                 <Loader2 className="h-5 w-5 animate-spin" /> Computing…
               </div>
             ) : preview ? (
               <div className="space-y-5">
                 <div>
-                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                  <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
                     Features enabled
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {preview.enabled_flags.map((f) => (
                       <span
                         key={f}
-                        className="px-2 py-1 text-xs rounded-full bg-green-50 text-green-700 border border-green-200"
+                        className="px-2 py-1 text-xs rounded-full bg-success/10 text-success border border-success/30"
                       >
                         {FEATURE_FLAG_LABELS[f]}
                       </span>
@@ -478,7 +478,7 @@ export default function SetupWizardPage() {
                     {preview.disabled_flags.map((f) => (
                       <span
                         key={f}
-                        className="px-2 py-1 text-xs rounded-full bg-gray-50 text-gray-500 border border-gray-200 line-through"
+                        className="px-2 py-1 text-xs rounded-full bg-muted text-muted-foreground border border-border line-through"
                       >
                         {FEATURE_FLAG_LABELS[f]}
                       </span>
@@ -486,30 +486,30 @@ export default function SetupWizardPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                  <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
                     Navigation
                   </h3>
                   <ul className="text-sm space-y-1">
                     {preview.nav.map((n) => (
                       <li key={n.href} className="flex items-center gap-2">
                         <span
-                          className={`h-2 w-2 rounded-full ${n.visible ? 'bg-green-500' : 'bg-gray-300'}`}
+                          className={`h-2 w-2 rounded-full ${n.visible ? 'bg-success' : 'bg-input'}`}
                         />
-                        <span className={n.visible ? 'text-gray-900' : 'text-gray-500'}>
+                        <span className={n.visible ? 'text-foreground' : 'text-muted-foreground'}>
                           {n.label}
                         </span>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-muted-foreground">
                           {n.visible ? 'shown' : 'hidden'}
                         </span>
                       </li>
                     ))}
-                    <li className="text-xs text-gray-400 pt-1">
+                    <li className="text-xs text-muted-foreground pt-1">
                       All other nav items are unaffected.
                     </li>
                   </ul>
                 </div>
                 <div>
-                  <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                  <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
                     Report packs
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -523,7 +523,7 @@ export default function SetupWizardPage() {
                     ))}
                   </div>
                 </div>
-                <div className="text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+                <div className="text-sm text-muted-foreground bg-muted rounded-lg p-3">
                   <p>
                     <strong>Policies:</strong>{' '}
                     {PICKING_STRATEGY_LABELS[policies.picking_strategy]} ·{' '}
@@ -538,7 +538,7 @@ export default function SetupWizardPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-gray-500 py-4">
+              <p className="text-sm text-muted-foreground py-4">
                 Preview unavailable — check the error above.
               </p>
             )}
@@ -551,7 +551,7 @@ export default function SetupWizardPage() {
         <button
           onClick={() => setStep((s) => Math.max(0, s - 1))}
           disabled={step === 0}
-          className="flex items-center gap-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-1 px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <ChevronLeft className="h-4 w-4" /> Back
         </button>
@@ -559,7 +559,7 @@ export default function SetupWizardPage() {
           <button
             onClick={() => setStep((s) => s + 1)}
             disabled={!canContinue}
-            className="flex items-center gap-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next <ChevronRight className="h-4 w-4" />
           </button>
@@ -567,7 +567,7 @@ export default function SetupWizardPage() {
           <button
             onClick={handleApply}
             disabled={applying || previewLoading || !preview}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 bg-success text-success-foreground rounded-lg hover:bg-success/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {applying && <Loader2 className="h-4 w-4 animate-spin" />}
             {applying ? 'Applying…' : 'Apply configuration'}

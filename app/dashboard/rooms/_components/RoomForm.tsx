@@ -35,7 +35,7 @@ interface RoomFormProps {
 }
 
 const inputCls =
-  'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary';
+  'w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary';
 
 export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
   const router = useRouter();
@@ -152,15 +152,15 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="p-4 rounded-lg bg-red-50 text-red-800">{error}</div>
+        <div className="p-4 rounded-lg bg-destructive/10 text-destructive">{error}</div>
       )}
 
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-gray-900">Room details</h2>
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">Room details</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Name *
             </label>
             <input
@@ -172,7 +172,7 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Type *
             </label>
             <select
@@ -187,14 +187,14 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
               ))}
             </select>
             {!initial && (
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Changing type applies that type&apos;s default temp range,
                 access level and features — all editable below.
               </p>
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Parent room
             </label>
             <select
@@ -211,7 +211,7 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Capacity (units)
             </label>
             <input
@@ -226,7 +226,7 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             Description
           </label>
           <textarea
@@ -240,7 +240,7 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Temp min (°C)
             </label>
             <input
@@ -253,7 +253,7 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Temp max (°C)
             </label>
             <input
@@ -269,11 +269,11 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
       </div>
 
       {/* Access */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-4">
-        <h2 className="text-lg font-semibold text-gray-900">Access</h2>
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">Access</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Access level
             </label>
             <select
@@ -291,14 +291,14 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Allowed roles
             </label>
             <div className="flex flex-wrap gap-3 pt-1">
               {USER_ROLES.map((r) => (
                 <label
                   key={r}
-                  className="inline-flex items-center gap-1.5 text-sm text-gray-700"
+                  className="inline-flex items-center gap-1.5 text-sm text-foreground"
                 >
                   <input
                     type="checkbox"
@@ -306,27 +306,27 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
                     onChange={() =>
                       toggleArrayValue(allowedRoles, r, setAllowedRoles)
                     }
-                    className="rounded border-gray-300"
+                    className="rounded border-input"
                   />
                   {r.replace('_', ' ')}
                 </label>
               ))}
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-muted-foreground">
               Empty = no role restriction.
             </p>
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             Item allowlist
           </label>
           <div className="flex flex-wrap gap-3">
             {ITEM_TYPES.map((t) => (
               <label
                 key={t}
-                className="inline-flex items-center gap-1.5 text-sm text-gray-700"
+                className="inline-flex items-center gap-1.5 text-sm text-foreground"
               >
                 <input
                   type="checkbox"
@@ -334,7 +334,7 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
                   onChange={() =>
                     toggleArrayValue(itemAllowlist, t, setItemAllowlist)
                   }
-                  className="rounded border-gray-300"
+                  className="rounded border-input"
                 />
                 {t}
               </label>
@@ -346,27 +346,27 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
             className={`${inputCls} mt-2`}
             placeholder="Extra categories, comma-separated (optional)"
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-muted-foreground">
             Empty = all item types allowed.
           </p>
         </div>
       </div>
 
       {/* Feature toggles */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-1">
           Room features
         </h2>
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-muted-foreground mb-4">
           Per-room capabilities — disabling a feature also disables its
           server-side behaviour (e.g. threshold_alerts stops alert evaluation).
         </p>
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-border">
           {ROOM_FEATURES.map((f) => (
             <div key={f.key} className="flex items-center justify-between py-3">
               <div>
-                <p className="text-sm font-medium text-gray-900">{f.label}</p>
-                <p className="text-xs text-gray-500">{f.description}</p>
+                <p className="text-sm font-medium text-foreground">{f.label}</p>
+                <p className="text-xs text-muted-foreground">{f.description}</p>
               </div>
               <ToggleSwitch
                 checked={toggles[f.key] ?? false}
@@ -380,11 +380,11 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
       </div>
 
       {/* Flags */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-4">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-900">Quarantine</p>
-            <p className="text-xs text-gray-500">
+            <p className="text-sm font-medium text-foreground">Quarantine</p>
+            <p className="text-xs text-muted-foreground">
               Stock here is held for inspection.
             </p>
           </div>
@@ -397,8 +397,8 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
         </div>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-900">Active</p>
-            <p className="text-xs text-gray-500">
+            <p className="text-sm font-medium text-foreground">Active</p>
+            <p className="text-xs text-muted-foreground">
               Inactive rooms are hidden from pickers and the simulator.
             </p>
           </div>
@@ -415,14 +415,14 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={saving}
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
         >
           {saving ? 'Saving…' : initial ? 'Update room' : 'Create room'}
         </button>

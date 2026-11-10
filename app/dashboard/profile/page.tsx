@@ -112,29 +112,29 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-        <p className="text-gray-600 mt-1">Manage your account settings</p>
+        <h1 className="text-2xl font-bold text-foreground">My Profile</h1>
+        <p className="text-muted-foreground mt-1">Manage your account settings</p>
       </div>
 
       {message && (
         <div className={`p-4 rounded-lg flex items-center gap-3 ${
-          message.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+          message.type === 'success' ? 'bg-success/10 border border-success/30' : 'bg-destructive/10 border border-destructive/30'
         }`}>
           {message.type === 'success' ? (
-            <CheckCircle className="h-5 w-5 text-green-600" />
+            <CheckCircle className="h-5 w-5 text-success" />
           ) : (
-            <AlertCircle className="h-5 w-5 text-red-600" />
+            <AlertCircle className="h-5 w-5 text-destructive" />
           )}
           <p className={`text-sm ${
-            message.type === 'success' ? 'text-green-800' : 'text-red-800'
+            message.type === 'success' ? 'text-success' : 'text-destructive'
           }`}>{message.text}</p>
         </div>
       )}
 
       {/* Profile Information */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">Profile Information</h2>
+          <h2 className="text-lg font-semibold text-foreground">Profile Information</h2>
           {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
@@ -148,19 +148,19 @@ export default function ProfilePage() {
         {isEditing ? (
           <form onSubmit={handleProfileUpdate} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Full Name</label>
               <input
                 type="text"
                 value={editForm.full_name}
                 onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
             <div className="flex gap-3">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-blue-400 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
               >
                 <Save className="h-4 w-4" />
                 {isSubmitting ? 'Saving...' : 'Save Changes'}
@@ -171,7 +171,7 @@ export default function ProfilePage() {
                   setIsEditing(false);
                   setEditForm({ full_name: profile?.full_name || '' });
                 }}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
               >
                 Cancel
               </button>
@@ -180,21 +180,21 @@ export default function ProfilePage() {
         ) : (
           <div className="space-y-4">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
+              <div className="p-3 bg-info/10 rounded-lg">
                 <User className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Full Name</p>
-                <p className="font-medium text-gray-900">{profile?.full_name || 'Not set'}</p>
+                <p className="text-sm text-muted-foreground">Full Name</p>
+                <p className="font-medium text-foreground">{profile?.full_name || 'Not set'}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Mail className="h-6 w-6 text-green-600" />
+              <div className="p-3 bg-success/10 rounded-lg">
+                <Mail className="h-6 w-6 text-success" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Email</p>
-                <p className="font-medium text-gray-900">{user?.email || 'Not set'}</p>
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-medium text-foreground">{user?.email || 'Not set'}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -202,8 +202,8 @@ export default function ProfilePage() {
                 <Lock className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Role</p>
-                <p className="font-medium text-gray-900 capitalize">{profile?.role || 'Not set'}</p>
+                <p className="text-sm text-muted-foreground">Role</p>
+                <p className="font-medium text-foreground capitalize">{profile?.role || 'Not set'}</p>
               </div>
             </div>
           </div>
@@ -211,18 +211,18 @@ export default function ProfilePage() {
       </div>
 
       {/* Alert Preferences */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-blue-100 rounded-lg">
+          <div className="p-2 bg-info/10 rounded-lg">
             <Bell className="h-5 w-5 text-primary" />
           </div>
-          <h2 className="text-lg font-semibold text-gray-900">Alert Preferences</h2>
+          <h2 className="text-lg font-semibold text-foreground">Alert Preferences</h2>
         </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-gray-900">Low Stock Alerts</p>
-              <p className="text-sm text-gray-600">Receive notifications when items are below minimum threshold</p>
+              <p className="font-medium text-foreground">Low Stock Alerts</p>
+              <p className="text-sm text-muted-foreground">Receive notifications when items are below minimum threshold</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -231,13 +231,13 @@ export default function ProfilePage() {
                 onChange={(e) => setAlertPreferences({ ...alertPreferences, alert_low_stock: e.target.checked })}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              <div className="w-11 h-6 bg-input peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/40 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-input after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-gray-900">Overdue Tool Alerts</p>
-              <p className="text-sm text-gray-600">Receive notifications for overdue tool loans</p>
+              <p className="font-medium text-foreground">Overdue Tool Alerts</p>
+              <p className="text-sm text-muted-foreground">Receive notifications for overdue tool loans</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -246,7 +246,7 @@ export default function ProfilePage() {
                 onChange={(e) => setAlertPreferences({ ...alertPreferences, alert_overdue_tools: e.target.checked })}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              <div className="w-11 h-6 bg-input peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/40 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-input after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
         </div>
@@ -254,7 +254,7 @@ export default function ProfilePage() {
           <button
             onClick={handleAlertPreferencesSave}
             disabled={isSubmitting}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-blue-400 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
           >
             <Save className="h-4 w-4" />
             {isSubmitting ? 'Saving...' : 'Save Preferences'}
@@ -263,22 +263,22 @@ export default function ProfilePage() {
       </div>
 
       {/* Password Management */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Password Management</h2>
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-6">Password Management</h2>
 
         {!showPasswordForm ? (
           <div className="space-y-4">
             <button
               onClick={handlePasswordResetEmail}
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-input rounded-lg hover:bg-muted transition-colors"
             >
               <Mail className="h-4 w-4" />
               {isSubmitting ? 'Sending...' : 'Request Password Reset'}
             </button>
             <button
               onClick={() => setShowPasswordForm(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
               <Lock className="h-4 w-4" />
               Change Password
@@ -287,22 +287,22 @@ export default function ProfilePage() {
         ) : (
           <form onSubmit={handlePasswordChange} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+              <label className="block text-sm font-medium text-foreground mb-1">New Password</label>
               <input
                 type="password"
                 value={passwordForm.newPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter new password"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Confirm New Password</label>
               <input
                 type="password"
                 value={passwordForm.confirmPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Confirm new password"
               />
             </div>
@@ -310,7 +310,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-blue-400 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
               >
                 <Save className="h-4 w-4" />
                 {isSubmitting ? 'Updating...' : 'Update Password'}
@@ -321,7 +321,7 @@ export default function ProfilePage() {
                   setShowPasswordForm(false);
                   setPasswordForm({ oldPassword: '', newPassword: '', confirmPassword: '' });
                 }}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
               >
                 Cancel
               </button>

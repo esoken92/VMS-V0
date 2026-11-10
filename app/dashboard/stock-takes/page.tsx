@@ -168,9 +168,9 @@ export default function StockTakesPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'open': return 'bg-blue-100 text-blue-700';
-      case 'completed': return 'bg-green-100 text-green-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'open': return 'bg-info/10 text-info';
+      case 'completed': return 'bg-success/10 text-success';
+      default: return 'bg-muted text-foreground';
     }
   };
 
@@ -181,13 +181,13 @@ export default function StockTakesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Stock Takes</h1>
-          <p className="text-gray-600 mt-1">Perform blind inventory counts</p>
+          <h1 className="text-2xl font-bold text-foreground">Stock Takes</h1>
+          <p className="text-muted-foreground mt-1">Perform blind inventory counts</p>
         </div>
         <button
           onClick={handleStartStockTake}
           disabled={busy}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           <Plus className="h-4 w-4" />
           {busy ? 'Working…' : 'Start New Stock Take'}
@@ -196,7 +196,7 @@ export default function StockTakesPage() {
 
       {/* Message */}
       {message && (
-        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
           {message.text}
         </div>
       )}
@@ -208,24 +208,24 @@ export default function StockTakesPage() {
             <div className="flex items-center gap-3">
               <ClipboardList className="h-6 w-6 text-primary" />
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Stock Take in Progress</h2>
-                <p className="text-sm text-gray-600">ID: {activeStockTake.id.slice(0, 8)}</p>
+                <h2 className="text-lg font-semibold text-foreground">Stock Take in Progress</h2>
+                <p className="text-sm text-muted-foreground">ID: {activeStockTake.id.slice(0, 8)}</p>
               </div>
             </div>
             <button
               onClick={() => setCountingMode(false)}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
             >
               Cancel
             </button>
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Notes</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               rows={2}
               placeholder="Add notes about this stock take..."
             />
@@ -233,13 +233,13 @@ export default function StockTakesPage() {
 
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {products.map((product) => (
-              <div key={product.id} className="flex items-center gap-4 p-3 bg-white rounded-lg border border-gray-200">
+              <div key={product.id} className="flex items-center gap-4 p-3 bg-card rounded-lg border border-border">
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900">{product.sku} - {product.name}</p>
-                  <p className="text-sm text-gray-600">{product.unit_of_measure}</p>
+                  <p className="font-medium text-foreground">{product.sku} - {product.name}</p>
+                  <p className="text-sm text-muted-foreground">{product.unit_of_measure}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <label className="text-sm text-gray-700">Count:</label>
+                  <label className="text-sm text-foreground">Count:</label>
                   <input
                     type="number"
                     step="0.01"
@@ -248,10 +248,10 @@ export default function StockTakesPage() {
                       ...countedItems,
                       [product.id]: parseFloat(e.target.value) || 0
                     })}
-                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-24 px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="0"
                   />
-                  <span className="text-sm text-gray-600">{product.unit_of_measure}</span>
+                  <span className="text-sm text-muted-foreground">{product.unit_of_measure}</span>
                 </div>
               </div>
             ))}
@@ -261,14 +261,14 @@ export default function StockTakesPage() {
             <button
               onClick={handleSaveDraft}
               disabled={busy}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 border border-input rounded-lg hover:bg-muted disabled:opacity-50 transition-colors"
             >
               {busy ? 'Saving…' : 'Save Draft'}
             </button>
             <button
               onClick={handleCompleteStockTake}
               disabled={busy}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-success text-success-foreground rounded-lg hover:bg-success/90 disabled:opacity-50 transition-colors"
             >
               <CheckCircle className="h-4 w-4" />
               {busy ? 'Completing…' : 'Complete Stock Take'}
@@ -278,46 +278,46 @@ export default function StockTakesPage() {
       )}
 
       {/* Search */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search stock takes by ID, zone, or status..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full pl-10 pr-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
       </div>
 
       {/* Stock Takes Table */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
+      <div className="bg-card rounded-lg border border-border shadow-sm overflow-x-auto">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading stock takes...</div>
+          <div className="p-8 text-center text-muted-foreground">Loading stock takes...</div>
         ) : (
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-muted border-b border-border">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started By</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Started</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Started By</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Started</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Progress</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border">
               {filteredStockTakes.map((stockTake) => (
-                <tr key={stockTake.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" title={stockTake.id}>{stockTake.id.slice(0, 8)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <tr key={stockTake.id} className="hover:bg-muted">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground" title={stockTake.id}>{stockTake.id.slice(0, 8)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                     {stockTake.started_by_name || 'Unknown'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     {stockTake.started_at ? new Date(stockTake.started_at).toLocaleString() : '-'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{getProgress(stockTake)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{getProgress(stockTake)}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs font-medium rounded ${getStatusColor(stockTake.status)}`}>
                       {stockTake.status.charAt(0).toUpperCase() + stockTake.status.slice(1)}
@@ -346,7 +346,7 @@ export default function StockTakesPage() {
               ))}
               {filteredStockTakes.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">No stock takes found</td>
+                  <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">No stock takes found</td>
                 </tr>
               )}
             </tbody>
@@ -356,42 +356,42 @@ export default function StockTakesPage() {
 
       {/* View Modal */}
       {showModal && activeStockTake && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">Stock Take Details</h2>
+        <div className="fixed inset-0 bg-sidebar/70 flex items-center justify-center z-50">
+          <div className="bg-card rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-border">
+              <h2 className="text-xl font-semibold text-foreground">Stock Take Details</h2>
             </div>
             <div className="p-6">
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
-                  <p className="text-sm text-gray-600">ID</p>
-                  <p className="font-medium text-gray-900" title={activeStockTake.id}>{activeStockTake.id.slice(0, 8)}</p>
+                  <p className="text-sm text-muted-foreground">ID</p>
+                  <p className="font-medium text-foreground" title={activeStockTake.id}>{activeStockTake.id.slice(0, 8)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Status</p>
-                  <p className="font-medium text-gray-900 capitalize">{activeStockTake.status}</p>
+                  <p className="text-sm text-muted-foreground">Status</p>
+                  <p className="font-medium text-foreground capitalize">{activeStockTake.status}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Started</p>
-                  <p className="font-medium text-gray-900">{activeStockTake.started_at ? new Date(activeStockTake.started_at).toLocaleString() : '-'}</p>
+                  <p className="text-sm text-muted-foreground">Started</p>
+                  <p className="font-medium text-foreground">{activeStockTake.started_at ? new Date(activeStockTake.started_at).toLocaleString() : '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Completed</p>
-                  <p className="font-medium text-gray-900">
+                  <p className="text-sm text-muted-foreground">Completed</p>
+                  <p className="font-medium text-foreground">
                     {activeStockTake.completed_at ? new Date(activeStockTake.completed_at).toLocaleString() : 'N/A'}
                   </p>
                 </div>
               </div>
               {activeStockTake.notes && (
                 <div className="mb-6">
-                  <p className="text-sm text-gray-600 mb-1">Notes</p>
-                  <p className="text-gray-900">{activeStockTake.notes}</p>
+                  <p className="text-sm text-muted-foreground mb-1">Notes</p>
+                  <p className="text-foreground">{activeStockTake.notes}</p>
                 </div>
               )}
               <div className="flex justify-end">
                 <button
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
                 >
                   Close
                 </button>

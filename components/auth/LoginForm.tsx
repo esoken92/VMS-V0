@@ -102,17 +102,17 @@ export default function LoginForm() {
     <div className="w-full max-w-md mx-auto">
       {/* Header */}
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-gray-900">VMS Inventory</h1>
-        <p className="text-gray-600 mt-2">Inventory Management System</p>
+        <h1 className="text-3xl font-bold text-foreground">VMS Inventory</h1>
+        <p className="text-muted-foreground mt-2">Inventory Management System</p>
       </div>
 
       {/* Error Alert */}
       {displayError && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex gap-3">
-          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+        <div className="mb-6 p-4 bg-destructive/10 border border-destructive/30 rounded-lg flex gap-3">
+          <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-red-800">Login Failed</p>
-            <p className="text-sm text-red-700 mt-1">{displayError}</p>
+            <p className="text-sm font-medium text-destructive">Login Failed</p>
+            <p className="text-sm text-destructive mt-1">{displayError}</p>
           </div>
         </div>
       )}
@@ -121,7 +121,7 @@ export default function LoginForm() {
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Email Field */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
             Email Address
           </label>
           <input
@@ -134,19 +134,19 @@ export default function LoginForm() {
             disabled={isSubmitting || loading}
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${
               errors.email
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 focus:ring-primary'
-            } disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                ? 'border-destructive/40 focus:ring-destructive'
+                : 'border-input focus:ring-primary'
+            } disabled:bg-muted disabled:cursor-not-allowed`}
             placeholder="you@example.com"
           />
           {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.email}</p>
           )}
         </div>
 
         {/* Password Field */}
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
             Password
           </label>
           <div className="relative">
@@ -160,16 +160,16 @@ export default function LoginForm() {
               disabled={isSubmitting || loading}
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition pr-12 ${
                 errors.password
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-primary'
-              } disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                  ? 'border-destructive/40 focus:ring-destructive'
+                  : 'border-input focus:ring-primary'
+              } disabled:bg-muted disabled:cursor-not-allowed`}
               placeholder="••••••••"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               disabled={isSubmitting || loading}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:cursor-not-allowed"
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? (
@@ -180,13 +180,13 @@ export default function LoginForm() {
             </button>
           </div>
           {errors.password && (
-            <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.password}</p>
           )}
         </div>
 
         {/* Station Selection */}
         <div>
-          <label htmlFor="station" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="station" className="block text-sm font-medium text-foreground mb-2">
             Work Station
           </label>
           <select
@@ -197,9 +197,9 @@ export default function LoginForm() {
             disabled={isSubmitting || loading}
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${
               errors.station
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 focus:ring-primary'
-            } disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                ? 'border-destructive/40 focus:ring-destructive'
+                : 'border-input focus:ring-primary'
+            } disabled:bg-muted disabled:cursor-not-allowed`}
           >
             <option value="">Select your station</option>
             <option value="receiving">Receiving / Goods In</option>
@@ -209,7 +209,7 @@ export default function LoginForm() {
             <option value="office">Office / Admin</option>
           </select>
           {errors.station && (
-            <p className="mt-1 text-sm text-red-600">{errors.station}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.station}</p>
           )}
         </div>
 
@@ -227,7 +227,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={isSubmitting || loading || !isFormValid()}
-          className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+          className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
         >
           {isSubmitting || loading ? (
             <>
@@ -241,7 +241,7 @@ export default function LoginForm() {
       </form>
 
       {/* Sign Up Link */}
-      <p className="text-center text-gray-600 mt-6">
+      <p className="text-center text-muted-foreground mt-6">
         Don&apos;t have an account?{' '}
         <Link
           href="/auth/signup"
@@ -252,23 +252,23 @@ export default function LoginForm() {
       </p>
 
       {/* Demo Credentials (seeded via `npm run db:seed` — local demo only) */}
-      <div className="mt-8 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-        <p className="text-sm font-medium text-purple-900 mb-3">🎯 Demo Credentials</p>
+      <div className="mt-8 p-4 bg-info/10 border border-info/30 rounded-lg">
+        <p className="text-sm font-medium text-info mb-3">🎯 Demo Credentials</p>
         <div className="space-y-2 text-xs">
           <div className="flex justify-between items-center">
-            <span className="text-purple-800 font-medium">Admin:</span>
-            <span className="text-purple-700">demo.admin@vms-demo.com / DemoAdmin123!</span>
+            <span className="text-info font-medium">Admin:</span>
+            <span className="text-info">demo.admin@vms-demo.com / DemoAdmin123!</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-purple-800 font-medium">Manager:</span>
-            <span className="text-purple-700">demo.manager@vms-demo.com / DemoManager123!</span>
+            <span className="text-info font-medium">Manager:</span>
+            <span className="text-info">demo.manager@vms-demo.com / DemoManager123!</span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-purple-800 font-medium">Staff:</span>
-            <span className="text-purple-700">demo.worker@vms-demo.com / DemoWorker123!</span>
+            <span className="text-info font-medium">Staff:</span>
+            <span className="text-info">demo.worker@vms-demo.com / DemoWorker123!</span>
           </div>
         </div>
-        <p className="text-xs text-purple-600 mt-3 italic">
+        <p className="text-xs text-info mt-3 italic">
           Local demo accounts only — change or remove before any real deployment
         </p>
       </div>

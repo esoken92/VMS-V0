@@ -169,10 +169,10 @@ export default function MonitoringPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-foreground">
             Environmental Monitoring
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-muted-foreground mt-1">
             Sensor health, climate telemetry and alert lifecycle
           </p>
         </div>
@@ -181,7 +181,7 @@ export default function MonitoringPage() {
             <button
               onClick={() => runSimulate(false)}
               disabled={simulating}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors text-sm disabled:opacity-50"
             >
               <Play className="h-4 w-4" />
               Simulate tick
@@ -189,7 +189,7 @@ export default function MonitoringPage() {
             <button
               onClick={() => runSimulate(true)}
               disabled={simulating}
-              className="flex items-center gap-2 px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors text-sm disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 border border-destructive/40 text-destructive rounded-lg hover:bg-destructive/10 transition-colors text-sm disabled:opacity-50"
               title="Force a temperature excursion — opens threshold alerts"
             >
               <Zap className="h-4 w-4" />
@@ -198,7 +198,7 @@ export default function MonitoringPage() {
             <button
               onClick={seedHistory}
               disabled={simulating}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm disabled:opacity-50"
               title="Backfill 24h of readings for charts"
             >
               <Activity className="h-4 w-4" />
@@ -209,10 +209,10 @@ export default function MonitoringPage() {
       </div>
 
       {error && (
-        <div className="p-4 rounded-lg bg-red-50 text-red-800">{error}</div>
+        <div className="p-4 rounded-lg bg-destructive/10 text-destructive">{error}</div>
       )}
       {message && (
-        <div className="p-4 rounded-lg bg-green-50 text-green-800">{message}</div>
+        <div className="p-4 rounded-lg bg-success/10 text-success">{message}</div>
       )}
 
       {/* Room status cards */}
@@ -221,15 +221,15 @@ export default function MonitoringPage() {
           <Link
             key={s.room_id}
             href={`/dashboard/rooms/${s.room_id}`}
-            className="bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:border-blue-300 transition-colors"
+            className="bg-card rounded-lg border border-border shadow-sm p-5 hover:border-primary/40 transition-colors"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold text-gray-900">{s.room_name}</h3>
+                <h3 className="font-semibold text-foreground">{s.room_name}</h3>
                 <RoomTypeBadge type={s.type} />
               </div>
               {s.open_alert_count > 0 && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-xs font-medium">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-destructive/10 text-destructive text-xs font-medium">
                   <AlertTriangle className="h-3 w-3" />
                   {s.open_alert_count}
                 </span>
@@ -239,20 +239,20 @@ export default function MonitoringPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <TempStatusDot status={s.temp_status} />
-                  <span className="text-2xl font-bold text-gray-900">
+                  <span className="text-2xl font-bold text-foreground">
                     {s.latest_temp !== null
                       ? `${s.latest_temp.toFixed(1)}°C`
                       : '—'}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   {s.latest_humidity !== null &&
                     `${s.latest_humidity.toFixed(0)}% RH · `}
                   {(s.temp_min !== null || s.temp_max !== null) &&
                     `range ${s.temp_min ?? '−∞'}…${s.temp_max ?? '+∞'}°C`}
                 </p>
               </div>
-              <div className="text-right text-xs text-gray-400">
+              <div className="text-right text-xs text-muted-foreground">
                 <Radio className="h-3.5 w-3.5 inline mr-1" />
                 {fmtAgo(s.last_reading_at)}
               </div>
@@ -260,7 +260,7 @@ export default function MonitoringPage() {
           </Link>
         ))}
         {statuses.length === 0 && !loading && (
-          <div className="col-span-full bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-500">
+          <div className="col-span-full bg-card rounded-lg border border-border p-8 text-center text-muted-foreground">
             No active rooms — create one under{' '}
             <Link href="/dashboard/rooms" className="text-primary underline">
               Storerooms
@@ -271,16 +271,16 @@ export default function MonitoringPage() {
       </div>
 
       {/* Stale sensors */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-3">
-          <Radio className="h-5 w-5 text-gray-400" />
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-3">
+          <Radio className="h-5 w-5 text-muted-foreground" />
           Stale sensors
-          <span className="text-sm font-normal text-gray-500">
+          <span className="text-sm font-normal text-muted-foreground">
             (no reading in {STALE_MINUTES}+ min)
           </span>
         </h2>
         {stale.length === 0 ? (
-          <p className="text-sm text-green-700">
+          <p className="text-sm text-success">
             All monitored rooms reported recently.
           </p>
         ) : (
@@ -289,7 +289,7 @@ export default function MonitoringPage() {
               <Link
                 key={s.room_id}
                 href={`/dashboard/rooms/${s.room_id}`}
-                className="px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-sm hover:bg-amber-100"
+                className="px-3 py-1.5 bg-warning/10 border border-warning/30 text-warning rounded-lg text-sm hover:bg-warning/15"
               >
                 {s.room_name} · {fmtAgo(s.last_reading_at)}
               </Link>
@@ -299,21 +299,21 @@ export default function MonitoringPage() {
       </div>
 
       {/* Alerts */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-gray-400" />
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-muted-foreground" />
             Alerts
           </h2>
-          <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+          <div className="flex gap-1 bg-muted rounded-lg p-1">
             {(['active', 'acknowledged', 'resolved'] as const).map((s) => (
               <button
                 key={s}
                 onClick={() => setAlertTab(s)}
                 className={`px-3 py-1 rounded-md text-sm capitalize ${
                   alertTab === s
-                    ? 'bg-white shadow-sm text-gray-900'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-card shadow-sm text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {s}
@@ -322,13 +322,13 @@ export default function MonitoringPage() {
           </div>
         </div>
         {alerts.length === 0 ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             No {alertTab} alerts.
           </p>
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="text-left text-xs text-gray-500 uppercase border-b border-gray-200">
+              <tr className="text-left text-xs text-muted-foreground uppercase border-b border-border">
                 <th className="pb-2">Room</th>
                 <th className="pb-2">Metric</th>
                 <th className="pb-2">Value</th>
@@ -337,7 +337,7 @@ export default function MonitoringPage() {
                 {canAck && <th className="pb-2 text-right">Actions</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-border">
               {alerts.map((a) => (
                 <tr key={a.id}>
                   <td className="py-2.5 text-sm">
@@ -348,24 +348,24 @@ export default function MonitoringPage() {
                       {a.room_name ?? a.room_id.slice(0, 8)}
                     </Link>
                   </td>
-                  <td className="py-2.5 text-sm text-gray-600">
+                  <td className="py-2.5 text-sm text-muted-foreground">
                     {METRIC_LABELS[a.metric]}
                   </td>
-                  <td className="py-2.5 text-sm font-medium text-gray-900">
+                  <td className="py-2.5 text-sm font-medium text-foreground">
                     {a.value}
                     {a.metric === 'temperature' ? '°C' : ''}
                   </td>
-                  <td className="py-2.5 text-sm text-gray-600">
+                  <td className="py-2.5 text-sm text-muted-foreground">
                     {fmtAgo(a.opened_at)}
                   </td>
                   <td className="py-2.5 text-sm">
                     <span
                       className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                         a.state === 'active'
-                          ? 'bg-red-100 text-red-700'
+                          ? 'bg-destructive/10 text-destructive'
                           : a.state === 'acknowledged'
-                            ? 'bg-amber-100 text-amber-700'
-                            : 'bg-green-100 text-green-700'
+                            ? 'bg-warning/15 text-warning'
+                            : 'bg-success/10 text-success'
                       }`}
                     >
                       {a.state}
@@ -378,7 +378,7 @@ export default function MonitoringPage() {
                         {a.state === 'active' && (
                           <button
                             onClick={() => handleAck(a.id)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 text-xs"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 border border-input rounded-lg hover:bg-muted text-xs"
                           >
                             <Check className="h-3.5 w-3.5" /> Acknowledge
                           </button>
@@ -386,7 +386,7 @@ export default function MonitoringPage() {
                         {a.state !== 'resolved' && (
                           <button
                             onClick={() => handleResolve(a.id)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 text-xs"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 bg-success text-success-foreground rounded-lg hover:bg-success/90 text-xs"
                           >
                             <CheckCheck className="h-3.5 w-3.5" /> Resolve
                           </button>
@@ -402,16 +402,16 @@ export default function MonitoringPage() {
       </div>
 
       {/* Climate history */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <Thermometer className="h-5 w-5 text-gray-400" />
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <Thermometer className="h-5 w-5 text-muted-foreground" />
             Climate history — 24h
           </h2>
           <select
             value={chartRoom}
             onChange={(e) => setChartRoom(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            className="px-3 py-2 border border-input rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           >
             {statuses.map((s) => (
               <option key={s.room_id} value={s.room_id}>

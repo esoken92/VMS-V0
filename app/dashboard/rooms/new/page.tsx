@@ -30,7 +30,7 @@ export default function NewRoomPage() {
 
   if (!canEdit) {
     return (
-      <div className="p-8 text-center text-gray-500">
+      <div className="p-8 text-center text-muted-foreground">
         You need a manager or admin role to create rooms.
       </div>
     );
@@ -41,14 +41,14 @@ export default function NewRoomPage() {
       <div>
         <Link
           href="/dashboard/rooms"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" /> Back to rooms
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900 mt-2">New Storeroom</h1>
+        <h1 className="text-2xl font-bold text-foreground mt-2">New Storeroom</h1>
       </div>
       {loading ? (
-        <div className="p-8 text-center text-gray-500">Loading…</div>
+        <div className="p-8 text-center text-muted-foreground">Loading…</div>
       ) : (
         <RoomForm roomOptions={options} />
       )}

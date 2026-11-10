@@ -55,7 +55,7 @@ export default function ClimateChart({
 
   if (data.length === 0) {
     return (
-      <div className="h-64 flex items-center justify-center text-gray-500 text-sm">
+      <div className="h-64 flex items-center justify-center text-muted-foreground text-sm">
         No sensor readings yet — run the simulator or ingest device data.
       </div>
     );
@@ -65,15 +65,15 @@ export default function ClimateChart({
     <div className="h-64 w-full">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 8, right: 12, bottom: 4, left: -16 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
           <XAxis
             dataKey="label"
-            tick={{ fontSize: 11, fill: '#6b7280' }}
+            tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
             minTickGap={40}
           />
           <YAxis
             yAxisId="temp"
-            tick={{ fontSize: 11, fill: '#6b7280' }}
+            tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
             domain={['auto', 'auto']}
             unit="°"
           />
@@ -81,7 +81,7 @@ export default function ClimateChart({
             <YAxis
               yAxisId="rh"
               orientation="right"
-              tick={{ fontSize: 11, fill: '#6b7280' }}
+              tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
               domain={[0, 100]}
               unit="%"
             />
@@ -91,25 +91,25 @@ export default function ClimateChart({
             <ReferenceLine
               yAxisId="temp"
               y={tempMin}
-              stroke="#3b82f6"
+              stroke="hsl(var(--info))"
               strokeDasharray="4 4"
-              label={{ value: `min ${tempMin}°`, fontSize: 10, fill: '#3b82f6' }}
+              label={{ value: `min ${tempMin}°`, fontSize: 10, fill: 'hsl(var(--info))' }}
             />
           )}
           {tempMax !== null && (
             <ReferenceLine
               yAxisId="temp"
               y={tempMax}
-              stroke="#ef4444"
+              stroke="hsl(var(--destructive))"
               strokeDasharray="4 4"
-              label={{ value: `max ${tempMax}°`, fontSize: 10, fill: '#ef4444' }}
+              label={{ value: `max ${tempMax}°`, fontSize: 10, fill: 'hsl(var(--destructive))' }}
             />
           )}
           <Line
             yAxisId="temp"
             type="monotone"
             dataKey="temperature"
-            stroke="#ef4444"
+            stroke="hsl(var(--primary))"
             strokeWidth={2}
             dot={false}
             connectNulls
@@ -120,7 +120,7 @@ export default function ClimateChart({
               yAxisId="rh"
               type="monotone"
               dataKey="humidity"
-              stroke="#0ea5e9"
+              stroke="hsl(var(--lavender))"
               strokeWidth={1.5}
               dot={false}
               connectNulls

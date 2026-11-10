@@ -2,50 +2,103 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Design tokens — monochromatic palette, hue 210.
+ * Single source of truth for every color in the app: pages and components
+ * must consume these tokens (bg-card, text-muted-foreground, bg-primary…),
+ * never raw palette utilities (bg-blue-600, text-gray-900).
+ * Status colors (success/warning/info/destructive) are the only non-210
+ * hues and exist because they carry meaning, not decoration.
+ */
+
+/*
+ * Design tokens — custom palette (dusty lavender / coral glow / canary /
+ * pale amber / air-force blue). Single source of truth: pages and
+ * components consume these tokens, never raw palette utilities.
+ * Status colors carry meaning; highlight/lavender are palette accents.
+ */
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 24 10% 10%;
+    --background: 45 20% 97%;
+    --foreground: 25 20% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 24 10% 10%;
+    --card-foreground: 25 20% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 24 10% 10%;
-    --primary: 22 89% 39%;
-    --primary-foreground: 30 40% 98%;
-    --secondary: 30 12% 95%;
-    --secondary-foreground: 24 10% 14%;
-    --muted: 30 12% 95%;
-    --muted-foreground: 25 8% 40%;
-    --accent: 30 12% 95%;
-    --accent-foreground: 24 10% 14%;
-    --destructive: 0 74% 42%;
-    --destructive-foreground: 30 40% 98%;
-    --border: 27 14% 88%;
-    --input: 27 14% 88%;
-    --ring: 22 89% 39%;
+    --popover-foreground: 25 20% 12%;
+    --primary: 17 72% 46%;
+    --primary-foreground: 30 50% 97%;
+    --secondary: 45 15% 93%;
+    --secondary-foreground: 25 20% 16%;
+    --muted: 45 15% 93%;
+    --muted-foreground: 30 10% 38%;
+    --accent: 324 20% 90%;
+    --accent-foreground: 324 25% 20%;
+    --lavender: 324 24% 48%;
+    /* Canary: highlight/marker surfaces only — never text (fails AA) */
+    --highlight: 60 92% 61%;
+    --destructive: 0 62% 44%;
+    --destructive-foreground: 0 0% 98%;
+    /* Okabe-Ito bluish-green: distinguishable from vermillion primary for
+       every color-vision deficiency (red-green blind safe) */
+    --success: 168 60% 28%;
+    --success-foreground: 0 0% 98%;
+    --warning: 55 78% 32%;
+    --warning-foreground: 0 0% 98%;
+    --info: 204 28% 40%;
+    --info-foreground: 0 0% 98%;
+    /* Bright status variants for text/icons on dark surfaces (scan rail) */
+    --success-bright: 168 60% 45%;
+    --warning-bright: 55 85% 55%;
+    --info-bright: 204 40% 65%;
+    --destructive-bright: 0 80% 65%;
+    --border: 40 12% 85%;
+    --input: 40 12% 85%;
+    --ring: 17 72% 46%;
+    /* Sidebar is a fixed dark rail (dark air-force blue) in both modes */
+    --sidebar: 204 30% 10%;
+    --sidebar-foreground: 45 20% 95%;
+    --sidebar-muted: 204 15% 60%;
+    --sidebar-border: 204 22% 20%;
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: 24 8% 7%;
-    --foreground: 30 12% 95%;
-    --card: 24 8% 9%;
-    --card-foreground: 30 12% 95%;
-    --popover: 24 8% 9%;
-    --popover-foreground: 30 12% 95%;
-    --primary: 24 95% 52%;
-    --primary-foreground: 24 60% 8%;
-    --secondary: 25 8% 16%;
-    --secondary-foreground: 30 12% 95%;
-    --muted: 25 8% 16%;
-    --muted-foreground: 28 8% 62%;
-    --accent: 25 8% 16%;
-    --accent-foreground: 30 12% 95%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 30 40% 98%;
-    --border: 25 8% 16%;
-    --input: 25 8% 16%;
-    --ring: 24 95% 52%;
+    --background: 25 15% 8%;
+    --foreground: 40 15% 94%;
+    --card: 25 15% 11%;
+    --card-foreground: 40 15% 94%;
+    --popover: 25 15% 11%;
+    --popover-foreground: 40 15% 94%;
+    --primary: 17 80% 62%;
+    --primary-foreground: 17 50% 10%;
+    --secondary: 30 10% 16%;
+    --secondary-foreground: 40 15% 94%;
+    --muted: 30 10% 16%;
+    --muted-foreground: 40 8% 62%;
+    --accent: 324 20% 25%;
+    --accent-foreground: 324 30% 85%;
+    --lavender: 324 30% 60%;
+    --highlight: 60 92% 61%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 168 55% 42%;
+    --success-foreground: 168 60% 8%;
+    --warning: 55 80% 55%;
+    --warning-foreground: 55 60% 8%;
+    --info: 204 35% 60%;
+    --info-foreground: 204 50% 10%;
+    --success-bright: 168 65% 50%;
+    --warning-bright: 55 85% 60%;
+    --info-bright: 204 45% 65%;
+    --destructive-bright: 0 80% 65%;
+    --border: 30 10% 18%;
+    --input: 30 10% 18%;
+    --ring: 17 80% 62%;
+    --sidebar: 204 35% 6%;
+    --sidebar-foreground: 40 15% 94%;
+    --sidebar-muted: 204 15% 60%;
+    --sidebar-border: 204 25% 14%;
   }
 }
 

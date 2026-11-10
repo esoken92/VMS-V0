@@ -21,15 +21,15 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
   return (
     <header
       className={`
-        sticky top-0 z-30 bg-white border-b border-gray-200
-        ${isImpersonating ? 'border-yellow-400' : 'border-gray-200'}
+        sticky top-0 z-30 bg-card border-b border-border
+        ${isImpersonating ? 'border-warning/50' : 'border-border'}
       `}
     >
       {/* Impersonation Banner */}
       {isImpersonating && (
-        <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-2 flex items-center gap-2">
-          <AlertCircle className="h-4 w-4 text-yellow-600" />
-          <p className="text-sm font-medium text-yellow-800">
+        <div className="bg-warning/10 border-b border-warning/30 px-4 py-2 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 text-warning" />
+          <p className="text-sm font-medium text-warning">
             🎭 Viewing as another user - changes will be logged
           </p>
         </div>
@@ -42,17 +42,17 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           {/* Mobile Menu Button */}
           <button
             onClick={onMenuClick}
-            className="md:hidden p-2 hover:bg-gray-100 rounded-lg"
+            className="md:hidden p-2 hover:bg-muted rounded-lg"
           >
-            <Menu className="h-6 w-6 text-gray-600" />
+            <Menu className="h-6 w-6 text-muted-foreground" />
           </button>
 
           {/* Page Title */}
           <div>
-            <h1 className="text-lg font-semibold text-gray-900">
+            <h1 className="text-lg font-semibold text-foreground">
               VMS Inventory Management
             </h1>
-            <p className="text-xs text-gray-500">Heavy-Duty Truck Parts</p>
+            <p className="text-xs text-muted-foreground">Heavy-Duty Truck Parts</p>
           </div>
         </div>
 
@@ -63,39 +63,39 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="
-                relative p-2 text-gray-600 hover:text-gray-900
-                hover:bg-gray-100 rounded-lg transition-colors
+                relative p-2 text-muted-foreground hover:text-foreground
+                hover:bg-muted rounded-lg transition-colors
               "
             >
               <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" />
+              <span className="absolute top-1 right-1 h-2 w-2 bg-destructive/100 rounded-full" />
             </button>
 
             {/* Notifications Dropdown */}
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                <div className="p-4 border-b border-gray-100">
-                  <h3 className="font-semibold text-gray-900">Notifications</h3>
+              <div className="absolute right-0 mt-2 w-80 bg-card rounded-lg shadow-lg border border-border z-50">
+                <div className="p-4 border-b border-border">
+                  <h3 className="font-semibold text-foreground">Notifications</h3>
                 </div>
-                <div className="divide-y divide-gray-100">
-                  <div className="p-4 hover:bg-gray-50 cursor-pointer">
-                    <p className="text-sm font-medium text-gray-900">
+                <div className="divide-y divide-border">
+                  <div className="p-4 hover:bg-muted cursor-pointer">
+                    <p className="text-sm font-medium text-foreground">
                       Low Stock Alert
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       5 products below minimum threshold
                     </p>
                   </div>
-                  <div className="p-4 hover:bg-gray-50 cursor-pointer">
-                    <p className="text-sm font-medium text-gray-900">
+                  <div className="p-4 hover:bg-muted cursor-pointer">
+                    <p className="text-sm font-medium text-foreground">
                       Overdue Tool Return
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       2 tools overdue for return
                     </p>
                   </div>
                 </div>
-                <div className="p-4 border-t border-gray-100 text-center">
+                <div className="p-4 border-t border-border text-center">
                   <button className="text-xs font-medium text-primary hover:text-primary/80">
                     View All Notifications
                   </button>
@@ -105,7 +105,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
           </div>
 
           {/* Divider */}
-          <div className="hidden sm:block w-px h-6 bg-gray-200" />
+          <div className="hidden sm:block w-px h-6 bg-input" />
 
           {/* User Menu */}
           <UserMenu />

@@ -119,12 +119,12 @@ export default function SignupForm() {
       <div className="w-full max-w-md mx-auto">
         <div className="text-center">
           <div className="flex justify-center mb-4">
-            <CheckCircle className="h-12 w-12 text-green-600" />
+            <CheckCircle className="h-12 w-12 text-success" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-foreground mb-2">
             Account Created!
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-muted-foreground mb-6">
             Your account is ready — you&apos;re being signed in with your new
             credentials now.
           </p>
@@ -133,14 +133,14 @@ export default function SignupForm() {
             <p className="text-sm text-foreground font-mono">{formData.email}</p>
           </div>
 
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-muted-foreground mb-6">
             New accounts start with the <strong>staff</strong> role. An admin
             can change your role from Dashboard → Users.
           </p>
 
           <Link
             href="/auth/login"
-            className="inline-block w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 rounded-lg transition duration-200"
+            className="inline-block w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 rounded-lg transition duration-200"
           >
             Return to Sign In
           </Link>
@@ -152,23 +152,23 @@ export default function SignupForm() {
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
-        <p className="text-gray-600 mt-2">VMS Inventory</p>
+        <h1 className="text-3xl font-bold text-foreground">Create Account</h1>
+        <p className="text-muted-foreground mt-2">VMS Inventory</p>
       </div>
 
       {displayError && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex gap-3">
-          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+        <div className="mb-6 p-4 bg-destructive/10 border border-destructive/30 rounded-lg flex gap-3">
+          <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-red-800">Signup Failed</p>
-            <p className="text-sm text-red-700 mt-1">{displayError}</p>
+            <p className="text-sm font-medium text-destructive">Signup Failed</p>
+            <p className="text-sm text-destructive mt-1">{displayError}</p>
           </div>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="fullName" className="block text-sm font-medium text-foreground mb-2">
             Full Name
           </label>
           <input
@@ -181,18 +181,18 @@ export default function SignupForm() {
             disabled={isSubmitting || loading}
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${
               errors.fullName
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 focus:ring-primary'
-            } disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                ? 'border-destructive/40 focus:ring-destructive'
+                : 'border-input focus:ring-primary'
+            } disabled:bg-muted disabled:cursor-not-allowed`}
             placeholder="John Doe"
           />
           {errors.fullName && (
-            <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.fullName}</p>
           )}
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
             Email Address
           </label>
           <input
@@ -205,18 +205,18 @@ export default function SignupForm() {
             disabled={isSubmitting || loading}
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${
               errors.email
-                ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 focus:ring-primary'
-            } disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                ? 'border-destructive/40 focus:ring-destructive'
+                : 'border-input focus:ring-primary'
+            } disabled:bg-muted disabled:cursor-not-allowed`}
             placeholder="you@example.com"
           />
           {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.email}</p>
           )}
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
             Password
           </label>
           <div className="relative">
@@ -230,16 +230,16 @@ export default function SignupForm() {
               disabled={isSubmitting || loading}
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition pr-12 ${
                 errors.password
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-primary'
-              } disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                  ? 'border-destructive/40 focus:ring-destructive'
+                  : 'border-input focus:ring-primary'
+              } disabled:bg-muted disabled:cursor-not-allowed`}
               placeholder="••••••••"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               disabled={isSubmitting || loading}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:cursor-not-allowed"
             >
               {showPassword ? (
                 <EyeOff className="h-5 w-5" />
@@ -249,15 +249,15 @@ export default function SignupForm() {
             </button>
           </div>
           {errors.password && (
-            <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.password}</p>
           )}
-          <p className="mt-2 text-xs text-gray-600">
+          <p className="mt-2 text-xs text-muted-foreground">
             Must contain uppercase, number, 8+ characters
           </p>
         </div>
 
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-2">
             Confirm Password
           </label>
           <div className="relative">
@@ -271,16 +271,16 @@ export default function SignupForm() {
               disabled={isSubmitting || loading}
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition pr-12 ${
                 errors.confirmPassword
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-primary'
-              } disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                  ? 'border-destructive/40 focus:ring-destructive'
+                  : 'border-input focus:ring-primary'
+              } disabled:bg-muted disabled:cursor-not-allowed`}
               placeholder="••••••••"
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               disabled={isSubmitting || loading}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:cursor-not-allowed"
             >
               {showConfirmPassword ? (
                 <EyeOff className="h-5 w-5" />
@@ -290,7 +290,7 @@ export default function SignupForm() {
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+            <p className="mt-1 text-sm text-destructive">{errors.confirmPassword}</p>
           )}
         </div>
 
@@ -310,9 +310,9 @@ export default function SignupForm() {
               }
             }}
             disabled={isSubmitting || loading}
-            className="mt-1 h-4 w-4 border-gray-300 rounded focus:ring-primary disabled:cursor-not-allowed"
+            className="mt-1 h-4 w-4 border-input rounded focus:ring-primary disabled:cursor-not-allowed"
           />
-          <label htmlFor="terms" className="text-sm text-gray-700 flex-1">
+          <label htmlFor="terms" className="text-sm text-foreground flex-1">
             I agree to the{' '}
             <Link href="/terms" className="text-primary hover:text-primary/80 underline">
               Terms of Service
@@ -324,13 +324,13 @@ export default function SignupForm() {
           </label>
         </div>
         {errors.terms && (
-          <p className="text-sm text-red-600">{errors.terms}</p>
+          <p className="text-sm text-destructive">{errors.terms}</p>
         )}
 
         <button
           type="submit"
           disabled={isSubmitting || loading || !isFormValid()}
-          className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+          className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
         >
           {isSubmitting || loading ? (
             <>
@@ -343,7 +343,7 @@ export default function SignupForm() {
         </button>
       </form>
 
-      <p className="text-center text-gray-600 mt-6">
+      <p className="text-center text-muted-foreground mt-6">
         Already have an account?{' '}
         <Link href="/auth/login" className="text-primary hover:text-primary/80 font-medium">
           Sign in

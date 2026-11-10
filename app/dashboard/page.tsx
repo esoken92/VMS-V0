@@ -41,8 +41,8 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Inventory overview</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Inventory overview</h1>
+        <p className="text-muted-foreground mt-1">
           {profile?.full_name ? `${profile.full_name} · ` : ''}
           {profile?.role ?? 'staff'} · {todayLabel}
         </p>
@@ -50,11 +50,11 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Link href="/dashboard/inventory" className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-primary/40 transition-all cursor-pointer">
+        <Link href="/dashboard/inventory" className="bg-card p-6 rounded-lg border border-border shadow-sm hover:shadow-md hover:border-primary/40 transition-all cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Products</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-sm font-medium text-muted-foreground">Total Products</p>
+              <p className="text-2xl font-bold text-foreground mt-1">
                 {stats ? stats.total_products.toLocaleString() : '—'}
               </p>
             </div>
@@ -62,14 +62,14 @@ export default function DashboardPage() {
               <Package className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">in catalog</p>
+          <p className="text-xs text-muted-foreground mt-2">in catalog</p>
         </Link>
 
-        <Link href="/dashboard/stock-movements" className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-primary/40 transition-all cursor-pointer">
+        <Link href="/dashboard/stock-movements" className="bg-card p-6 rounded-lg border border-border shadow-sm hover:shadow-md hover:border-primary/40 transition-all cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Stock Movements</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-sm font-medium text-muted-foreground">Stock Movements</p>
+              <p className="text-2xl font-bold text-foreground mt-1">
                 {stats ? stats.movements_this_month.toLocaleString() : '—'}
               </p>
             </div>
@@ -77,89 +77,89 @@ export default function DashboardPage() {
               <TrendingUp className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">this month</p>
+          <p className="text-xs text-muted-foreground mt-2">this month</p>
         </Link>
 
-        <Link href="/dashboard/inventory" className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-primary/40 transition-all cursor-pointer">
+        <Link href="/dashboard/inventory" className="bg-card p-6 rounded-lg border border-border shadow-sm hover:shadow-md hover:border-primary/40 transition-all cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Low Stock Alerts</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-sm font-medium text-muted-foreground">Low Stock Alerts</p>
+              <p className="text-2xl font-bold text-foreground mt-1">
                 {stats ? stats.low_stock_count : '—'}
               </p>
             </div>
-            <div className={`p-3 rounded-lg ${stats && stats.low_stock_count > 0 ? 'bg-amber-100' : 'bg-primary/10'}`}>
-              <AlertTriangle className={`h-6 w-6 ${stats && stats.low_stock_count > 0 ? 'text-amber-600' : 'text-primary'}`} />
+            <div className={`p-3 rounded-lg ${stats && stats.low_stock_count > 0 ? 'bg-warning/15' : 'bg-primary/10'}`}>
+              <AlertTriangle className={`h-6 w-6 ${stats && stats.low_stock_count > 0 ? 'text-warning' : 'text-primary'}`} />
             </div>
           </div>
-          <p className="text-xs text-gray-500 mt-2">at or below threshold</p>
+          <p className="text-xs text-muted-foreground mt-2">at or below threshold</p>
         </Link>
 
-        <Link href="/dashboard/tool-loans" className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-primary/40 transition-all cursor-pointer">
+        <Link href="/dashboard/tool-loans" className="bg-card p-6 rounded-lg border border-border shadow-sm hover:shadow-md hover:border-primary/40 transition-all cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Active Tool Loans</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-sm font-medium text-muted-foreground">Active Tool Loans</p>
+              <p className="text-2xl font-bold text-foreground mt-1">
                 {stats ? stats.active_tool_loans : '—'}
               </p>
             </div>
-            <div className={`p-3 rounded-lg ${stats && stats.overdue_tool_loans > 0 ? 'bg-amber-100' : 'bg-primary/10'}`}>
-              <CheckCircle className={`h-6 w-6 ${stats && stats.overdue_tool_loans > 0 ? 'text-amber-600' : 'text-primary'}`} />
+            <div className={`p-3 rounded-lg ${stats && stats.overdue_tool_loans > 0 ? 'bg-warning/15' : 'bg-primary/10'}`}>
+              <CheckCircle className={`h-6 w-6 ${stats && stats.overdue_tool_loans > 0 ? 'text-warning' : 'text-primary'}`} />
             </div>
           </div>
-          <p className="text-xs text-gray-600 mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             {stats ? `${stats.overdue_tool_loans} overdue` : ' '}
           </p>
         </Link>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Link href="/dashboard/stock-movements" className="p-4 border border-gray-200 rounded-lg hover:border-primary/40 hover:bg-primary/5 transition-colors text-left">
+          <Link href="/dashboard/stock-movements" className="p-4 border border-border rounded-lg hover:border-primary/40 hover:bg-primary/5 transition-colors text-left">
             <PackagePlus className="h-5 w-5 text-primary mb-2" />
-            <p className="font-medium text-gray-900">Record Stock Movement</p>
-            <p className="text-sm text-gray-600">Add inbound or outbound stock</p>
+            <p className="font-medium text-foreground">Record Stock Movement</p>
+            <p className="text-sm text-muted-foreground">Add inbound or outbound stock</p>
           </Link>
-          <Link href="/dashboard/tool-loans" className="p-4 border border-gray-200 rounded-lg hover:border-primary/40 hover:bg-primary/5 transition-colors text-left">
+          <Link href="/dashboard/tool-loans" className="p-4 border border-border rounded-lg hover:border-primary/40 hover:bg-primary/5 transition-colors text-left">
             <Wrench className="h-5 w-5 text-primary mb-2" />
-            <p className="font-medium text-gray-900">Tool Check-Out</p>
-            <p className="text-sm text-gray-600">Assign tool to staff member</p>
+            <p className="font-medium text-foreground">Tool Check-Out</p>
+            <p className="text-sm text-muted-foreground">Assign tool to staff member</p>
           </Link>
-          <Link href="/dashboard/stock-takes" className="p-4 border border-gray-200 rounded-lg hover:border-primary/40 hover:bg-primary/5 transition-colors text-left">
+          <Link href="/dashboard/stock-takes" className="p-4 border border-border rounded-lg hover:border-primary/40 hover:bg-primary/5 transition-colors text-left">
             <ClipboardList className="h-5 w-5 text-primary mb-2" />
-            <p className="font-medium text-gray-900">Start Stock Take</p>
-            <p className="text-sm text-gray-600">Begin blind inventory count</p>
+            <p className="font-medium text-foreground">Start Stock Take</p>
+            <p className="text-sm text-muted-foreground">Begin blind inventory count</p>
           </Link>
         </div>
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h2>
         <div className="space-y-4">
           {stats === null && (
-            <p className="text-sm text-gray-500">Loading recent activity…</p>
+            <p className="text-sm text-muted-foreground">Loading recent activity…</p>
           )}
           {stats?.recent_movements.length === 0 && (
-            <p className="text-sm text-gray-500">No stock movements yet.</p>
+            <p className="text-sm text-muted-foreground">No stock movements yet.</p>
           )}
           {stats?.recent_movements.map((m) => (
-            <div key={m.id} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+            <div key={m.id} className="flex items-center gap-4 p-3 bg-muted rounded-lg">
               <div
                 className={`w-2 h-2 rounded-full ${
-                  m.quantity > 0 ? 'bg-green-500' : 'bg-primary'
+                  m.quantity > 0 ? 'bg-success/100' : 'bg-primary'
                 }`}
               ></div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-foreground">
                   {m.type.charAt(0).toUpperCase() + m.type.slice(1)}:{' '}
                   {m.product_name ?? m.product_sku ?? 'Unknown product'}{' '}
                   ({m.quantity > 0 ? '+' : ''}
                   {m.quantity} {m.product_unit ?? ''})
                 </p>
-                <p className="text-xs text-gray-600">
+                <p className="text-xs text-muted-foreground">
                   {timeAgo(m.created_at)} by {m.user_name ?? 'Unknown'}
                 </p>
               </div>

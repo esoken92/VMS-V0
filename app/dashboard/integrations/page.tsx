@@ -35,9 +35,9 @@ function CopyButton({ text, label = 'Copy' }: { text: string; label?: string }) 
           setCopied(false);
         }
       }}
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded border border-gray-300 bg-white hover:bg-gray-50 text-gray-700"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded border border-input bg-card hover:bg-muted text-foreground"
     >
-      {copied ? <Check className="h-3.5 w-3.5 text-green-600" /> : <Copy className="h-3.5 w-3.5" />}
+      {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
       {copied ? 'Copied' : label}
     </button>
   );
@@ -45,12 +45,12 @@ function CopyButton({ text, label = 'Copy' }: { text: string; label?: string }) 
 
 function CodeBlock({ title, code }: { title: string; code: string }) {
   return (
-    <div className="rounded-lg border border-gray-200 overflow-hidden">
-      <div className="flex items-center justify-between bg-gray-50 px-3 py-2 border-b border-gray-200">
-        <p className="text-xs font-mono text-gray-600">{title}</p>
+    <div className="rounded-lg border border-border overflow-hidden">
+      <div className="flex items-center justify-between bg-muted px-3 py-2 border-b border-border">
+        <p className="text-xs font-mono text-sidebar-muted">{title}</p>
         <CopyButton text={code} />
       </div>
-      <pre className="bg-gray-900 text-gray-100 text-xs p-4 overflow-x-auto whitespace-pre">
+      <pre className="bg-sidebar text-sidebar-foreground text-xs p-4 overflow-x-auto whitespace-pre">
         {code}
       </pre>
     </div>
@@ -69,12 +69,12 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-4">
+    <section className="bg-card rounded-lg border border-border shadow-sm p-6 space-y-4">
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-blue-50 text-primary">{icon}</div>
+        <div className="p-2 rounded-lg bg-info/10 text-primary">{icon}</div>
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-          <p className="text-sm text-gray-500">{subtitle}</p>
+          <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+          <p className="text-sm text-sidebar-muted">{subtitle}</p>
         </div>
       </div>
       {children}
@@ -213,8 +213,8 @@ export default function IntegrationsPage() {
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Integrations</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-2xl font-bold text-foreground">Integrations</h1>
+        <p className="text-sidebar-muted mt-1">
           Connect AI assistants and scripts to VMS — MCP server, scoped API keys, REST API v1.
         </p>
       </div>
@@ -223,42 +223,42 @@ export default function IntegrationsPage() {
         <div
           className={`p-4 rounded-lg flex items-center gap-3 ${
             message.type === 'success'
-              ? 'bg-green-50 border border-green-200'
-              : 'bg-red-50 border border-red-200'
+              ? 'bg-success/10 border border-success/30'
+              : 'bg-destructive/10 border border-destructive/30'
           }`}
         >
           {message.type === 'success' ? (
-            <CheckCircle className="h-5 w-5 text-green-600" />
+            <CheckCircle className="h-5 w-5 text-success" />
           ) : (
-            <AlertCircle className="h-5 w-5 text-red-600" />
+            <AlertCircle className="h-5 w-5 text-destructive" />
           )}
-          <p className={`text-sm ${message.type === 'success' ? 'text-green-800' : 'text-red-800'}`}>
+          <p className={`text-sm ${message.type === 'success' ? 'text-success' : 'text-destructive'}`}>
             {message.text}
           </p>
         </div>
       )}
 
       {createdKey && (
-        <div className="bg-amber-50 border border-amber-300 rounded-lg p-6 space-y-3">
+        <div className="bg-warning/10 border border-warning/40 rounded-lg p-6 space-y-3">
           <div className="flex items-center gap-3">
-            <KeyRound className="h-5 w-5 text-amber-600" />
-            <h3 className="text-base font-semibold text-amber-900">
+            <KeyRound className="h-5 w-5 text-warning" />
+            <h3 className="text-base font-semibold text-warning">
               API key created — copy it now
             </h3>
           </div>
-          <p className="text-sm text-amber-800">
+          <p className="text-sm text-warning">
             This is the only time the full key is shown. Store it somewhere safe; VMS only keeps a
             hash.
           </p>
           <div className="flex items-center gap-3">
-            <code className="flex-1 bg-white border border-amber-300 rounded px-3 py-2 text-sm font-mono break-all">
+            <code className="flex-1 bg-card border border-warning/40 rounded px-3 py-2 text-sm font-mono break-all">
               {createdKey.key}
             </code>
             <CopyButton text={createdKey.key} label="Copy key" />
           </div>
           <button
             onClick={() => setCreatedKey(null)}
-            className="text-sm text-amber-700 underline hover:text-amber-900"
+            className="text-sm text-warning underline hover:text-warning"
           >
             I&apos;ve saved it — dismiss
           </button>
@@ -272,17 +272,17 @@ export default function IntegrationsPage() {
       >
         <div className="grid gap-4">
           <div>
-            <p className="text-sm text-gray-700 mb-2">
-              Endpoint: <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">{baseUrl}/api/mcp</code>
+            <p className="text-sm text-foreground mb-2">
+              Endpoint: <code className="bg-muted px-1.5 py-0.5 rounded text-xs">{baseUrl}/api/mcp</code>
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-sidebar-muted">
               Read-scoped keys see read tools only; write-scoped keys unlock mutations. All calls are
               governed by your role&apos;s permission matrix, same as the dashboard.
             </p>
           </div>
           <CodeBlock title="Claude Desktop — claude_desktop_config.json" code={claudeConfig} />
           <CodeBlock title="Cursor — .cursor/mcp.json" code={cursorConfig} />
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-sidebar-muted">
             After creating a key below, replace <code>vms_YOUR_KEY</code> in the config and restart
             the client. Verify with a <code>tools/list</code> request.
           </p>
@@ -295,46 +295,46 @@ export default function IntegrationsPage() {
         subtitle="Scoped credentials for the REST API and MCP — keys you create act as YOU, capped by both scope and your role"
       >
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-sidebar-muted">
             Rate limit: 60 requests/minute per key. Keys can optionally expire.
           </p>
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-sidebar-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm"
           >
             <KeyRound className="h-4 w-4" />
             Create Key
           </button>
         </div>
 
-        <div className="border border-gray-200 rounded-lg overflow-hidden">
+        <div className="border border-border rounded-lg overflow-hidden">
           {loading ? (
-            <div className="p-6 text-center text-gray-500 text-sm">Loading keys…</div>
+            <div className="p-6 text-center text-sidebar-muted text-sm">Loading keys…</div>
           ) : keys.length === 0 ? (
-            <div className="p-6 text-center text-gray-500 text-sm">
+            <div className="p-6 text-center text-sidebar-muted text-sm">
               No keys yet — create one to connect an MCP client or script.
             </div>
           ) : (
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted border-b border-border">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prefix</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Scopes</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Last used</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expires</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-sidebar-muted uppercase">Name</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-sidebar-muted uppercase">Prefix</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-sidebar-muted uppercase">Scopes</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-sidebar-muted uppercase">Last used</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-sidebar-muted uppercase">Expires</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-sidebar-muted uppercase">Status</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-border">
                 {keys.map((k) => {
                   const revoked = !!k.revoked_at;
                   const expired = !!k.expires_at && new Date(k.expires_at).getTime() <= Date.now();
                   return (
                     <tr key={k.id} className={revoked ? 'opacity-50' : ''}>
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">{k.name}</td>
-                      <td className="px-4 py-3 text-sm font-mono text-gray-600">{k.key_prefix}…</td>
+                      <td className="px-4 py-3 text-sm font-medium text-foreground">{k.name}</td>
+                      <td className="px-4 py-3 text-sm font-mono text-sidebar-muted">{k.key_prefix}…</td>
                       <td className="px-4 py-3 text-sm">
                         <div className="flex gap-1">
                           {k.scopes.map((s) => (
@@ -342,10 +342,10 @@ export default function IntegrationsPage() {
                               key={s}
                               className={`px-2 py-0.5 text-xs rounded capitalize ${
                                 s === 'admin'
-                                  ? 'bg-purple-100 text-purple-700'
+                                  ? 'bg-info/10 text-info'
                                   : s === 'write'
-                                    ? 'bg-blue-100 text-blue-700'
-                                    : 'bg-gray-100 text-gray-700'
+                                    ? 'bg-info/10 text-info'
+                                    : 'bg-muted text-foreground'
                               }`}
                             >
                               {s}
@@ -353,26 +353,26 @@ export default function IntegrationsPage() {
                           ))}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-4 py-3 text-sm text-sidebar-muted">
                         {k.last_used_at ? new Date(k.last_used_at).toLocaleString() : 'Never'}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-4 py-3 text-sm text-sidebar-muted">
                         {k.expires_at ? new Date(k.expires_at).toLocaleDateString() : 'Never'}
                       </td>
                       <td className="px-4 py-3 text-sm">
                         {revoked ? (
-                          <span className="text-red-600">Revoked</span>
+                          <span className="text-destructive">Revoked</span>
                         ) : expired ? (
-                          <span className="text-amber-600">Expired</span>
+                          <span className="text-warning">Expired</span>
                         ) : (
-                          <span className="text-green-600">Active</span>
+                          <span className="text-success">Active</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">
                         {!revoked && (
                           <button
                             onClick={() => handleRevoke(k.id, k.name)}
-                            className="p-1.5 hover:bg-red-50 rounded text-red-600"
+                            className="p-1.5 hover:bg-destructive/10 rounded text-destructive"
                             title="Revoke key"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -394,7 +394,7 @@ export default function IntegrationsPage() {
         subtitle="The same surface as MCP, over plain HTTP — spec at /api/v1/openapi.json"
       >
         <CodeBlock title="curl" code={curlExample} />
-        <div className="text-sm text-gray-600 space-y-1">
+        <div className="text-sm text-sidebar-muted space-y-1">
           <p>
             <a href="/api/v1/openapi.json" target="_blank" className="text-primary hover:underline">
               OpenAPI 3.0 spec →
@@ -414,7 +414,7 @@ export default function IntegrationsPage() {
         title="Machine-readable discovery"
         subtitle="llms.txt lets agents find this surface on their own"
       >
-        <div className="text-sm text-gray-600 space-y-2">
+        <div className="text-sm text-sidebar-muted space-y-2">
           <p>
             <a href="/llms.txt" target="_blank" className="text-primary hover:underline">
               /llms.txt
@@ -425,7 +425,7 @@ export default function IntegrationsPage() {
             </a>{' '}
             — live version generated from the current tool registry.
           </p>
-          <p className="flex items-center gap-2 text-gray-500 text-xs">
+          <p className="flex items-center gap-2 text-sidebar-muted text-xs">
             <BookOpen className="h-4 w-4" />
             Both list the auth model, rate limit, REST routes, and every MCP tool with its scope.
           </p>
@@ -433,23 +433,23 @@ export default function IntegrationsPage() {
       </Section>
 
       {showCreate && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Create API key</h2>
+        <div className="fixed inset-0 bg-sidebar/70 flex items-center justify-center z-50">
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
+            <h2 className="text-xl font-semibold text-foreground mb-4">Create API key</h2>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Claude Desktop on Kurt's laptop"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Scopes</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Scopes</label>
                 <div className="space-y-2">
                   {(['read', 'write', 'admin'] as const).map((scope) => {
                     const disabled = scope === 'admin' && !canAdmin;
@@ -463,8 +463,8 @@ export default function IntegrationsPage() {
                           className="mt-1"
                         />
                         <span>
-                          <span className="text-sm font-medium text-gray-800 capitalize">{scope}</span>
-                          <span className="block text-xs text-gray-500">
+                          <span className="text-sm font-medium text-foreground capitalize">{scope}</span>
+                          <span className="block text-xs text-sidebar-muted">
                             {SCOPE_DESCRIPTIONS[scope]}
                           </span>
                         </span>
@@ -474,13 +474,13 @@ export default function IntegrationsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Expiry</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Expiry</label>
                 <select
                   value={form.expires_in_days}
                   onChange={(e) =>
                     setForm({ ...form, expires_in_days: e.target.value as typeof form.expires_in_days })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Never expires</option>
                   <option value="30">30 days</option>
@@ -492,14 +492,14 @@ export default function IntegrationsPage() {
                 <button
                   type="button"
                   onClick={() => setShowCreate(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting || form.scopes.length === 0}
-                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-blue-400 transition-colors"
+                  className="px-4 py-2 bg-primary text-sidebar-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
                 >
                   {isSubmitting ? 'Creating…' : 'Create key'}
                 </button>

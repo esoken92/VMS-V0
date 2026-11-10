@@ -56,10 +56,6 @@ export default function Home() {
       <main>
         {/* ── Hero ─────────────────────────────────────────────── */}
         <section className="relative overflow-hidden">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,hsl(var(--primary)_/_0.15),transparent)]"
-          />
           <div className="container relative py-20 text-center sm:py-28">
             <a
               href={LICENSE_URL}

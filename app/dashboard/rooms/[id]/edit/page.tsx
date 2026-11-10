@@ -39,7 +39,7 @@ export default function EditRoomPage() {
 
   if (!canEdit) {
     return (
-      <div className="p-8 text-center text-gray-500">
+      <div className="p-8 text-center text-muted-foreground">
         You need a manager or admin role to edit rooms.
       </div>
     );
@@ -50,17 +50,17 @@ export default function EditRoomPage() {
       <div>
         <Link
           href={`/dashboard/rooms/${params.id}`}
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" /> Back to room
         </Link>
-        <h1 className="text-2xl font-bold text-gray-900 mt-2">
+        <h1 className="text-2xl font-bold text-foreground mt-2">
           Edit {room?.name ?? 'Room'}
         </h1>
       </div>
-      {error && <div className="p-4 rounded-lg bg-red-50 text-red-800">{error}</div>}
+      {error && <div className="p-4 rounded-lg bg-destructive/10 text-destructive">{error}</div>}
       {loading ? (
-        <div className="p-8 text-center text-gray-500">Loading…</div>
+        <div className="p-8 text-center text-muted-foreground">Loading…</div>
       ) : room ? (
         <RoomForm initial={room} roomOptions={options} />
       ) : null}

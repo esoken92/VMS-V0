@@ -235,9 +235,9 @@ export default function InventoryPage() {
 
   const getStockColor = (status: string) => {
     switch (status) {
-      case 'out_of_stock': return 'text-red-600';
-      case 'low_stock': return 'text-yellow-600';
-      default: return 'text-green-600';
+      case 'out_of_stock': return 'text-destructive';
+      case 'low_stock': return 'text-warning';
+      default: return 'text-success';
     }
   };
 
@@ -251,13 +251,13 @@ export default function InventoryPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Inventory</h1>
-          <p className="text-gray-600 mt-1">Manage your product catalog</p>
+          <h1 className="text-2xl font-bold text-foreground">Inventory</h1>
+          <p className="text-muted-foreground mt-1">Manage your product catalog</p>
         </div>
         {canEdit && (
           <button
             onClick={handleAddProduct}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
           >
             <Plus className="h-4 w-4" />
             Add Product
@@ -267,27 +267,27 @@ export default function InventoryPage() {
 
       {/* Message */}
       {message && (
-        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
           {message.text}
         </div>
       )}
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-4">
         <div className="flex items-center gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search by SKU, name, or barcode..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full pl-10 pr-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
           >
             <Filter className="h-4 w-4" />
             Filters
@@ -295,10 +295,10 @@ export default function InventoryPage() {
         </div>
 
         {showFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="mt-4 pt-4 border-t border-border grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+              <label className="block text-sm font-medium text-foreground mb-1">Category</label>
+              <select className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                 <option value="">All Categories</option>
                 <option value="consumable">Consumable</option>
                 <option value="fluid">Fluid</option>
@@ -307,8 +307,8 @@ export default function InventoryPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+              <label className="block text-sm font-medium text-foreground mb-1">Supplier</label>
+              <select className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                 <option value="">All Suppliers</option>
                 {suppliers.map(s => (
                   <option key={s.id} value={s.id}>{s.name}</option>
@@ -316,8 +316,8 @@ export default function InventoryPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Stock Status</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+              <label className="block text-sm font-medium text-foreground mb-1">Stock Status</label>
+              <select className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                 <option value="">All Status</option>
                 <option value="in_stock">In Stock</option>
                 <option value="low_stock">Low Stock</option>
@@ -325,8 +325,8 @@ export default function InventoryPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Bin Location</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+              <label className="block text-sm font-medium text-foreground mb-1">Bin Location</label>
+              <select className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                 <option value="">All Bins</option>
                 {binLocations.map(b => (
                   <option key={b.id} value={b.id}>{b.zone}-{b.bin_location}</option>
@@ -338,44 +338,44 @@ export default function InventoryPage() {
       </div>
 
       {/* Product Table */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading products...</div>
+          <div className="p-8 text-center text-muted-foreground">Loading products...</div>
         ) : (
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-muted border-b border-border">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Min Threshold</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bin</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">SKU</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Stock</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Min Threshold</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Bin</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Unit</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border">
               {filteredProducts.map((product) => {
                 const stockStatus = getStockStatus(product);
                 return (
-                  <tr key={product.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.sku}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{product.item_type}</td>
+                  <tr key={product.id} className="hover:bg-muted">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">{product.sku}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{product.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground capitalize">{product.item_type}</td>
                     <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${getStockColor(stockStatus)}`}>
                       {product.current_stock}
                       {stockStatus === 'low_stock' && <AlertTriangle className="h-3 w-3 inline ml-1" />}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{product.min_threshold}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{getBinLabel(product.bin_location_id)}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{product.unit_of_measure}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{product.min_threshold}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{getBinLabel(product.bin_location_id)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{product.unit_of_measure}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
                         {canEdit && (
                           <button
                             onClick={() => handleEditProduct(product)}
-                            className="p-1 hover:bg-gray-100 rounded"
+                            className="p-1 hover:bg-muted rounded"
                             title="Edit"
                           >
                             <Edit className="h-4 w-4" />
@@ -384,7 +384,7 @@ export default function InventoryPage() {
                         {canDelete && (
                           <button
                             onClick={() => setDeleteProduct(product)}
-                            className="p-1 hover:bg-red-100 rounded text-red-600"
+                            className="p-1 hover:bg-destructive/10 rounded text-destructive"
                             title="Delete"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -397,7 +397,7 @@ export default function InventoryPage() {
               })}
               {filteredProducts.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-6 py-8 text-center text-gray-500">No products found</td>
+                  <td colSpan={8} className="px-6 py-8 text-center text-muted-foreground">No products found</td>
                 </tr>
               )}
             </tbody>
@@ -407,44 +407,44 @@ export default function InventoryPage() {
 
       {/* Add/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">
+        <div className="fixed inset-0 bg-sidebar/70 flex items-center justify-center z-50">
+          <div className="bg-card rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-border">
+              <h2 className="text-xl font-semibold text-foreground">
                 {editingProduct ? 'Edit Product' : 'Add Product'}
               </h2>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">SKU *</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">SKU *</label>
                   <input
                     type="text"
                     required
                     value={formData.sku}
                     onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Name *</label>
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Category *</label>
                   <select
                     required
                     value={formData.item_type}
                     onChange={(e) => setFormData({ ...formData, item_type: e.target.value as Product['item_type'] })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="consumable">Consumable</option>
                     <option value="fluid">Fluid</option>
@@ -453,11 +453,11 @@ export default function InventoryPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Supplier</label>
                   <select
                     value={formData.supplier_id}
                     onChange={(e) => setFormData({ ...formData, supplier_id: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="">Select Supplier</option>
                     {suppliers.map(s => (
@@ -468,66 +468,66 @@ export default function InventoryPage() {
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Current Stock</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Current Stock</label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.current_stock}
                     onChange={(e) => setFormData({ ...formData, current_stock: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Min Threshold</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Min Threshold</label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.min_threshold}
                     onChange={(e) => setFormData({ ...formData, min_threshold: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Average Cost</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Average Cost</label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.average_cost}
                     onChange={(e) => setFormData({ ...formData, average_cost: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Unit of Measure *</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Unit of Measure *</label>
                   <input
                     type="text"
                     required
                     value={formData.unit_of_measure}
                     onChange={(e) => setFormData({ ...formData, unit_of_measure: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="e.g., Each, Drum, Box"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Issuing Unit *</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Issuing Unit *</label>
                   <input
                     type="text"
                     required
                     value={formData.issuing_unit}
                     onChange={(e) => setFormData({ ...formData, issuing_unit: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="e.g., Piece, Liter"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bin Location</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Bin Location</label>
                 <select
                   value={formData.bin_location_id}
                   onChange={(e) => setFormData({ ...formData, bin_location_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Select Bin Location</option>
                   {binLocations.map(b => (
@@ -538,8 +538,8 @@ export default function InventoryPage() {
               {/* Tracking attributes — shown only when the provisioning
                   wizard enabled the matching feature flags. */}
               {(showExpiryFields || showSerialFields) && (
-                <div className="border-t border-gray-200 pt-4">
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                <div className="border-t border-border pt-4">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
                     Tracking attributes
                   </p>
                   <div className="flex flex-wrap gap-6">
@@ -551,7 +551,7 @@ export default function InventoryPage() {
                           onChange={(e) => setFormData({ ...formData, expiry_tracked: e.target.checked })}
                           className="h-4 w-4 text-primary rounded"
                         />
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-foreground">
                           Expiry-tracked product
                         </span>
                       </label>
@@ -564,7 +564,7 @@ export default function InventoryPage() {
                           onChange={(e) => setFormData({ ...formData, serialized: e.target.checked })}
                           className="h-4 w-4 text-primary rounded"
                         />
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm text-foreground">
                           Serialized item
                         </span>
                       </label>
@@ -576,14 +576,14 @@ export default function InventoryPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
                 >
                   {submitting ? 'Saving…' : editingProduct ? 'Update' : 'Add'} Product
                 </button>
@@ -595,22 +595,22 @@ export default function InventoryPage() {
 
       {/* Delete Confirmation Modal */}
       {deleteProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Delete Product</h2>
-            <p className="text-gray-600 mb-6">
+        <div className="fixed inset-0 bg-sidebar/70 flex items-center justify-center z-50">
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
+            <h2 className="text-xl font-semibold text-foreground mb-4">Delete Product</h2>
+            <p className="text-muted-foreground mb-6">
               Are you sure you want to delete &quot;{deleteProduct.name}&quot;? This action cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setDeleteProduct(null)}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteProduct}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="px-4 py-2 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors"
               >
                 Delete
               </button>

@@ -58,10 +58,10 @@ export default function ZoneMapPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Visual Zone Map</h1>
-          <p className="text-gray-600 mt-1">Interactive warehouse layout</p>
+          <h1 className="text-2xl font-bold text-foreground">Visual Zone Map</h1>
+          <p className="text-muted-foreground mt-1">Interactive warehouse layout</p>
         </div>
-        <div className="p-8 text-center text-gray-500">Loading zone map...</div>
+        <div className="p-8 text-center text-muted-foreground">Loading zone map...</div>
       </div>
     );
   }
@@ -70,30 +70,30 @@ export default function ZoneMapPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Visual Zone Map</h1>
-          <p className="text-gray-600 mt-1">Interactive warehouse layout</p>
+          <h1 className="text-2xl font-bold text-foreground">Visual Zone Map</h1>
+          <p className="text-muted-foreground mt-1">Interactive warehouse layout</p>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-4">
         <div className="flex items-center gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search by zone or location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full pl-10 pr-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-400" />
+            <Filter className="h-4 w-4 text-muted-foreground" />
             <select
               value={selectedZone}
               onChange={(e) => setSelectedZone(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="px-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">All Zones</option>
               {zones.map(zone => (
@@ -108,8 +108,8 @@ export default function ZoneMapPage() {
       <div className="space-y-6">
         {selectedZone === 'all' ? (
           zones.map(zone => (
-            <div key={zone} className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <div key={zone} className="bg-card rounded-lg border border-border shadow-sm p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-primary" />
                 {zone}
               </h2>
@@ -122,14 +122,14 @@ export default function ZoneMapPage() {
                       <div
                         key={bin.id}
                         onClick={() => handleBinClick(bin)}
-                        className="bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                        className="bg-muted border border-border rounded-lg p-4 cursor-pointer hover:bg-muted hover:border-primary/40 transition-colors"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-gray-900">{bin.bin_location}</span>
-                          <Box className="h-4 w-4 text-gray-400" />
+                          <span className="font-medium text-foreground">{bin.bin_location}</span>
+                          <Box className="h-4 w-4 text-muted-foreground" />
                         </div>
-                        <p className="text-xs text-gray-600">{binProducts.length} items</p>
-                        <p className="text-xs text-gray-500">Max: {bin.max_weight_kg}kg</p>
+                        <p className="text-xs text-muted-foreground">{binProducts.length} items</p>
+                        <p className="text-xs text-muted-foreground">Max: {bin.max_weight_kg}kg</p>
                       </div>
                     );
                   })}
@@ -137,8 +137,8 @@ export default function ZoneMapPage() {
             </div>
           ))
         ) : (
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-lg border border-border shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary" />
               {selectedZone}
             </h2>
@@ -149,14 +149,14 @@ export default function ZoneMapPage() {
                   <div
                     key={bin.id}
                     onClick={() => handleBinClick(bin)}
-                    className="bg-gray-50 border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                    className="bg-muted border border-border rounded-lg p-4 cursor-pointer hover:bg-muted hover:border-primary/40 transition-colors"
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-gray-900">{bin.bin_location}</span>
-                      <Box className="h-4 w-4 text-gray-400" />
+                      <span className="font-medium text-foreground">{bin.bin_location}</span>
+                      <Box className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <p className="text-xs text-gray-600">{binProducts.length} items</p>
-                    <p className="text-xs text-gray-500">Max: {bin.max_weight_kg}kg</p>
+                    <p className="text-xs text-muted-foreground">{binProducts.length} items</p>
+                    <p className="text-xs text-muted-foreground">Max: {bin.max_weight_kg}kg</p>
                   </div>
                 );
               })}
@@ -167,59 +167,59 @@ export default function ZoneMapPage() {
 
       {/* Bin Detail Modal */}
       {showDetailModal && selectedBin && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">
+        <div className="fixed inset-0 bg-sidebar/70 flex items-center justify-center z-50">
+          <div className="bg-card rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-border">
+              <h2 className="text-xl font-semibold text-foreground">
                 {selectedBin.zone} - {selectedBin.bin_location}
               </h2>
             </div>
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Zone</p>
-                  <p className="text-gray-900">{selectedBin.zone}</p>
+                  <p className="text-sm text-muted-foreground mb-1">Zone</p>
+                  <p className="text-foreground">{selectedBin.zone}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Location</p>
-                  <p className="text-gray-900">{selectedBin.bin_location}</p>
+                  <p className="text-sm text-muted-foreground mb-1">Location</p>
+                  <p className="text-foreground">{selectedBin.bin_location}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Max Weight</p>
-                  <p className="text-gray-900">{selectedBin.max_weight_kg} kg</p>
+                  <p className="text-sm text-muted-foreground mb-1">Max Weight</p>
+                  <p className="text-foreground">{selectedBin.max_weight_kg} kg</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Description</p>
-                  <p className="text-gray-900">{selectedBin.description || '-'}</p>
+                  <p className="text-sm text-muted-foreground mb-1">Description</p>
+                  <p className="text-foreground">{selectedBin.description || '-'}</p>
                 </div>
               </div>
               
               <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-3">Products in this bin</h3>
+                <h3 className="text-sm font-medium text-foreground mb-3">Products in this bin</h3>
                 {getBinProducts(selectedBin.id).length > 0 ? (
                   <div className="space-y-2">
                     {getBinProducts(selectedBin.id).map(product => (
-                      <div key={product.id} className="bg-gray-50 rounded-lg p-3 flex items-center justify-between">
+                      <div key={product.id} className="bg-muted rounded-lg p-3 flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{product.name}</p>
-                          <p className="text-xs text-gray-600">{product.sku}</p>
+                          <p className="text-sm font-medium text-foreground">{product.name}</p>
+                          <p className="text-xs text-muted-foreground">{product.sku}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-medium text-gray-900">{product.current_stock}</p>
-                          <p className="text-xs text-gray-600">in stock</p>
+                          <p className="text-sm font-medium text-foreground">{product.current_stock}</p>
+                          <p className="text-xs text-muted-foreground">in stock</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-sm">No products in this bin</p>
+                  <p className="text-muted-foreground text-sm">No products in this bin</p>
                 )}
               </div>
               
               <div className="flex justify-end pt-4">
                 <button
                   onClick={() => setShowDetailModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
                 >
                   Close
                 </button>

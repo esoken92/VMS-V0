@@ -73,21 +73,21 @@ export default function UserMenu() {
         onClick={() => setIsOpen(!isOpen)}
         className="
           flex items-center gap-3 px-4 py-2 rounded-lg
-          hover:bg-gray-100 transition-colors
+          hover:bg-muted transition-colors
           focus:outline-none focus:ring-2 focus:ring-primary
         "
       >
-        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold text-sm">
+        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-bold text-sm">
           {profile?.full_name?.charAt(0).toUpperCase() || 'U'}
         </div>
         <div className="hidden sm:block">
-          <p className="text-sm font-medium text-gray-900">
+          <p className="text-sm font-medium text-foreground">
             {profile?.full_name}
           </p>
-          <p className="text-xs text-gray-500">{profile?.role?.replace('_', ' ')}</p>
+          <p className="text-xs text-muted-foreground">{profile?.role?.replace('_', ' ')}</p>
         </div>
         <ChevronDown
-          className={`h-4 w-4 text-gray-400 transition-transform ${
+          className={`h-4 w-4 text-muted-foreground transition-transform ${
             isOpen ? 'rotate-180' : ''
           }`}
         />
@@ -96,33 +96,33 @@ export default function UserMenu() {
       {isOpen && (
         <div
           className="
-            absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg
-            border border-gray-200 z-50 overflow-hidden
+            absolute right-0 mt-2 w-56 bg-card rounded-lg shadow-lg
+            border border-border z-50 overflow-hidden
           "
         >
-          <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-            <p className="text-sm font-semibold text-gray-900">
+          <div className="px-4 py-3 border-b border-border bg-muted">
+            <p className="text-sm font-semibold text-foreground">
               {profile?.full_name}
             </p>
-            <p className="text-xs text-gray-500">{user?.email}</p>
+            <p className="text-xs text-muted-foreground">{user?.email}</p>
             <div className="mt-2 flex gap-2">
-              <span className="px-2 py-1 bg-blue-100 text-primary text-xs font-medium rounded">
+              <span className="px-2 py-1 bg-info/10 text-primary text-xs font-medium rounded">
                 {profile?.role?.replace('_', ' ')}
               </span>
             </div>
           </div>
 
           {isImpersonating && (
-            <div className="px-4 py-3 border-b border-yellow-200 bg-yellow-50">
-              <p className="text-xs font-medium text-yellow-800 mb-2">
+            <div className="px-4 py-3 border-b border-warning/30 bg-warning/10">
+              <p className="text-xs font-medium text-warning mb-2">
                 🎭 Super Admin Mode Active
               </p>
               <button
                 onClick={handleImpersonationExit}
                 className="
                   w-full px-3 py-1 text-xs font-medium
-                  bg-yellow-600 text-white rounded
-                  hover:bg-yellow-700 transition-colors
+                  bg-warning text-warning-foreground rounded
+                  hover:bg-warning/90 transition-colors
                 "
               >
                 Exit View As Mode
@@ -136,7 +136,7 @@ export default function UserMenu() {
                 onClick={handleExitWorkerPreview}
                 className="
                   w-full flex items-center gap-3 px-4 py-2 text-sm text-primary
-                  hover:bg-blue-50 transition-colors
+                  hover:bg-muted transition-colors
                 "
               >
                 <EyeOff className="h-4 w-4 text-primary/70" />
@@ -147,11 +147,11 @@ export default function UserMenu() {
                 <button
                   onClick={handleEnterWorkerPreview}
                   className="
-                    w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700
-                    hover:bg-gray-100 transition-colors
+                    w-full flex items-center gap-3 px-4 py-2 text-sm text-foreground
+                    hover:bg-muted transition-colors
                   "
                 >
-                  <Eye className="h-4 w-4 text-gray-400" />
+                  <Eye className="h-4 w-4 text-muted-foreground" />
                   View as Worker
                 </button>
               )
@@ -161,11 +161,11 @@ export default function UserMenu() {
               href="/dashboard/profile"
               onClick={() => setIsOpen(false)}
               className="
-                flex items-center gap-3 px-4 py-2 text-sm text-gray-700
-                hover:bg-gray-100 transition-colors
+                flex items-center gap-3 px-4 py-2 text-sm text-foreground
+                hover:bg-muted transition-colors
               "
             >
-              <User className="h-4 w-4 text-gray-400" />
+              <User className="h-4 w-4 text-muted-foreground" />
               My Profile
             </Link>
 
@@ -175,11 +175,11 @@ export default function UserMenu() {
                 href="/dashboard/settings"
                 onClick={() => setIsOpen(false)}
                 className="
-                  flex items-center gap-3 px-4 py-2 text-sm text-gray-700
-                  hover:bg-gray-100 transition-colors
+                  flex items-center gap-3 px-4 py-2 text-sm text-foreground
+                  hover:bg-muted transition-colors
                 "
               >
-                <Settings className="h-4 w-4 text-gray-400" />
+                <Settings className="h-4 w-4 text-muted-foreground" />
                 Settings
               </Link>
             )}
@@ -188,22 +188,22 @@ export default function UserMenu() {
               href="#"
               onClick={() => setIsOpen(false)}
               className="
-                flex items-center gap-3 px-4 py-2 text-sm text-gray-700
-                hover:bg-gray-100 transition-colors
+                flex items-center gap-3 px-4 py-2 text-sm text-foreground
+                hover:bg-muted transition-colors
               "
             >
-              <HelpCircle className="h-4 w-4 text-gray-400" />
+              <HelpCircle className="h-4 w-4 text-muted-foreground" />
               Help & Support
             </Link>
           </div>
 
-          <div className="border-t border-gray-100" />
+          <div className="border-t border-border" />
 
           <button
             onClick={handleLogout}
             className="
-              w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600
-              hover:bg-red-50 transition-colors font-medium
+              w-full flex items-center gap-3 px-4 py-2 text-sm text-destructive
+              hover:bg-destructive/10 transition-colors font-medium
             "
           >
             <LogOut className="h-4 w-4" />

@@ -121,11 +121,11 @@ export default function SettingsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600 mt-1">System configuration</p>
+          <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+          <p className="text-muted-foreground mt-1">System configuration</p>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <p className="text-red-800">Access denied. Only super admins can access settings.</p>
+        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6">
+          <p className="text-destructive">Access denied. Only super admins can access settings.</p>
         </div>
       </div>
     );
@@ -134,47 +134,47 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">System configuration (Super Admin only)</p>
+        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+        <p className="text-muted-foreground mt-1">System configuration (Super Admin only)</p>
       </div>
 
       {message && (
         <div className={`p-4 rounded-lg flex items-center gap-3 ${
-          message.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+          message.type === 'success' ? 'bg-success/10 border border-success/30' : 'bg-destructive/10 border border-destructive/30'
         }`}>
           {message.type === 'success' ? (
-            <CheckCircle className="h-5 w-5 text-green-600" />
+            <CheckCircle className="h-5 w-5 text-success" />
           ) : (
-            <AlertCircle className="h-5 w-5 text-red-600" />
+            <AlertCircle className="h-5 w-5 text-destructive" />
           )}
           <p className={`text-sm ${
-            message.type === 'success' ? 'text-green-800' : 'text-red-800'
+            message.type === 'success' ? 'text-success' : 'text-destructive'
           }`}>{message.text}</p>
         </div>
       )}
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* General Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-2 bg-info/10 rounded-lg">
               <Building className="h-5 w-5 text-primary" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">General Settings</h2>
+            <h2 className="text-lg font-semibold text-foreground">General Settings</h2>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Company Name</label>
               <input
                 type="text"
                 value={settings.company_name || ''}
                 onChange={(e) => setSettings({ ...settings, company_name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Company Logo</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Company Logo</label>
               <div className="space-y-3">
                 {logoPreview && (
                   <div className="relative inline-block">
@@ -182,21 +182,21 @@ export default function SettingsPage() {
                     <img
                       src={logoPreview}
                       alt="Company Logo"
-                      className="h-20 w-auto object-contain border border-gray-200 rounded-lg p-2"
+                      className="h-20 w-auto object-contain border border-border rounded-lg p-2"
                     />
                     <button
                       type="button"
                       onClick={handleLogoRemove}
-                      className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      className="absolute -top-2 -right-2 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive"
                     >
                       <X className="h-3 w-3" />
                     </button>
                   </div>
                 )}
                 <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                    <Upload className="h-4 w-4 text-gray-600" />
-                    <span className="text-sm text-gray-700">Choose Image</span>
+                  <label className="flex items-center gap-2 px-4 py-2 border border-input rounded-lg cursor-pointer hover:bg-muted transition-colors">
+                    <Upload className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-foreground">Choose Image</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -209,21 +209,21 @@ export default function SettingsPage() {
                       type="button"
                       onClick={handleLogoSave}
                       disabled={isUploadingLogo}
-                      className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-blue-400 transition-colors text-sm"
+                      className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors text-sm"
                     >
                       {isUploadingLogo ? 'Uploading...' : 'Save Logo'}
                     </button>
                   )}
                 </div>
-                <p className="text-xs text-gray-500">PNG, JPG, or GIF (max 2MB)</p>
+                <p className="text-xs text-muted-foreground">PNG, JPG, or GIF (max 2MB)</p>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Timezone</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Timezone</label>
               <select
                 value={settings.timezone || 'UTC'}
                 onChange={(e) => setSettings({ ...settings, timezone: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="UTC">UTC</option>
                 <option value="America/New_York">Eastern Time (ET)</option>
@@ -238,19 +238,19 @@ export default function SettingsPage() {
         </div>
 
         {/* Notification Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Bell className="h-5 w-5 text-green-600" />
+            <div className="p-2 bg-success/10 rounded-lg">
+              <Bell className="h-5 w-5 text-success" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">Notification Settings</h2>
+            <h2 className="text-lg font-semibold text-foreground">Notification Settings</h2>
           </div>
 
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-gray-900">Low Stock Alerts</p>
-                <p className="text-sm text-gray-600">Send email alerts when stock is low</p>
+                <p className="font-medium text-foreground">Low Stock Alerts</p>
+                <p className="text-sm text-muted-foreground">Send email alerts when stock is low</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -259,13 +259,13 @@ export default function SettingsPage() {
                   onChange={(e) => setSettings({ ...settings, low_stock_alert_enabled: e.target.checked ? 'true' : 'false' })}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                <div className="w-11 h-6 bg-input peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/40 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-input after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-gray-900">Overdue Tool Alerts</p>
-                <p className="text-sm text-gray-600">Send email alerts for overdue tools</p>
+                <p className="font-medium text-foreground">Overdue Tool Alerts</p>
+                <p className="text-sm text-muted-foreground">Send email alerts for overdue tools</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -274,63 +274,63 @@ export default function SettingsPage() {
                   onChange={(e) => setSettings({ ...settings, overdue_tool_alert_enabled: e.target.checked ? 'true' : 'false' })}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                <div className="w-11 h-6 bg-input peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/40 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-input after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
           </div>
         </div>
 
         {/* Inventory Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Package className="h-5 w-5 text-purple-600" />
+            <div className="p-2 bg-info/10 rounded-lg">
+              <Package className="h-5 w-5 text-info" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">Inventory Settings</h2>
+            <h2 className="text-lg font-semibold text-foreground">Inventory Settings</h2>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Low Stock Threshold</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Low Stock Threshold</label>
               <input
                 type="number"
                 value={settings.low_stock_threshold || ''}
                 onChange={(e) => setSettings({ ...settings, low_stock_threshold: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 min="0"
               />
-              <p className="text-xs text-gray-500 mt-1">Minimum quantity before low stock alert</p>
+              <p className="text-xs text-muted-foreground mt-1">Minimum quantity before low stock alert</p>
             </div>
           </div>
         </div>
 
         {/* Security Settings */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <Shield className="h-5 w-5 text-red-600" />
+            <div className="p-2 bg-destructive/10 rounded-lg">
+              <Shield className="h-5 w-5 text-destructive" />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">Security Settings</h2>
+            <h2 className="text-lg font-semibold text-foreground">Security Settings</h2>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Session Timeout (minutes)</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Session Timeout (minutes)</label>
               <input
                 type="number"
                 value={settings.session_timeout_minutes || ''}
                 onChange={(e) => setSettings({ ...settings, session_timeout_minutes: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 min="5"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Minimum Password Length</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Minimum Password Length</label>
               <input
                 type="number"
                 value={settings.password_min_length || ''}
                 onChange={(e) => setSettings({ ...settings, password_min_length: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 min="6"
               />
             </div>
@@ -342,7 +342,7 @@ export default function SettingsPage() {
           <button
             type="submit"
             disabled={isSaving}
-            className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-blue-400 transition-colors"
+            className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
           >
             <Save className="h-4 w-4" />
             {isSaving ? 'Saving...' : 'Save Settings'}

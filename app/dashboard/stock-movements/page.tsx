@@ -126,20 +126,20 @@ export default function StockMovementsPage() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'inbound': return 'bg-green-100 text-green-700';
-      case 'outbound': return 'bg-blue-100 text-blue-700';
-      case 'scrap': return 'bg-red-100 text-red-700';
-      case 'adjustment': return 'bg-yellow-100 text-yellow-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'inbound': return 'bg-success/10 text-success';
+      case 'outbound': return 'bg-info/10 text-info';
+      case 'scrap': return 'bg-destructive/10 text-destructive';
+      case 'adjustment': return 'bg-warning/15 text-warning';
+      default: return 'bg-muted text-foreground';
     }
   };
 
   const getQuantityColor = (type: string) => {
     switch (type) {
-      case 'inbound': return 'text-green-600';
+      case 'inbound': return 'text-success';
       case 'outbound': return 'text-primary';
-      case 'scrap': return 'text-red-600';
-      default: return 'text-gray-600';
+      case 'scrap': return 'text-destructive';
+      default: return 'text-muted-foreground';
     }
   };
 
@@ -147,14 +147,14 @@ export default function StockMovementsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Stock Movements</h1>
-          <p className="text-gray-600 mt-1">Track inbound, outbound, and scrap movements</p>
+          <h1 className="text-2xl font-bold text-foreground">Stock Movements</h1>
+          <p className="text-muted-foreground mt-1">Track inbound, outbound, and scrap movements</p>
         </div>
       </div>
 
       {/* Message */}
       {message && (
-        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+        <div className={`p-4 rounded-lg ${message.type === 'success' ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'}`}>
           {message.text}
         </div>
       )}
@@ -163,76 +163,76 @@ export default function StockMovementsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <button
           onClick={() => handleRecordMovement('inbound')}
-          className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-300 transition-colors"
+          className="flex items-center gap-3 p-4 bg-card border border-border rounded-lg hover:bg-muted hover:border-success/40 transition-colors"
         >
-          <div className="p-2 bg-green-100 rounded-lg">
-            <ArrowDown className="h-5 w-5 text-green-600" />
+          <div className="p-2 bg-success/10 rounded-lg">
+            <ArrowDown className="h-5 w-5 text-success" />
           </div>
           <div className="text-left">
-            <p className="font-medium text-gray-900">Inbound Receipt</p>
-            <p className="text-sm text-gray-600">Receive stock from supplier</p>
+            <p className="font-medium text-foreground">Inbound Receipt</p>
+            <p className="text-sm text-muted-foreground">Receive stock from supplier</p>
           </div>
         </button>
         <button
           onClick={() => handleRecordMovement('outbound')}
-          className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
+          className="flex items-center gap-3 p-4 bg-card border border-border rounded-lg hover:bg-muted hover:border-primary/40 transition-colors"
         >
-          <div className="p-2 bg-blue-100 rounded-lg">
+          <div className="p-2 bg-info/10 rounded-lg">
             <ArrowUp className="h-5 w-5 text-primary" />
           </div>
           <div className="text-left">
-            <p className="font-medium text-gray-900">Outbound Issue</p>
-            <p className="text-sm text-gray-600">Issue stock to customer</p>
+            <p className="font-medium text-foreground">Outbound Issue</p>
+            <p className="text-sm text-muted-foreground">Issue stock to customer</p>
           </div>
         </button>
         <button
           onClick={() => handleRecordMovement('scrap')}
-          className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors"
+          className="flex items-center gap-3 p-4 bg-card border border-border rounded-lg hover:bg-destructive/10 hover:border-destructive/40 transition-colors"
         >
-          <div className="p-2 bg-red-100 rounded-lg">
-            <Trash2 className="h-5 w-5 text-red-600" />
+          <div className="p-2 bg-destructive/10 rounded-lg">
+            <Trash2 className="h-5 w-5 text-destructive" />
           </div>
           <div className="text-left">
-            <p className="font-medium text-gray-900">Scrap Movement</p>
-            <p className="text-sm text-gray-600">Record damaged/defective items</p>
+            <p className="font-medium text-foreground">Scrap Movement</p>
+            <p className="text-sm text-muted-foreground">Record damaged/defective items</p>
           </div>
         </button>
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search movements by product, reference, or user..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full pl-10 pr-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
       </div>
 
       {/* Movements Table */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading movements...</div>
+          <div className="p-8 text-center text-muted-foreground">Loading movements...</div>
         ) : (
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-muted border-b border-border">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Type</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Product</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Quantity</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Reason</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">User</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border">
               {filteredMovements.map((movement) => (
-                <tr key={movement.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                <tr key={movement.id} className="hover:bg-muted">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     {movement.created_at ? new Date(movement.created_at).toLocaleString() : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -240,21 +240,21 @@ export default function StockMovementsPage() {
                       {movement.type.charAt(0).toUpperCase() + movement.type.slice(1)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                     {movement.product_name || 'Unknown'} ({movement.product_sku || ''})
                   </td>
                   <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${getQuantityColor(movement.type)}`}>
                     {movement.quantity > 0 ? '+' : ''}{movement.quantity} {movement.product_unit || ''}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{movement.reason || '-'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{movement.reason || '-'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     {movement.user_name || 'Unknown'}
                   </td>
                 </tr>
               ))}
               {filteredMovements.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">No movements found</td>
+                  <td colSpan={6} className="px-6 py-8 text-center text-muted-foreground">No movements found</td>
                 </tr>
               )}
             </tbody>
@@ -264,21 +264,21 @@ export default function StockMovementsPage() {
 
       {/* Movement Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">
+        <div className="fixed inset-0 bg-sidebar/70 flex items-center justify-center z-50">
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-border">
+              <h2 className="text-xl font-semibold text-foreground">
                 Record {movementType.charAt(0).toUpperCase() + movementType.slice(1)} Movement
               </h2>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Product *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Product *</label>
                 <select
                   required
                   value={formData.product_id}
                   onChange={(e) => setFormData({ ...formData, product_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Select Product</option>
                   {products.map(p => (
@@ -287,7 +287,7 @@ export default function StockMovementsPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Quantity *</label>
                 <input
                   type="number"
                   required
@@ -295,26 +295,26 @@ export default function StockMovementsPage() {
                   step="0.01"
                   value={formData.quantity}
                   onChange={(e) => setFormData({ ...formData, quantity: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Reason</label>
                 <textarea
                   value={formData.reason}
                   onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   rows={3}
                   placeholder="Enter reason for this movement..."
                 />
               </div>
               {movementType === 'scrap' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Scrap Image</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">Scrap Image</label>
                   <div className="flex items-center gap-3">
-                    <label className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                      <Upload className="h-4 w-4 text-gray-600" />
-                      <span className="text-sm text-gray-700">Choose Image</span>
+                    <label className="flex items-center gap-2 px-4 py-2 border border-input rounded-lg cursor-pointer hover:bg-muted transition-colors">
+                      <Upload className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-foreground">Choose Image</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -323,7 +323,7 @@ export default function StockMovementsPage() {
                       />
                     </label>
                     {formData.scrap_image && (
-                      <span className="text-sm text-gray-600">{formData.scrap_image.name}</span>
+                      <span className="text-sm text-muted-foreground">{formData.scrap_image.name}</span>
                     )}
                   </div>
                 </div>
@@ -332,14 +332,14 @@ export default function StockMovementsPage() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
                 >
                   {submitting ? 'Recording…' : 'Record Movement'}
                 </button>

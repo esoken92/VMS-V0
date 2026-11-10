@@ -27,16 +27,16 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="hidden md:flex w-64 bg-gray-900 text-white flex-col h-screen sticky top-0 z-40">
+    <aside className="hidden md:flex w-64 bg-sidebar text-sidebar-foreground flex-col h-screen sticky top-0 z-40">
       {/* Logo Section */}
-      <div className="p-6 border-b border-gray-800">
+      <div className="p-6 border-b border-sidebar-border">
         <Link href="/dashboard" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Package className="h-5 w-5" />
           </div>
           <div>
             <h1 className="text-lg font-bold">VMS</h1>
-            <p className="text-xs text-gray-400">Inventory</p>
+            <p className="text-xs text-sidebar-muted">Inventory</p>
           </div>
         </Link>
       </div>
@@ -54,8 +54,8 @@ export default function Sidebar() {
                 transition-all duration-200 relative
                 ${
                   active
-                    ? 'bg-primary text-white shadow-lg'
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                    ? 'bg-primary text-sidebar-foreground shadow-lg'
+                    : 'text-sidebar-foreground hover:bg-sidebar hover:text-sidebar-foreground'
                 }
               `}
               title={item.description}
@@ -66,7 +66,7 @@ export default function Sidebar() {
                   <p className="font-medium text-sm">{item.label}</p>
                   <p
                     className={`text-xs ${
-                      active ? 'text-white/80' : 'text-gray-500'
+                      active ? 'text-sidebar-foreground/80' : 'text-sidebar-muted'
                     }`}
                   >
                     {item.description}
@@ -74,7 +74,7 @@ export default function Sidebar() {
                 </div>
               </div>
               {active && (
-                <ChevronRight className="h-4 w-4 text-white/50 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="h-4 w-4 text-sidebar-foreground/50 group-hover:translate-x-1 transition-transform" />
               )}
             </Link>
           );
@@ -82,9 +82,9 @@ export default function Sidebar() {
       </nav>
 
       {/* Role Badge */}
-      <div className="border-t border-gray-800 p-4">
-        <div className="bg-gray-800 rounded-lg p-3">
-          <p className="text-xs text-gray-400 mb-1">
+      <div className="border-t border-sidebar-border p-4">
+        <div className="bg-sidebar rounded-lg p-3">
+          <p className="text-xs text-sidebar-muted mb-1">
             {previewAsOperator ? 'Previewing as' : 'Current Role'}
           </p>
           <p className="text-sm font-bold text-primary uppercase">

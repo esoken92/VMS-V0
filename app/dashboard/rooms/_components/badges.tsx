@@ -9,26 +9,26 @@ import type { RoomAccessLevel, RoomType } from '@/lib/storerooms/room-types';
 import { roomTypeLabel } from '@/lib/storerooms/room-types';
 
 const TYPE_STYLES: Record<RoomType, string> = {
-  general: 'bg-gray-100 text-gray-700',
+  general: 'bg-muted text-foreground',
   cold: 'bg-sky-100 text-sky-800',
-  frozen: 'bg-indigo-100 text-indigo-800',
-  dry: 'bg-amber-100 text-amber-800',
+  frozen: 'bg-info/10 text-info',
+  dry: 'bg-warning/15 text-warning',
   it: 'bg-violet-100 text-violet-800',
   vehicle: 'bg-teal-100 text-teal-800',
   secure: 'bg-slate-800 text-slate-100',
   hazmat: 'bg-orange-100 text-orange-800',
-  quarantine: 'bg-yellow-100 text-yellow-800',
-  staging: 'bg-emerald-100 text-emerald-800',
+  quarantine: 'bg-warning/15 text-warning',
+  staging: 'bg-success/10 text-success',
   dock: 'bg-cyan-100 text-cyan-800',
   returns: 'bg-pink-100 text-pink-800',
-  destruction: 'bg-red-100 text-red-800',
+  destruction: 'bg-destructive/10 text-destructive',
 };
 
 const ACCESS_STYLES: Record<RoomAccessLevel, string> = {
-  open: 'bg-green-100 text-green-800',
-  restricted: 'bg-amber-100 text-amber-800',
+  open: 'bg-success/10 text-success',
+  restricted: 'bg-warning/15 text-warning',
   secure: 'bg-slate-800 text-slate-100',
-  locked: 'bg-red-100 text-red-800',
+  locked: 'bg-destructive/10 text-destructive',
 };
 
 export function RoomTypeBadge({ type }: { type: RoomType }) {
@@ -58,10 +58,10 @@ export function TempStatusDot({
 }) {
   const style =
     status === 'ok'
-      ? 'bg-green-500'
+      ? 'bg-success'
       : status === 'low' || status === 'high'
-        ? 'bg-red-500'
-        : 'bg-gray-300';
+        ? 'bg-destructive/100'
+        : 'bg-input';
   const title =
     status === 'ok'
       ? 'Within range'

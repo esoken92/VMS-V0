@@ -23,11 +23,11 @@ export default function PreviewBanner() {
   };
 
   return (
-    <div className="bg-blue-50 border-b border-blue-200 px-4 py-2">
+    <div className="bg-info/10 border-b border-info/30 px-4 py-2">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
           <Eye className="h-4 w-4 text-primary" />
-          <p className="text-sm font-medium text-blue-800">
+          <p className="text-sm font-medium text-info">
             Viewing as worker — navigation and access are limited to the
             operator surface
           </p>
@@ -35,7 +35,7 @@ export default function PreviewBanner() {
         <button
           onClick={handleExit}
           disabled={exiting}
-          className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm disabled:opacity-60"
+          className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm disabled:opacity-60"
         >
           <LogOut className="h-4 w-4" />
           {exiting ? 'Exiting…' : 'Exit preview'}

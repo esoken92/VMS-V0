@@ -39,14 +39,14 @@ export default function ToggleSwitch({
         'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full',
         'transition-colors duration-200 ease-in-out',
         'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-        checked ? 'bg-primary' : 'bg-gray-300',
+        checked ? 'bg-primary' : 'bg-input',
         disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
       ].join(' ')}
     >
       <span
         aria-hidden="true"
         className={[
-          'inline-block h-5 w-5 transform rounded-full bg-white shadow',
+          'inline-block h-5 w-5 transform rounded-full bg-card shadow',
           'transition-transform duration-200 ease-in-out',
           checked ? 'translate-x-[22px]' : 'translate-x-0.5',
         ].join(' ')}

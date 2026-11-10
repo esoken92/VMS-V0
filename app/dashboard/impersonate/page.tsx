@@ -81,17 +81,17 @@ export default function ImpersonatePage() {
   if (isImpersonating) {
     return (
       <div className="space-y-6">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <div className="bg-warning/10 border border-warning/30 rounded-lg p-6">
           <div className="flex items-center gap-3 mb-4">
-            <Shield className="h-6 w-6 text-yellow-600" />
-            <h2 className="text-lg font-semibold text-yellow-900">Impersonation Mode Active</h2>
+            <Shield className="h-6 w-6 text-warning" />
+            <h2 className="text-lg font-semibold text-warning">Impersonation Mode Active</h2>
           </div>
-          <p className="text-yellow-800 mb-4">
+          <p className="text-warning mb-4">
             You are currently viewing the system as <strong>{impersonatedByUser?.full_name || 'Unknown'}</strong>.
           </p>
           <button
             onClick={handleExitImpersonation}
-            className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-warning text-warning-foreground rounded-lg hover:bg-warning/90 transition-colors"
           >
             <LogOut className="h-4 w-4" />
             Exit Impersonation
@@ -105,11 +105,11 @@ export default function ImpersonatePage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Impersonate User</h1>
-          <p className="text-gray-600 mt-1">View the system as another user</p>
+          <h1 className="text-2xl font-bold text-foreground">Impersonate User</h1>
+          <p className="text-muted-foreground mt-1">View the system as another user</p>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <p className="text-red-800">Access denied. Only super admins can impersonate users.</p>
+        <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-6">
+          <p className="text-destructive">Access denied. Only super admins can impersonate users.</p>
         </div>
       </div>
     );
@@ -118,31 +118,31 @@ export default function ImpersonatePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Impersonate User</h1>
-        <p className="text-gray-600 mt-1">View the system as another user (Super Admin only)</p>
+        <h1 className="text-2xl font-bold text-foreground">Impersonate User</h1>
+        <p className="text-muted-foreground mt-1">View the system as another user (Super Admin only)</p>
       </div>
 
       {message && (
         <div className={`p-4 rounded-lg flex items-center gap-3 ${
-          message.type === 'success' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+          message.type === 'success' ? 'bg-success/10 border border-success/30' : 'bg-destructive/10 border border-destructive/30'
         }`}>
           {message.type === 'success' ? (
-            <CheckCircle className="h-5 w-5 text-green-600" />
+            <CheckCircle className="h-5 w-5 text-success" />
           ) : (
-            <AlertCircle className="h-5 w-5 text-red-600" />
+            <AlertCircle className="h-5 w-5 text-destructive" />
           )}
           <p className={`text-sm ${
-            message.type === 'success' ? 'text-green-800' : 'text-red-800'
+            message.type === 'success' ? 'text-success' : 'text-destructive'
           }`}>{message.text}</p>
         </div>
       )}
 
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+      <div className="bg-warning/10 border border-warning/30 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <Shield className="h-5 w-5 text-yellow-600 mt-0.5" />
+          <Shield className="h-5 w-5 text-warning mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-yellow-900">Security Notice</p>
-            <p className="text-sm text-yellow-800 mt-1">
+            <p className="text-sm font-medium text-warning">Security Notice</p>
+            <p className="text-sm text-warning mt-1">
               All impersonation sessions are logged. You will see a banner indicating you are in impersonation mode.
             </p>
           </div>
@@ -150,15 +150,15 @@ export default function ImpersonatePage() {
       </div>
 
       <form onSubmit={handleImpersonate} className="space-y-6">
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Select User</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Select User</label>
               <select
                 required
                 value={selectedUserId}
                 onChange={(e) => setSelectedUserId(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="">Choose a user...</option>
                 {filteredUsers.map((user) => (
@@ -169,62 +169,62 @@ export default function ImpersonatePage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Reason *</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Reason *</label>
               <input
                 type="text"
                 required
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Why are you impersonating this user?"
               />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search users by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full pl-10 pr-4 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
         </div>
 
         {loading ? (
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8 text-center text-gray-500">
+          <div className="bg-card rounded-lg border border-border shadow-sm p-8 text-center text-muted-foreground">
             Loading users...
           </div>
         ) : (
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+          <div className="bg-card rounded-lg border border-border shadow-sm overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted border-b border-border">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-border">
                 {filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-6 py-8 text-center text-gray-500">No users found</td>
+                    <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">No users found</td>
                   </tr>
                 ) : (
                   filteredUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.full_name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{user.email ?? '-'}</td>
+                    <tr key={user.id} className="hover:bg-muted">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">{user.full_name}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{user.email ?? '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 py-1 text-xs font-medium rounded capitalize ${
-                          user.role === 'admin' ? 'bg-blue-100 text-blue-700' :
-                          user.role === 'fleet_dispatch' ? 'bg-green-100 text-green-700' :
-                          'bg-gray-100 text-gray-700'
+                          user.role === 'admin' ? 'bg-info/10 text-info' :
+                          user.role === 'fleet_dispatch' ? 'bg-success/10 text-success' :
+                          'bg-muted text-foreground'
                         }`}>
                           {user.role.replace('_', ' ')}
                         </span>
@@ -233,7 +233,7 @@ export default function ImpersonatePage() {
                         <button
                           type="button"
                           onClick={() => setSelectedUserId(user.id)}
-                          className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm"
+                          className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm"
                         >
                           <UserCheck className="h-4 w-4" />
                           Impersonate
@@ -251,7 +251,7 @@ export default function ImpersonatePage() {
           <button
             type="submit"
             disabled={!selectedUserId || isSubmitting}
-            className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-blue-400 transition-colors"
+            className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
           >
             <UserCheck className="h-4 w-4" />
             {isSubmitting ? 'Starting...' : 'Start Impersonation'}

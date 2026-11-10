@@ -59,7 +59,7 @@ import ToggleSwitch from '../_components/ToggleSwitch';
 
 const MANAGER_UP = ['super_admin', 'admin', 'manager'];
 const inputCls =
-  'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm';
+  'w-full px-3 py-2 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm';
 
 export default function RoomDetailPage() {
   const params = useParams<{ id: string }>();
@@ -181,11 +181,11 @@ export default function RoomDetailPage() {
   };
 
   if (loading) {
-    return <div className="p-8 text-center text-gray-500">Loading room…</div>;
+    return <div className="p-8 text-center text-muted-foreground">Loading room…</div>;
   }
   if (!room) {
     return (
-      <div className="p-8 text-center text-gray-500">
+      <div className="p-8 text-center text-muted-foreground">
         {error ?? 'Room not found'}
       </div>
     );
@@ -201,28 +201,28 @@ export default function RoomDetailPage() {
       <div>
         <Link
           href="/dashboard/rooms"
-          className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" /> Back to rooms
         </Link>
         <div className="flex items-start justify-between mt-2">
           <div>
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold text-gray-900">{room.name}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{room.name}</h1>
               <RoomTypeBadge type={room.type} />
               <AccessLevelBadge level={room.access_level} />
               {room.quarantine && (
-                <span className="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium">
+                <span className="px-2 py-0.5 rounded-full bg-warning/15 text-warning text-xs font-medium">
                   quarantine
                 </span>
               )}
               {!room.active && (
-                <span className="px-2 py-0.5 rounded-full bg-gray-200 text-gray-600 text-xs font-medium">
+                <span className="px-2 py-0.5 rounded-full bg-input text-muted-foreground text-xs font-medium">
                   inactive
                 </span>
               )}
             </div>
-            <p className="text-gray-600 mt-1">
+            <p className="text-muted-foreground mt-1">
               {room.parent_name && (
                 <>
                   in{' '}
@@ -235,7 +235,7 @@ export default function RoomDetailPage() {
           {canEdit && (
             <Link
               href={`/dashboard/rooms/${room.id}/edit`}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 border border-input rounded-lg hover:bg-muted transition-colors"
             >
               <Edit className="h-4 w-4" /> Edit
             </Link>
@@ -244,20 +244,20 @@ export default function RoomDetailPage() {
       </div>
 
       {error && (
-        <div className="p-4 rounded-lg bg-red-50 text-red-800">{error}</div>
+        <div className="p-4 rounded-lg bg-destructive/10 text-destructive">{error}</div>
       )}
       {message && (
-        <div className="p-4 rounded-lg bg-green-50 text-green-800">{message}</div>
+        <div className="p-4 rounded-lg bg-success/10 text-success">{message}</div>
       )}
 
       {/* Climate */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+      <div className="bg-card rounded-lg border border-border shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <Thermometer className="h-5 w-5 text-gray-400" />
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <Thermometer className="h-5 w-5 text-muted-foreground" />
             Climate — last 24h
           </h2>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-muted-foreground">
             {latestTemp !== null ? (
               <>
                 now <span className="font-semibold">{latestTemp.toFixed(1)}°C</span>
@@ -266,7 +266,7 @@ export default function RoomDetailPage() {
               'no data'
             )}
             {(room.temp_min !== null || room.temp_max !== null) && (
-              <span className="text-gray-400">
+              <span className="text-muted-foreground">
                 {' '}
                 · range {room.temp_min ?? '−∞'}…{room.temp_max ?? '+∞'}°C
               </span>
@@ -282,33 +282,33 @@ export default function RoomDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Contents */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
-            <Package className="h-5 w-5 text-gray-400" />
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
+            <Package className="h-5 w-5 text-muted-foreground" />
             Contents ({contents.length})
           </h2>
           {contents.length === 0 ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               No products located here. Assign bin locations to this room to
               see its contents.
             </p>
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="text-left text-xs text-gray-500 uppercase border-b border-gray-200">
+                <tr className="text-left text-xs text-muted-foreground uppercase border-b border-border">
                   <th className="pb-2">SKU</th>
                   <th className="pb-2">Product</th>
                   <th className="pb-2">Bin</th>
                   <th className="pb-2 text-right">Stock</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border">
                 {contents.map((c) => (
                   <tr key={c.product_id}>
-                    <td className="py-2 text-sm text-gray-600">{c.sku}</td>
-                    <td className="py-2 text-sm text-gray-900">{c.name}</td>
-                    <td className="py-2 text-sm text-gray-600">{c.bin_label}</td>
-                    <td className="py-2 text-sm text-gray-900 text-right">
+                    <td className="py-2 text-sm text-muted-foreground">{c.sku}</td>
+                    <td className="py-2 text-sm text-foreground">{c.name}</td>
+                    <td className="py-2 text-sm text-muted-foreground">{c.bin_label}</td>
+                    <td className="py-2 text-sm text-foreground text-right">
                       {c.current_stock} {c.unit_of_measure}
                     </td>
                   </tr>
@@ -317,14 +317,14 @@ export default function RoomDetailPage() {
             </table>
           )}
           {children.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              <p className="text-sm font-medium text-gray-700 mb-2">Sub-rooms</p>
+            <div className="mt-4 pt-4 border-t border-border">
+              <p className="text-sm font-medium text-foreground mb-2">Sub-rooms</p>
               <div className="flex flex-wrap gap-2">
                 {children.map((c) => (
                   <Link
                     key={c.id}
                     href={`/dashboard/rooms/${c.id}`}
-                    className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm text-gray-800"
+                    className="px-3 py-1.5 bg-muted hover:bg-input rounded-lg text-sm text-foreground"
                   >
                     {c.name}
                   </Link>
@@ -335,24 +335,24 @@ export default function RoomDetailPage() {
         </div>
 
         {/* Feature toggles */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-foreground mb-1">
             Room features
           </h2>
-          <p className="text-sm text-gray-500 mb-3">
+          <p className="text-sm text-muted-foreground mb-3">
             {canEdit
               ? 'Toggle per-room capabilities.'
               : 'Per-room capabilities (read-only).'}
           </p>
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-border">
             {ROOM_FEATURES.map((f) => (
               <div
                 key={f.key}
                 className="flex items-center justify-between py-2.5"
               >
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{f.label}</p>
-                  <p className="text-xs text-gray-500">{f.description}</p>
+                  <p className="text-sm font-medium text-foreground">{f.label}</p>
+                  <p className="text-xs text-muted-foreground">{f.description}</p>
                 </div>
                 <ToggleSwitch
                   checked={toggles[f.key] ?? false}
@@ -369,9 +369,9 @@ export default function RoomDetailPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Access */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-foreground">
               Access & allowlist
             </h2>
             {canEdit && !editingAccess && (
@@ -386,20 +386,20 @@ export default function RoomDetailPage() {
           {!editingAccess ? (
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-500">Access level</span>
+                <span className="text-muted-foreground">Access level</span>
                 <AccessLevelBadge level={room.access_level} />
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Allowed roles</span>
-                <span className="text-gray-900">
+                <span className="text-muted-foreground">Allowed roles</span>
+                <span className="text-foreground">
                   {room.allowed_roles.length > 0
                     ? room.allowed_roles.join(', ')
                     : 'any'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Item allowlist</span>
-                <span className="text-gray-900">
+                <span className="text-muted-foreground">Item allowlist</span>
+                <span className="text-foreground">
                   {room.item_allowlist.length > 0
                     ? room.item_allowlist.join(', ')
                     : 'all items'}
@@ -409,7 +409,7 @@ export default function RoomDetailPage() {
           ) : (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Access level
                 </label>
                 <select
@@ -427,7 +427,7 @@ export default function RoomDetailPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Allowed roles
                 </label>
                 <div className="flex flex-wrap gap-3">
@@ -446,7 +446,7 @@ export default function RoomDetailPage() {
                               : [...allowedRoles, r],
                           )
                         }
-                        className="rounded border-gray-300"
+                        className="rounded border-input"
                       />
                       {r.replace('_', ' ')}
                     </label>
@@ -454,7 +454,7 @@ export default function RoomDetailPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-foreground mb-1">
                   Item allowlist
                 </label>
                 <div className="flex flex-wrap gap-3">
@@ -473,7 +473,7 @@ export default function RoomDetailPage() {
                               : [...allowlist, t],
                           )
                         }
-                        className="rounded border-gray-300"
+                        className="rounded border-input"
                       />
                       {t}
                     </label>
@@ -489,13 +489,13 @@ export default function RoomDetailPage() {
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setEditingAccess(false)}
-                  className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
+                  className="px-3 py-1.5 border border-input rounded-lg text-sm hover:bg-muted"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAccessSave}
-                  className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm hover:bg-primary/90"
+                  className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-sm hover:bg-primary/90"
                 >
                   Save access
                 </button>
@@ -505,10 +505,10 @@ export default function RoomDetailPage() {
         </div>
 
         {/* Alert rules */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+        <div className="bg-card rounded-lg border border-border shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-gray-400" />
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-muted-foreground" />
               Alert rules ({rules.length})
             </h2>
             {canEdit && (
@@ -524,7 +524,7 @@ export default function RoomDetailPage() {
           {showRuleForm && canEdit && (
             <form
               onSubmit={handleRuleSave}
-              className="mb-4 p-4 bg-gray-50 rounded-lg space-y-3"
+              className="mb-4 p-4 bg-muted rounded-lg space-y-3"
             >
               <div className="grid grid-cols-2 gap-3">
                 <select
@@ -592,7 +592,7 @@ export default function RoomDetailPage() {
                 {USER_ROLES.map((r) => (
                   <label
                     key={r}
-                    className="inline-flex items-center gap-1.5 text-xs text-gray-600"
+                    className="inline-flex items-center gap-1.5 text-xs text-muted-foreground"
                   >
                     <input
                       type="checkbox"
@@ -605,7 +605,7 @@ export default function RoomDetailPage() {
                             : [...ruleForm.notify_roles, r],
                         })
                       }
-                      className="rounded border-gray-300"
+                      className="rounded border-input"
                     />
                     notify {r.replace('_', ' ')}
                   </label>
@@ -615,13 +615,13 @@ export default function RoomDetailPage() {
                 <button
                   type="button"
                   onClick={() => setShowRuleForm(false)}
-                  className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
+                  className="px-3 py-1.5 border border-input rounded-lg text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm hover:bg-primary/90"
+                  className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-sm hover:bg-primary/90"
                 >
                   Save rule
                 </button>
@@ -630,41 +630,41 @@ export default function RoomDetailPage() {
           )}
 
           {rules.length === 0 ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               No alert rules — alerts won&apos;t fire for this room until a
               threshold rule exists.
             </p>
           ) : (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-border">
               {rules.map((r) => (
                 <div
                   key={r.id}
                   className="py-2.5 flex items-center justify-between"
                 >
                   <div className="text-sm">
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium text-foreground">
                       {METRIC_LABELS[r.metric]}
                     </span>{' '}
-                    <span className="text-gray-600">
+                    <span className="text-muted-foreground">
                       {r.op} {r.threshold}
                     </span>
-                    <span className="text-gray-400">
+                    <span className="text-muted-foreground">
                       {' '}
                       · dwell {r.dwell_minutes}m ·{' '}
                     </span>
                     <span
                       className={
                         r.severity === 'critical'
-                          ? 'text-red-600 font-medium'
+                          ? 'text-destructive font-medium'
                           : r.severity === 'warning'
-                            ? 'text-amber-600'
-                            : 'text-gray-500'
+                            ? 'text-warning'
+                            : 'text-muted-foreground'
                       }
                     >
                       {r.severity}
                     </span>
                     {!r.active && (
-                      <span className="text-gray-400"> (disabled)</span>
+                      <span className="text-muted-foreground"> (disabled)</span>
                     )}
                   </div>
                   {canEdit && (
@@ -674,7 +674,7 @@ export default function RoomDetailPage() {
                         if (res.success) void load();
                         else setError(res.error);
                       }}
-                      className="p-1 hover:bg-red-100 rounded text-red-600"
+                      className="p-1 hover:bg-destructive/10 rounded text-destructive"
                       title="Delete rule"
                     >
                       <Trash2 className="h-4 w-4" />

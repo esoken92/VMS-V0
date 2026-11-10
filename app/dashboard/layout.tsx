@@ -49,24 +49,24 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-muted">
       {/* Sidebar */}
       <Sidebar />
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 md:hidden"
+          className="fixed inset-0 bg-sidebar/70 z-50 md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
       {/* Mobile Sidebar */}
       {mobileMenuOpen && (
-        <div className="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 md:hidden">
-          <div className="p-6 border-b border-gray-800">
-            <h1 className="text-lg font-bold text-white">VMS</h1>
-            <p className="text-xs text-gray-400">Inventory</p>
+        <div className="fixed inset-y-0 left-0 z-50 w-64 bg-sidebar md:hidden">
+          <div className="p-6 border-b border-sidebar-border">
+            <h1 className="text-lg font-bold text-sidebar-foreground">VMS</h1>
+            <p className="text-xs text-sidebar-muted">Inventory</p>
           </div>
           {/* Mobile menu items would go here */}
         </div>
@@ -84,9 +84,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             provisioning wizard has run at least once. Operators never see
             it (persona already accounts for worker preview). */}
         {flagsLoaded && !provisioned && persona === 'builder' && (
-          <div className="bg-amber-50 border-b border-amber-200 px-6 py-2">
+          <div className="bg-warning/10 border-b border-warning/30 px-6 py-2">
             <div className="flex items-center justify-between max-w-7xl mx-auto">
-              <p className="text-sm text-amber-900">
+              <p className="text-sm text-warning">
                 This instance hasn&apos;t been configured yet — pick an
                 industry and stock policies to tailor the menus, fields and
                 workflows.
@@ -103,11 +103,11 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
         {/* Impersonation Banner */}
         {isImpersonating && (
-          <div className="bg-yellow-50 border-b border-yellow-200 px-6 py-3">
+          <div className="bg-warning/10 border-b border-warning/30 px-6 py-3">
             <div className="flex items-center justify-between max-w-7xl mx-auto">
               <div className="flex items-center gap-3">
-                <Shield className="h-5 w-5 text-yellow-600" />
-                <p className="text-sm text-yellow-900">
+                <Shield className="h-5 w-5 text-warning" />
+                <p className="text-sm text-warning">
                   Viewing as <strong>{profile?.full_name || 'Unknown'}</strong>
                   {impersonatedByUser?.full_name
                     ? ` — signed in as ${impersonatedByUser.full_name}`
@@ -117,7 +117,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
               </div>
               <button
                 onClick={handleExitImpersonation}
-                className="flex items-center gap-2 px-3 py-1.5 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm"
+                className="flex items-center gap-2 px-3 py-1.5 bg-warning text-warning-foreground rounded-lg hover:bg-warning/90 transition-colors text-sm"
               >
                 <LogOut className="h-4 w-4" />
                 Exit
