@@ -55,7 +55,7 @@ The app is plain Postgres — Supabase is just one way to host it:
 ## Sensor ingestion (framework ready, no service needed)
 
 - Endpoint: `POST /api/sensors/ingest` (authenticated, idempotent on device+metric+timestamp).
-- Bridge any MQTT/webhook source; a built-in simulator generates demo readings without hardware.
+- Bridge any MQTT/webhook source; a built-in simulator generates simulated readings without hardware.
 - ESP32 examples + MQTT broker notes live in `docs/SENSORS.md`.
 
 ## Typst PDF reports (built-in, no service needed)

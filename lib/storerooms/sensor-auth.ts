@@ -7,7 +7,7 @@
  *      doesn't leak either). When the env var is unset the Bearer path
  *      always fails — no key configured means no key auth.
  *   2. Session cookie — any authenticated user (staff+) may ingest, e.g.
- *      the demo UI or a technician's tablet.
+ *      a dashboard UI or a technician's tablet.
  *
  * A Bearer header that fails does NOT fall through to session auth — a
  * request presenting a device credential is authenticated as a device or

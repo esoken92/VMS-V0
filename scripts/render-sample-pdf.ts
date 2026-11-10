@@ -17,7 +17,7 @@ import {
 } from '../lib/pdf/templates/inventory';
 
 const fixture: InventoryValuationInput = {
-  orgName: 'VMS Demo Fleet Services',
+  orgName: 'VMS V0 Fleet Services',
   generatedAt: format(new Date(), 'd MMM yyyy, HH:mm'),
   grandTotal: 0, // recomputed below
   categories: [

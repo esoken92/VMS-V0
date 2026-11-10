@@ -1,6 +1,6 @@
 /**
  * lib/storerooms/simulator — realistic fake telemetry so the monitoring
- * dashboard demos end-to-end without hardware. Feeds the SAME ingest path
+ * end-to-end testing without hardware. Feeds the SAME ingest path
  * as real devices (lib/storerooms/ingest.ts) — idempotent keys, alert
  * evaluation, everything.
  *

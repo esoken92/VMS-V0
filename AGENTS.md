@@ -1,10 +1,10 @@
-# VMS-Demo-V0 — Agent Notes (clean-slate reboot)
+# VMS-V0 — Agent Notes (clean-slate reboot)
 
 ## Architecture decisions (decided, do not revert)
 
 - **Self-hosted first.** App must run on the dev's PC and later on a
-  client's PC — including old/constrained hardware. A Vercel-hosted demo
-  copy is ALSO in scope: project `vms-demo-v0` is linked and deployed by
+  client's PC — including old/constrained hardware. A Vercel-hosted deployment
+  copy is ALSO in scope: project `vms-v0` is linked and deployed by
   the owner, pointed at a hosted Postgres (Supabase/Neon) via
   `DATABASE_URL` — see `docs/DEPLOYMENT-LIVE.md`. Never create/switch
   live resources without explicit owner approval.
@@ -55,7 +55,7 @@ Unset env → feature disables gracefully, UI shows "not configured".
 ```bash
 # Zero-install path (no Docker, no Postgres): embedded PGlite at ./.vms-data
 npm run dev:standalone        # bootstraps .vms-data on first run, then next dev
-npm run db:bootstrap          # apply pending migrations + refresh demo hashes
+npm run db:bootstrap          # apply pending migrations + refresh seed hashes
 npm run db:reset              # wipe .vms-data + rebuild (recovery path)
 
 # Postgres path (Docker or installed server — DATABASE_URL in .env)
@@ -106,7 +106,7 @@ checked; `vms-owner.json` is the real liveness signal.
   (longest-prefix) drives both proxy denies and nav visibility.
   Adding a builder surface? Add its prefix there — hiding nav alone is
   not enforcement. `/dashboard/forbidden` is the deny target.
-- **Authentication copy**: `components/auth/LoginForm.tsx` demo-creds
+- **Authentication copy**: `components/auth/LoginForm.tsx` seed-creds
   box must stay in sync with `scripts/seed.ts` accounts.
 
 ## Definition of done

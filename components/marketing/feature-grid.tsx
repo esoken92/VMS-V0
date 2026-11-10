@@ -65,7 +65,7 @@ const FEATURES: Feature[] = [
     icon: Thermometer,
     title: 'Sensor monitoring',
     description:
-      'Temperature, humidity, and door telemetry per room with threshold rules, excursion alerts, and a demo simulator.',
+      'Temperature, humidity, and door telemetry per room with threshold rules, excursion alerts, and a sensor simulator.',
   },
   {
     icon: Plug,

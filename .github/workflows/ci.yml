@@ -43,7 +43,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # Fresh checkout → build the embedded store: prelude + migrations + demo seed.
+      # Fresh checkout → build the embedded store: prelude + migrations + seed dataset.
       - run: npm run db:bootstrap
       # Read-only check: opening + Σ stock_movements == current_stock
       # for every product. Fails if any stock write bypassed the ledger.

@@ -72,7 +72,7 @@ export default function Home() {
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              VMS is a free, open-source inventory template for teams still
+              VMS V0 is a free, open-source inventory template for teams still
               running stock on spreadsheets and paper — typed storerooms,
               scan-first workflows, tool custody, sensor monitoring, and an
               audit trail that never forgets.
@@ -83,7 +83,7 @@ export default function Home() {
                 href="/dashboard"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-8 py-3.5 text-base font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:w-auto"
               >
-                View demo
+                Open the app
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
               <a
@@ -98,9 +98,9 @@ export default function Home() {
             </div>
 
             <p className="mt-6 text-sm text-muted-foreground">
-              Runs locally in under 5 minutes — demo credentials are in the{' '}
+              Runs locally in under 5 minutes — seed credentials are in the{' '}
               <a
-                href={`${GITHUB_URL}#demo-credentials`}
+                href={`${GITHUB_URL}#seeded-accounts`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-medium text-foreground underline-offset-4 hover:underline"
@@ -244,7 +244,7 @@ export default function Home() {
                   href="/dashboard"
                   className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border px-8 py-3.5 text-base font-semibold text-foreground transition-colors hover:bg-accent sm:w-auto"
                 >
-                  Try the demo first
+                  Try the app first
                 </Link>
               </div>
             </div>

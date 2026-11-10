@@ -1,6 +1,6 @@
-# DEPLOYMENT-LIVE.md — Hosted demo launch guide
+# DEPLOYMENT-LIVE.md — Hosted deployment guide
 
-Step-by-step to take this repo from local-only to a hosted demo on
+Step-by-step to take this repo from local-only to a hosted deployment on
 **Vercel + Supabase (hosted Postgres only)**. Supabase is used purely as a
 managed Postgres database — the app uses **Auth.js credentials** and its own
 storage driver, not Supabase Auth/Storage/Realtime.
@@ -16,10 +16,10 @@ storage driver, not Supabase Auth/Storage/Realtime.
 
 | Item | Value |
 |---|---|
-| Vercel project | `vms-demo-v0` (id `prj_l6FWklSBfv0sjo8nJjp4ceQCU6tC`) |
+| Vercel project | `vms-v0` (id `prj_l6FWklSBfv0sjo8nJjp4ceQCU6tC`) |
 | Team | `kurt-jonathan-s-projects` (`team_eiHEZQZtAZMNdFlwTh2EtYar`) |
-| Git link | `github.com/esoken92/VMS-Demo-V0`, production branch `main` |
-| Expected domain | `https://vms-demo-v0.vercel.app` (assigned on first deploy) |
+| Git link | `github.com/esoken92/VMS-V0`, production branch `main` |
+| Expected domain | `https://vms-v0.vercel.app` (assigned on first deploy) |
 | Deployments | **None** — link-only, per "do not deploy yet" |
 
 Env vars already set on the Vercel project (target: `production` + `preview`):
@@ -27,16 +27,16 @@ Env vars already set on the Vercel project (target: `production` + `preview`):
 | Key | Status |
 |---|---|
 | `AUTH_SECRET` | ✅ real value set (sensitive — not stored in this file) |
-| `AUTH_URL` | ✅ `https://vms-demo-v0.vercel.app` |
-| `NEXT_PUBLIC_APP_URL` | ✅ `https://vms-demo-v0.vercel.app` |
+| `AUTH_URL` | ✅ `https://vms-v0.vercel.app` |
+| `NEXT_PUBLIC_APP_URL` | ✅ `https://vms-v0.vercel.app` |
 | `DATABASE_URL` | ⚠️ **placeholder** — replace with the real pooled URL in Step 4 |
 
 ### What remains (manual)
 
 1. Create the Supabase project + run migrations + seed (Steps 1–3)
 2. Paste the real `DATABASE_URL` into Vercel (Step 4)
-3. Create demo logins so `profiles.password_hash` is populated (Step 5)
-4. Disable Vercel Authentication if the demo must be public (Step 6)
+3. Create seed logins so `profiles.password_hash` is populated (Step 5)
+4. Disable Vercel Authentication if the app must be public (Step 6)
 5. First deploy (Step 7)
 
 ---
@@ -49,7 +49,7 @@ The agent could not do this: the `supabase-mcp-server` MCP has no
 this app there.
 
 1. Go to https://supabase.com/dashboard → **New project**
-2. Name: `vms-demo` · Plan: **Free** · Region: **`eu-west-1` (Ireland)** —
+2. Name: `vms-v0` · Plan: **Free** · Region: **`eu-west-1` (Ireland)** —
    closest available to South Africa
 3. Save the generated **DB password** somewhere safe (needed for Step 4)
 
@@ -97,13 +97,13 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS password_hash TEXT;
 
 Without this, every login fails and `signupUser` errors on insert.
 
-## Step 3 — Seed demo data (optional, recommended for demos)
+## Step 3 — Seed seed data (optional, recommended for evaluation)
 
 Paste `supabase/seed.sql` into the SQL Editor (or
 `psql "$SESSION_POOLER_URL" -f supabase/seed.sql`).
 
 It creates bin locations, suppliers, ~35 products, stock movements, tool
-loans, stock takes, and the four demo `auth.users`/`profiles` rows.
+loans, stock takes, and the four seed `auth.users`/`profiles` rows.
 
 ⚠️ The seed sets `auth.users.encrypted_password` (bcrypt) which the app
 **ignores** — it verifies `profiles.password_hash` (argon2id). So seeded users
@@ -121,7 +121,7 @@ v3.4.9, no code change required):
 postgresql://postgres.YOUR_REF:YOUR_DB_PASSWORD@aws-0-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require&prepare=false
 ```
 
-Update it at Vercel → project `vms-demo-v0` → **Settings → Environment
+Update it at Vercel → project `vms-v0` → **Settings → Environment
 Variables** → `DATABASE_URL` (a placeholder with this exact shape is already
 there — just replace the ref/password/region tokens).
 
@@ -129,54 +129,54 @@ For local psql/admin access use the **Session pooler** (`…pooler.supabase.com:
 IPv4-friendly, supports prepared statements); the direct host
 `db.YOUR_REF.supabase.co` is IPv6-only on the free tier.
 
-## Step 5 — Create working demo logins
+## Step 5 — Create working seed logins
 
 `seed.sql` does not populate `profiles.password_hash`. Easiest path — after
 the first deploy is live:
 
-1. Sign up each demo account through the app at
-   `https://vms-demo-v0.vercel.app/auth/signup` using the emails/passwords
+1. Sign up each seed account through the app at
+   `https://vms-v0.vercel.app/auth/signup` using the emails/passwords
    below (sign-up assigns role `staff` and writes a proper argon2id hash).
 2. Promote roles in the Supabase SQL Editor:
 
 ```sql
 UPDATE profiles SET role = 'super_admin'
-  WHERE user_id IN (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com');
+  WHERE user_id IN (SELECT id FROM auth.users WHERE email = 'admin@vms-v0.local');
 UPDATE profiles SET role = 'manager'
-  WHERE user_id IN (SELECT id FROM auth.users WHERE email = 'demo.manager@vms-demo.com');
+  WHERE user_id IN (SELECT id FROM auth.users WHERE email = 'manager@vms-v0.local');
 UPDATE profiles SET role = 'fleet_dispatch'
-  WHERE user_id IN (SELECT id FROM auth.users WHERE email = 'demo.fleet@vms-demo.com');
--- demo.worker@vms-demo.com stays 'staff'
+  WHERE user_id IN (SELECT id FROM auth.users WHERE email = 'fleet@vms-v0.local');
+-- worker@vms-v0.local stays 'staff'
 ```
 
 Alternative: generate argon2id hashes locally
-(`node -e "require('argon2').hash('DemoAdmin123!',{type:2}).then(console.log)"`)
+(`node -e "require('argon2').hash('VmsAdmin123!',{type:2}).then(console.log)"`)
 and `UPDATE profiles SET password_hash = '…' WHERE …`.
 
-### Demo credentials (from README / seed.sql)
+### Seed credentials (from README / seed.sql)
 
 | Role | Email | Password |
 |---|---|---|
-| Super Admin | `demo.admin@vms-demo.com` | `DemoAdmin123!` |
-| Manager | `demo.manager@vms-demo.com` | `DemoManager123!` |
-| Fleet Dispatch | `demo.fleet@vms-demo.com` | `DemoFleet123!` |
-| Warehouse Staff | `demo.worker@vms-demo.com` | `DemoWorker123!` |
+| Super Admin | `admin@vms-v0.local` | `VmsAdmin123!` |
+| Manager | `manager@vms-v0.local` | `VmsManager123!` |
+| Fleet Dispatch | `fleet@vms-v0.local` | `VmsFleet123!` |
+| Warehouse Staff | `worker@vms-v0.local` | `VmsWorker123!` |
 
 Only seed these into environments you don't mind being public.
 
-## Step 6 — Deployment protection (public demo)
+## Step 6 — Deployment protection (public deployment)
 
 The team default has **Vercel Authentication (SSO protection)** enabled for
 `all_except_custom_domains` — visitors will hit a Vercel login wall. For a
-public demo: Vercel → project → **Settings → Deployment Protection** → set
-Vercel Authentication to **Off** (or keep it on if the demo should stay
+public deployment: Vercel → project → **Settings → Deployment Protection** → set
+Vercel Authentication to **Off** (or keep it on if the deployment should stay
 private).
 
 ## Step 7 — First deploy
 
 - Push to `main` (auto-deploys), **or** Vercel dashboard → project →
   **Deployments → Deploy**.
-- First successful build assigns `https://vms-demo-v0.vercel.app`.
+- First successful build assigns `https://vms-v0.vercel.app`.
 - Watch the build: `npm run build` must pass — the data-layer port is still in
   progress, so expect possible failures unrelated to infra (e.g. missing
   `scripts/migrate.ts`/`scripts/seed.ts` referenced by `npm run db:*` scripts —
@@ -193,7 +193,7 @@ WHERE table_schema = 'public' ORDER BY table_name;
 -- unit_conversions
 ```
 
-Then sign in at `https://vms-demo-v0.vercel.app` with a demo account.
+Then sign in at `https://vms-v0.vercel.app` with a seed account.
 
 ---
 

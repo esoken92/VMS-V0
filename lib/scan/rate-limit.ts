@@ -6,7 +6,7 @@
  * physical throughput is already bounded by the device.
  *
  * Caveat: the window lives in process memory, so the limit is per
- * Next.js server instance and resets on deploy — acceptable for the demo
+ * Next.js server instance and resets on deploy — acceptable for v0
  * (single-process). For multi-instance deployments swap this for a
  * Postgres advisory lock or a scan_events count query.
  */

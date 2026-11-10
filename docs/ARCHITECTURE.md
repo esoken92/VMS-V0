@@ -51,7 +51,7 @@ No telemetry, no analytics SDKs, nothing phones home.
 ├── proxy.ts             # Edge gate: session + route rules
 ├── drizzle/                  # Drizzle schema + generated migrations
 ├── supabase/migrations/      # Canonical init SQL (001→00N, ordered)
-├── supabase/seed.sql         # Demo users + sample dataset (public creds)
+├── supabase/seed.sql         # Seed users + sample dataset (public creds)
 ├── docs/                     # This file, LOGIC_CHAIN, INTEGRATIONS,
 │                             #   PLAYTEST, research/
 └── docker-compose.yml        # postgres:16-alpine, single service
@@ -102,13 +102,13 @@ narrative version:
    only check (and absent entirely on hosts where it isn't configured).
 
 Auth.js v5 credentials + argon2id. Sessions are JWT/DB-token based;
-demo users come from `supabase/seed.sql` (documented public credentials —
-demo use only). Roles: `super_admin`, `admin`, `manager`,
+seed users come from `supabase/seed.sql` (documented public credentials —
+seed/dev use only). Roles: `super_admin`, `admin`, `manager`,
 `fleet_dispatch`, `staff`.
 
 ## Deployment topologies
 
-**A. Local demo / dev (target: <5 min)**
+**A. Local dev (target: <5 min)**
 
 ```
 docker compose up -d        # Postgres 16, schema auto-init from

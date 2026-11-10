@@ -536,7 +536,7 @@ export async function bootstrap(
         'skipped silently: fix the reported statements and re-run.',
     );
   } else {
-    console.log('\nBootstrap complete. Sign in with demo.admin@vms-demo.com / DemoAdmin123!');
+    console.log('\nBootstrap complete. Sign in with admin@vms-v0.local / VmsAdmin123!');
   }
   return result;
 }

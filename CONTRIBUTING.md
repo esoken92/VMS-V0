@@ -14,9 +14,9 @@ npm run dev:standalone        # → http://localhost:3000
 ```
 
 `dev:standalone` runs an embedded Postgres (PGlite) persisted at
-`./.vms-data`, bootstraps the schema + demo data on first run, then
-starts Next.js. Sign in with `demo.admin@vms-demo.com` /
-`DemoAdmin123!`. Nothing else to install.
+`./.vms-data`, bootstraps the schema + seed data on first run, then
+starts Next.js. Sign in with `admin@vms-v0.local` /
+`VmsAdmin123!`. Nothing else to install.
 
 **Docker Postgres (full parity):**
 
@@ -37,8 +37,8 @@ falls back to the embedded store. Driver selection lives in
 | `npm run type-check` | `tsc --noEmit` |
 | `npm run lint` | `next lint` |
 | `npm run build` | production build |
-| `npm run db:bootstrap` | apply pending migrations + demo seed to the embedded store |
-| `npm run db:seed` | load demo data (server Postgres path) |
+| `npm run db:bootstrap` | apply pending migrations + seed dataset to the embedded store |
+| `npm run db:seed` | load seed data (server Postgres path) |
 | `npm run db:migrate` | apply migrations to a server Postgres |
 | `npm run db:reset` | wipe + rebuild `.vms-data` (recovery for a corrupt store) |
 | `npx tsx scripts/verify-ledger.ts` | read-only reconciliation: every product's stock must equal opening + Σ movements. Gates in CI |

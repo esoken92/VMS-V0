@@ -1,0 +1,456 @@
+▲ Next.js 16.4.3 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.18.160:3000
+- Environments: .env
+✓ Ready in 579ms
+⚠ Warning: Next.js ignored package-lock.json in C:\Users\kurtj because it is outside the current Git repository (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0).
+ To use this directory, set `turbopack.root` in your Next.js config.
+
+✓ Running next.config.ts took 40ms
+- Experiments (use with caution):
+  · serverActions
+
+⚠ Blocked cross-origin request to Next.js dev resource /_next/hmr from "127.0.0.1".
+Cross-origin access to Next.js dev resources is blocked by default for safety.
+
+To allow this host in development, add it to "allowedDevOrigins" in next.config.js and restart the dev server:
+
+// next.config.js
+module.exports = {
+  allowedDevOrigins: ['127.0.0.1'],
+}
+
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ GET /auth/login 200 in 715ms (next.js: 385ms, proxy.ts: 161ms, application-code: 169ms)
+ GET /auth/login?next=%2Ficon.svg 200 in 172ms (next.js: 14ms, proxy.ts: 5ms, application-code: 153ms)
+ GET /api/auth/session 200 in 1207ms (next.js: 1097ms, application-code: 110ms)
+ GET /api/auth/session 200 in 19ms (next.js: 9ms, application-code: 9ms)
+ GET /api/auth/session 200 in 26ms (next.js: 1.7ms, application-code: 24ms)
+ GET /api/auth/session 200 in 12ms (next.js: 2ms, application-code: 10ms)
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (owner — serving 127.0.0.1:51762)
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:51762)
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (owner — serving 127.0.0.1:51765)
+ GET /auth/login 200 in 59ms (next.js: 6ms, proxy.ts: 7ms, application-code: 45ms)
+  Reload env: .env
+ GET /auth/login 200 in 204ms (next.js: 119ms, proxy.ts: 45ms, application-code: 40ms)
+ GET /api/auth/csrf 200 in 90ms (next.js: 62ms, application-code: 28ms)
+[31m[auth][error][0m MissingCSRF: CSRF token was missing during an action callback. Read more at https://errors.authjs.dev#missingcsrf
+    at validateCSRF (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.next\dev\server\chunks\node_modules_@auth_core_0gltlle7chk72._.js:1892:11)
+    at AuthInternal (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.next\dev\server\chunks\node_modules_@auth_core_0gltlle7chk72._.js:2510:222)
+    at async Auth (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.next\dev\server\chunks\node_modules_@auth_core_0gltlle7chk72._.js:350:34)
+    at async AppRouteRouteModule.renderToResponse (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:25953)
+    at async AppRouteRouteModule.executeRequest (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:5:30505)
+    at async responseGenerator (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.next\dev\server\chunks\node_modules_next_1pqmci-rs_9p9._.js:1370:50)
+    at async AppRouteRouteModule.handleResponse (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js:1:262295)
+    at async handleResponse (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.next\dev\server\chunks\node_modules_next_1pqmci-rs_9p9._.js:1442:32)
+    at async handleRequest (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.next\dev\server\chunks\node_modules_next_1pqmci-rs_9p9._.js:1581:5)
+    at async DevServer.renderToResponseWithComponentsImpl (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\server\base-server.js:1765:9)
+    at async DevServer.renderPageComponent (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\server\base-server.js:1824:24)
+    at async DevServer.renderToResponseImpl (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\server\base-server.js:1867:36)
+    at async DevServer.pipeImpl (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\server\base-server.js:1286:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\server\next-server.js:340:17)
+    at async DevServer.handleRequestImpl (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\server\base-server.js:1008:17)
+    at async C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\server\dev\next-dev-server.js:384:20
+    at async Span.traceAsyncFn (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\trace\trace.js:168:20)
+    at async DevServer.handleRequest (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\server\dev\next-dev-server.js:380:24)
+    at async invokeRender (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\server\lib\router-server.js:363:21)
+    at async handleRequest (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\server\lib\router-server.js:567:24)
+    at async requestHandlerImpl (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\server\lib\router-server.js:636:13)
+    at async Server.requestListener (C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\node_modules\next\dist\server\lib\start-server.js:210:13)
+ POST /api/auth/callback/credentials 302 in 10ms (next.js: 1.6ms, application-code: 9ms)
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (owner — serving 127.0.0.1:63281)
+ GET / 200 in 225ms (next.js: 60ms, proxy.ts: 6ms, application-code: 160ms)
+ GET /auth/login?next=%2Ficon.svg 200 in 80ms (next.js: 7ms, proxy.ts: 4ms, application-code: 69ms)
+ GET /auth/login 200 in 53ms (next.js: 6ms, proxy.ts: 6ms, application-code: 40ms)
+ GET /api/auth/session 200 in 19ms (next.js: 9ms, application-code: 10ms)
+ GET /api/auth/session 200 in 11ms (next.js: 1.8ms, application-code: 9ms)
+ GET /auth/login?next=%2Ficon.svg 200 in 76ms (next.js: 6ms, proxy.ts: 8ms, application-code: 62ms)
+ GET /api/auth/session 200 in 9ms (next.js: 1.5ms, application-code: 8ms)
+ GET /api/auth/session 200 in 9ms (next.js: 1.1ms, application-code: 8ms)
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (owner — serving 127.0.0.1:49700)
+ GET /auth/login 200 in 57ms (next.js: 6ms, proxy.ts: 6ms, application-code: 45ms)
+ GET /api/auth/session 200 in 18ms (next.js: 8ms, application-code: 10ms)
+ GET /api/auth/session 200 in 10ms (next.js: 1.8ms, application-code: 8ms)
+ GET /auth/login?next=%2Ficon.svg 200 in 77ms (next.js: 8ms, proxy.ts: 6ms, application-code: 62ms)
+ GET /api/auth/session 200 in 16ms (next.js: 1.4ms, application-code: 15ms)
+ GET /api/auth/session 200 in 10ms (next.js: 2.0ms, application-code: 8ms)
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (owner — serving 127.0.0.1:55573)
+ GET /api/auth/providers 200 in 15ms (next.js: 7ms, application-code: 8ms)
+ GET /api/auth/csrf 200 in 9ms (next.js: 1.6ms, application-code: 8ms)
+[db] remote embedded query failed: connect ECONNREFUSED 127.0.0.1:51762 
+  sql> select "profiles"."id", "profiles"."user_id", "profiles"."full_name", "profiles"."role", "profiles"."password_hash", "auth"."users"."email" from "auth"."users" 
+ POST /api/auth/callback/credentials? 200 in 724ms (next.js: 2.0ms, application-code: 722ms)
+ GET /api/auth/session 200 in 17ms (next.js: 2.0ms, application-code: 15ms)
+ GET /dashboard 200 in 130ms (next.js: 87ms, proxy.ts: 17ms, application-code: 25ms)
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ POST /dashboard 200 in 176ms (next.js: 10ms, proxy.ts: 14ms, application-code: 151ms)
+  └─ ƒ getSessionProfile() in 59ms lib/actions/session-profile.ts
+ GET /dashboard 200 in 175ms (next.js: 110ms, proxy.ts: 14ms, application-code: 51ms)
+ GET /api/auth/session 200 in 31ms (next.js: 9ms, application-code: 21ms)
+ GET /api/auth/session 200 in 18ms (next.js: 2ms, application-code: 16ms)
+ POST /dashboard 200 in 97ms (next.js: 10ms, proxy.ts: 15ms, application-code: 72ms)
+  └─ ƒ getDashboardStats() in 59ms lib/actions/dashboard.ts
+ GET /api/auth/session 200 in 21ms (next.js: 1.7ms, application-code: 20ms)
+ GET /api/auth/session 200 in 19ms (next.js: 1.6ms, application-code: 18ms)
+ POST /dashboard 200 in 67ms (next.js: 8ms, proxy.ts: 15ms, application-code: 44ms)
+  └─ ƒ getFeatureFlags() in 32ms lib/actions/provisioning.ts
+ POST /dashboard 200 in 52ms (next.js: 6ms, proxy.ts: 9ms, application-code: 37ms)
+  └─ ƒ getDashboardStats() in 27ms lib/actions/dashboard.ts
+ POST /dashboard 200 in 62ms (next.js: 6ms, proxy.ts: 10ms, application-code: 46ms)
+  └─ ƒ getFeatureFlags() in 36ms lib/actions/provisioning.ts
+ POST /dashboard 200 in 51ms (next.js: 6ms, proxy.ts: 11ms, application-code: 34ms)
+  └─ ƒ getSessionProfile() in 23ms lib/actions/session-profile.ts
+ POST /dashboard 200 in 42ms (next.js: 6ms, proxy.ts: 10ms, application-code: 26ms)
+  └─ ƒ getSessionProfile() in 15ms lib/actions/session-profile.ts
+ POST /dashboard 200 in 43ms (next.js: 8ms, proxy.ts: 9ms, application-code: 27ms)
+  └─ ƒ getSessionProfile() in 17ms lib/actions/session-profile.ts
+ POST /dashboard 200 in 45ms (next.js: 7ms, proxy.ts: 10ms, application-code: 28ms)
+  └─ ƒ getSessionProfile() in 18ms lib/actions/session-profile.ts
+ POST /dashboard 200 in 43ms (next.js: 7ms, proxy.ts: 8ms, application-code: 27ms)
+  └─ ƒ getSessionProfile() in 16ms lib/actions/session-profile.ts
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ GET /dashboard 200 in 86ms (next.js: 6ms, proxy.ts: 9ms, application-code: 72ms)
+ GET /api/auth/session 200 in 27ms (next.js: 8ms, application-code: 19ms)
+ GET /api/auth/session 200 in 18ms (next.js: 1.8ms, application-code: 16ms)
+ POST /dashboard 200 in 66ms (next.js: 9ms, proxy.ts: 13ms, application-code: 45ms)
+  └─ ƒ getDashboardStats() in 28ms lib/actions/dashboard.ts
+ GET /api/auth/session 200 in 19ms (next.js: 1.4ms, application-code: 18ms)
+ GET /api/auth/session 200 in 15ms (next.js: 1.7ms, application-code: 13ms)
+ POST /dashboard 200 in 70ms (next.js: 8ms, proxy.ts: 13ms, application-code: 49ms)
+  └─ ƒ getFeatureFlags() in 39ms lib/actions/provisioning.ts
+ POST /dashboard 200 in 59ms (next.js: 6ms, proxy.ts: 8ms, application-code: 45ms)
+  └─ ƒ getDashboardStats() in 34ms lib/actions/dashboard.ts
+ POST /dashboard 200 in 59ms (next.js: 6ms, proxy.ts: 8ms, application-code: 45ms)
+  └─ ƒ getFeatureFlags() in 35ms lib/actions/provisioning.ts
+ POST /dashboard 200 in 34ms (next.js: 5ms, proxy.ts: 9ms, application-code: 20ms)
+  └─ ƒ getSessionProfile() in 10ms lib/actions/session-profile.ts
+ POST /dashboard 200 in 43ms (next.js: 6ms, proxy.ts: 8ms, application-code: 29ms)
+  └─ ƒ getSessionProfile() in 18ms lib/actions/session-profile.ts
+ POST /dashboard 200 in 44ms (next.js: 7ms, proxy.ts: 8ms, application-code: 29ms)
+  └─ ƒ getSessionProfile() in 20ms lib/actions/session-profile.ts
+ POST /dashboard 200 in 58ms (next.js: 29ms, proxy.ts: 12ms, application-code: 17ms)
+  └─ ƒ getSessionProfile() in 7ms lib/actions/session-profile.ts
+ POST /dashboard 200 in 40ms (next.js: 7ms, proxy.ts: 8ms, application-code: 26ms)
+  └─ ƒ getSessionProfile() in 17ms lib/actions/session-profile.ts
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ GET /dashboard/inventory 200 in 136ms (next.js: 59ms, proxy.ts: 8ms, application-code: 69ms)
+ GET /api/auth/session 200 in 28ms (next.js: 9ms, application-code: 19ms)
+ GET /api/auth/session 200 in 17ms (next.js: 1.8ms, application-code: 15ms)
+ POST /dashboard/inventory 200 in 72ms (next.js: 9ms, proxy.ts: 15ms, application-code: 47ms)
+  └─ ƒ listProducts() in 29ms lib/actions/products.ts
+ GET /api/auth/session 200 in 19ms (next.js: 1.7ms, application-code: 17ms)
+ GET /api/auth/session 200 in 18ms (next.js: 2.0ms, application-code: 16ms)
+ POST /dashboard/inventory 200 in 73ms (next.js: 10ms, proxy.ts: 23ms, application-code: 40ms)
+  └─ ƒ listSuppliers() in 30ms lib/actions/suppliers.ts
+ POST /dashboard/inventory 200 in 44ms (next.js: 6ms, proxy.ts: 9ms, application-code: 29ms)
+  └─ ƒ listBinLocations() in 18ms lib/actions/bin-locations.ts
+ POST /dashboard/inventory 200 in 61ms (next.js: 6ms, proxy.ts: 9ms, application-code: 46ms)
+  └─ ƒ getFeatureFlags() in 35ms lib/actions/provisioning.ts
+ POST /dashboard/inventory 200 in 57ms (next.js: 7ms, proxy.ts: 8ms, application-code: 43ms)
+  └─ ƒ getFeatureFlags() in 32ms lib/actions/provisioning.ts
+ POST /dashboard/inventory 200 in 31ms (next.js: 5ms, proxy.ts: 7ms, application-code: 19ms)
+  └─ ƒ listProducts() in 9ms lib/actions/products.ts
+ POST /dashboard/inventory 200 in 38ms (next.js: 6ms, proxy.ts: 7ms, application-code: 25ms)
+  └─ ƒ listSuppliers() in 15ms lib/actions/suppliers.ts
+ POST /dashboard/inventory 200 in 43ms (next.js: 6ms, proxy.ts: 8ms, application-code: 28ms)
+  └─ ƒ listBinLocations() in 18ms lib/actions/bin-locations.ts
+ POST /dashboard/inventory 200 in 47ms (next.js: 6ms, proxy.ts: 7ms, application-code: 33ms)
+  └─ ƒ getFeatureFlags() in 24ms lib/actions/provisioning.ts
+ POST /dashboard/inventory 200 in 44ms (next.js: 6ms, proxy.ts: 7ms, application-code: 30ms)
+  └─ ƒ getFeatureFlags() in 22ms lib/actions/provisioning.ts
+ POST /dashboard/inventory 200 in 51ms (next.js: 6ms, proxy.ts: 15ms, application-code: 31ms)
+  └─ ƒ getSessionProfile() in 21ms lib/actions/session-profile.ts
+ POST /dashboard/inventory 200 in 45ms (next.js: 6ms, proxy.ts: 7ms, application-code: 32ms)
+  └─ ƒ getSessionProfile() in 21ms lib/actions/session-profile.ts
+ POST /dashboard/inventory 200 in 44ms (next.js: 7ms, proxy.ts: 7ms, application-code: 30ms)
+  └─ ƒ getSessionProfile() in 19ms lib/actions/session-profile.ts
+ POST /dashboard/inventory 200 in 43ms (next.js: 7ms, proxy.ts: 8ms, application-code: 28ms)
+  └─ ƒ getSessionProfile() in 18ms lib/actions/session-profile.ts
+ POST /dashboard/inventory 200 in 42ms (next.js: 7ms, proxy.ts: 8ms, application-code: 27ms)
+  └─ ƒ getSessionProfile() in 17ms lib/actions/session-profile.ts
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ GET /dashboard/scan 200 in 137ms (next.js: 67ms, proxy.ts: 7ms, application-code: 63ms)
+ GET /api/auth/session 200 in 25ms (next.js: 8ms, application-code: 17ms)
+ GET /api/auth/session 200 in 15ms (next.js: 1.3ms, application-code: 14ms)
+ POST /dashboard/scan 200 in 81ms (next.js: 10ms, proxy.ts: 15ms, application-code: 57ms)
+  └─ ƒ getFeatureFlags() in 41ms lib/actions/provisioning.ts
+ GET /api/auth/session 200 in 23ms (next.js: 1.9ms, application-code: 21ms)
+ GET /api/auth/session 200 in 31ms (next.js: 2ms, application-code: 29ms)
+ POST /dashboard/scan 200 in 68ms (next.js: 7ms, proxy.ts: 23ms, application-code: 37ms)
+  └─ ƒ getFeatureFlags() in 28ms lib/actions/provisioning.ts
+ POST /dashboard/scan 200 in 50ms (next.js: 7ms, proxy.ts: 8ms, application-code: 35ms)
+  └─ ƒ getSessionProfile() in 25ms lib/actions/session-profile.ts
+ POST /dashboard/scan 200 in 72ms (next.js: 11ms, proxy.ts: 8ms, application-code: 53ms)
+  └─ ƒ getSessionProfile() in 43ms lib/actions/session-profile.ts
+ POST /dashboard/scan 200 in 43ms (next.js: 6ms, proxy.ts: 8ms, application-code: 29ms)
+  └─ ƒ getSessionProfile() in 20ms lib/actions/session-profile.ts
+ POST /dashboard/scan 200 in 40ms (next.js: 7ms, proxy.ts: 9ms, application-code: 24ms)
+  └─ ƒ getSessionProfile() in 9ms lib/actions/session-profile.ts
+ GET / 200 in 129ms (next.js: 10ms, proxy.ts: 10ms, application-code: 109ms)
+ POST /dashboard/scan 200 in 166ms (next.js: 9ms, proxy.ts: 120ms, application-code: 37ms)
+  └─ ƒ getSessionProfile() in 23ms lib/actions/session-profile.ts
+ GET /auth/login?next=%2Ficon.svg 200 in 66ms (next.js: 7ms, proxy.ts: 5ms, application-code: 53ms)
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ GET /dashboard/rooms 200 in 140ms (next.js: 68ms, proxy.ts: 8ms, application-code: 64ms)
+ GET /api/auth/session 200 in 26ms (next.js: 8ms, application-code: 17ms)
+ GET /api/auth/session 200 in 18ms (next.js: 2ms, application-code: 16ms)
+ POST /dashboard/rooms 200 in 92ms (next.js: 7ms, proxy.ts: 14ms, application-code: 71ms)
+  └─ ƒ listRooms() in 55ms lib/actions/storerooms.ts
+ GET /api/auth/session 200 in 17ms (next.js: 1.7ms, application-code: 15ms)
+ GET /api/auth/session 200 in 16ms (next.js: 1.5ms, application-code: 14ms)
+ POST /dashboard/rooms 200 in 64ms (next.js: 6ms, proxy.ts: 22ms, application-code: 36ms)
+  └─ ƒ getFeatureFlags() in 25ms lib/actions/provisioning.ts
+ POST /dashboard/rooms 200 in 50ms (next.js: 6ms, proxy.ts: 7ms, application-code: 37ms)
+  └─ ƒ listRooms() in 29ms lib/actions/storerooms.ts
+ POST /dashboard/rooms 200 in 56ms (next.js: 6ms, proxy.ts: 9ms, application-code: 41ms)
+  └─ ƒ getFeatureFlags() in 33ms lib/actions/provisioning.ts
+ POST /dashboard/rooms 200 in 52ms (next.js: 6ms, proxy.ts: 8ms, application-code: 38ms)
+  └─ ƒ getSessionProfile() in 28ms lib/actions/session-profile.ts
+ POST /dashboard/rooms 200 in 44ms (next.js: 7ms, proxy.ts: 8ms, application-code: 29ms)
+  └─ ƒ getSessionProfile() in 19ms lib/actions/session-profile.ts
+ POST /dashboard/rooms 200 in 43ms (next.js: 7ms, proxy.ts: 8ms, application-code: 28ms)
+  └─ ƒ getSessionProfile() in 18ms lib/actions/session-profile.ts
+ POST /dashboard/rooms 200 in 44ms (next.js: 7ms, proxy.ts: 7ms, application-code: 30ms)
+  └─ ƒ getSessionProfile() in 21ms lib/actions/session-profile.ts
+ POST /dashboard/rooms 200 in 43ms (next.js: 7ms, proxy.ts: 8ms, application-code: 29ms)
+  └─ ƒ getSessionProfile() in 20ms lib/actions/session-profile.ts
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ GET /dashboard/monitoring 200 in 217ms (next.js: 83ms, proxy.ts: 7ms, application-code: 126ms)
+ GET /api/auth/session 200 in 25ms (next.js: 8ms, application-code: 17ms)
+ GET /api/auth/session 200 in 16ms (next.js: 1.5ms, application-code: 15ms)
+ POST /dashboard/monitoring 200 in 66ms (next.js: 9ms, proxy.ts: 13ms, application-code: 44ms)
+  └─ ƒ listRoomStatuses() in 27ms lib/actions/sensors.ts
+ GET /api/auth/session 200 in 17ms (next.js: 1.6ms, application-code: 16ms)
+ GET /api/auth/session 200 in 14ms (next.js: 1.6ms, application-code: 13ms)
+ POST /dashboard/monitoring 200 in 59ms (next.js: 9ms, proxy.ts: 12ms, application-code: 38ms)
+  └─ ƒ listAlerts({"state":"active"}) in 28ms lib/actions/sensors.ts
+ POST /dashboard/monitoring 200 in 62ms (next.js: 7ms, proxy.ts: 8ms, application-code: 46ms)
+  └─ ƒ getFeatureFlags() in 37ms lib/actions/provisioning.ts
+ POST /dashboard/monitoring 200 in 54ms (next.js: 6ms, proxy.ts: 7ms, application-code: 41ms)
+  └─ ƒ listRoomStatuses() in 32ms lib/actions/sensors.ts
+ POST /dashboard/monitoring 200 in 42ms (next.js: 6ms, proxy.ts: 7ms, application-code: 29ms)
+  └─ ƒ listAlerts({"state":"active"}) in 19ms lib/actions/sensors.ts
+ POST /dashboard/monitoring 200 in 48ms (next.js: 6ms, proxy.ts: 8ms, application-code: 34ms)
+  └─ ƒ getFeatureFlags() in 25ms lib/actions/provisioning.ts
+ POST /dashboard/monitoring 200 in 54ms (next.js: 6ms, proxy.ts: 8ms, application-code: 40ms)
+  └─ ƒ getSessionProfile() in 28ms lib/actions/session-profile.ts
+ POST /dashboard/monitoring 200 in 44ms (next.js: 7ms, proxy.ts: 7ms, application-code: 30ms)
+  └─ ƒ getSessionProfile() in 19ms lib/actions/session-profile.ts
+ POST /dashboard/monitoring 200 in 45ms (next.js: 7ms, proxy.ts: 8ms, application-code: 30ms)
+  └─ ƒ getSessionProfile() in 18ms lib/actions/session-profile.ts
+ POST /dashboard/monitoring 200 in 60ms (next.js: 9ms, proxy.ts: 8ms, application-code: 43ms)
+  └─ ƒ getSessionProfile() in 32ms lib/actions/session-profile.ts
+ POST /dashboard/monitoring 200 in 43ms (next.js: 7ms, proxy.ts: 7ms, application-code: 29ms)
+  └─ ƒ getSessionProfile() in 19ms lib/actions/session-profile.ts
+ POST /dashboard/monitoring 200 in 38ms (next.js: 7ms, proxy.ts: 8ms, application-code: 24ms)
+  └─ ƒ listRoomStatuses() in 14ms lib/actions/sensors.ts
+ POST /dashboard/monitoring 200 in 51ms (next.js: 6ms, proxy.ts: 7ms, application-code: 38ms)
+  └─ ƒ listAlerts({"state":"active"}) in 28ms lib/actions/sensors.ts
+ POST /dashboard/monitoring 200 in 45ms (next.js: 6ms, proxy.ts: 7ms, application-code: 31ms)
+  └─ ƒ getRoomReadings({"hours":24,"room_id":"a1000000-0000-4000-8000-000000000001"}) in 23ms lib/actions/sensors.ts
+ POST /api/sensors/simulate?points=48&step_minutes=30 200 in 144ms (next.js: 49ms, application-code: 95ms)
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ POST /dashboard/monitoring 200 in 58ms (next.js: 9ms, proxy.ts: 9ms, application-code: 40ms)
+  └─ ƒ listRoomStatuses() in 31ms lib/actions/sensors.ts
+ POST /dashboard/monitoring 200 in 55ms (next.js: 6ms, proxy.ts: 7ms, application-code: 42ms)
+  └─ ƒ listAlerts({"state":"active"}) in 33ms lib/actions/sensors.ts
+ POST /dashboard/monitoring 200 in 54ms (next.js: 6ms, proxy.ts: 8ms, application-code: 40ms)
+  └─ ƒ getRoomReadings({"hours":24,"room_id":"a1000000-0000-4000-8000-000000000001"}) in 30ms lib/actions/sensors.ts
+ GET /dashboard/monitoring 200 in 108ms (next.js: 52ms, proxy.ts: 8ms, application-code: 48ms)
+ GET /api/auth/session 200 in 36ms (next.js: 8ms, application-code: 28ms)
+ POST /dashboard/monitoring 200 in 73ms (next.js: 8ms, proxy.ts: 24ms, application-code: 40ms)
+  └─ ƒ listRoomStatuses() in 29ms lib/actions/sensors.ts
+ GET /api/auth/session 200 in 28ms (next.js: 1.8ms, application-code: 26ms)
+ GET /api/auth/session 200 in 28ms (next.js: 1.6ms, application-code: 26ms)
+ POST /dashboard/monitoring 200 in 67ms (next.js: 7ms, proxy.ts: 23ms, application-code: 37ms)
+  └─ ƒ listAlerts({"state":"active"}) in 26ms lib/actions/sensors.ts
+ GET /api/auth/session 200 in 25ms (next.js: 1.6ms, application-code: 24ms)
+ POST /dashboard/monitoring 200 in 60ms (next.js: 7ms, proxy.ts: 11ms, application-code: 42ms)
+  └─ ƒ getFeatureFlags() in 31ms lib/actions/provisioning.ts
+ POST /dashboard/monitoring 200 in 58ms (next.js: 6ms, proxy.ts: 7ms, application-code: 45ms)
+  └─ ƒ listRoomStatuses() in 35ms lib/actions/sensors.ts
+ POST /dashboard/monitoring 200 in 53ms (next.js: 7ms, proxy.ts: 7ms, application-code: 39ms)
+  └─ ƒ listAlerts({"state":"active"}) in 29ms lib/actions/sensors.ts
+ POST /dashboard/monitoring 200 in 48ms (next.js: 6ms, proxy.ts: 8ms, application-code: 34ms)
+  └─ ƒ getFeatureFlags() in 25ms lib/actions/provisioning.ts
+ POST /dashboard/monitoring 200 in 54ms (next.js: 7ms, proxy.ts: 9ms, application-code: 38ms)
+  └─ ƒ getSessionProfile() in 29ms lib/actions/session-profile.ts
+ POST /dashboard/monitoring 200 in 58ms (next.js: 8ms, proxy.ts: 8ms, application-code: 43ms)
+  └─ ƒ getSessionProfile() in 31ms lib/actions/session-profile.ts
+ POST /dashboard/monitoring 200 in 58ms (next.js: 9ms, proxy.ts: 7ms, application-code: 41ms)
+  └─ ƒ getSessionProfile() in 31ms lib/actions/session-profile.ts
+ POST /dashboard/monitoring 200 in 45ms (next.js: 8ms, proxy.ts: 8ms, application-code: 30ms)
+  └─ ƒ getSessionProfile() in 21ms lib/actions/session-profile.ts
+ POST /dashboard/monitoring 200 in 49ms (next.js: 8ms, proxy.ts: 7ms, application-code: 33ms)
+  └─ ƒ listRoomStatuses() in 24ms lib/actions/sensors.ts
+ POST /dashboard/monitoring 200 in 44ms (next.js: 7ms, proxy.ts: 8ms, application-code: 29ms)
+  └─ ƒ listAlerts({"state":"active"}) in 20ms lib/actions/sensors.ts
+ POST /dashboard/monitoring 200 in 56ms (next.js: 7ms, proxy.ts: 9ms, application-code: 41ms)
+  └─ ƒ getRoomReadings({"hours":24,"room_id":"a1000000-0000-4000-8000-000000000001"}) in 30ms lib/actions/sensors.ts
+ POST /dashboard/monitoring 200 in 54ms (next.js: 8ms, proxy.ts: 9ms, application-code: 37ms)
+  └─ ƒ getSessionProfile() in 26ms lib/actions/session-profile.ts
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ GET /dashboard/stock-takes 200 in 161ms (next.js: 83ms, proxy.ts: 8ms, application-code: 70ms)
+ GET /api/auth/session 200 in 22ms (next.js: 7ms, application-code: 15ms)
+ GET /api/auth/session 200 in 17ms (next.js: 2.0ms, application-code: 15ms)
+ POST /dashboard/stock-takes 200 in 77ms (next.js: 7ms, proxy.ts: 27ms, application-code: 43ms)
+  └─ ƒ listStockTakes() in 31ms lib/actions/stock-takes.ts
+ GET /api/auth/session 200 in 17ms (next.js: 2ms, application-code: 15ms)
+ GET /api/auth/session 200 in 22ms (next.js: 1.6ms, application-code: 20ms)
+ POST /dashboard/stock-takes 200 in 63ms (next.js: 7ms, proxy.ts: 23ms, application-code: 34ms)
+  └─ ƒ listProducts() in 22ms lib/actions/products.ts
+ POST /dashboard/stock-takes 200 in 48ms (next.js: 6ms, proxy.ts: 8ms, application-code: 33ms)
+  └─ ƒ getFeatureFlags() in 24ms lib/actions/provisioning.ts
+ POST /dashboard/stock-takes 200 in 47ms (next.js: 6ms, proxy.ts: 7ms, application-code: 35ms)
+  └─ ƒ listStockTakes() in 25ms lib/actions/stock-takes.ts
+ POST /dashboard/stock-takes 200 in 43ms (next.js: 6ms, proxy.ts: 7ms, application-code: 30ms)
+  └─ ƒ listProducts() in 21ms lib/actions/products.ts
+ POST /dashboard/stock-takes 200 in 46ms (next.js: 6ms, proxy.ts: 8ms, application-code: 32ms)
+  └─ ƒ getFeatureFlags() in 24ms lib/actions/provisioning.ts
+ POST /dashboard/stock-takes 200 in 42ms (next.js: 6ms, proxy.ts: 9ms, application-code: 28ms)
+  └─ ƒ getSessionProfile() in 18ms lib/actions/session-profile.ts
+ POST /dashboard/stock-takes 200 in 54ms (next.js: 8ms, proxy.ts: 9ms, application-code: 37ms)
+  └─ ƒ getSessionProfile() in 27ms lib/actions/session-profile.ts
+ POST /dashboard/stock-takes 200 in 43ms (next.js: 7ms, proxy.ts: 7ms, application-code: 29ms)
+  └─ ƒ getSessionProfile() in 21ms lib/actions/session-profile.ts
+ POST /dashboard/stock-takes 200 in 42ms (next.js: 7ms, proxy.ts: 8ms, application-code: 27ms)
+  └─ ƒ getSessionProfile() in 18ms lib/actions/session-profile.ts
+ POST /dashboard/stock-takes 200 in 46ms (next.js: 7ms, proxy.ts: 8ms, application-code: 30ms)
+  └─ ƒ getSessionProfile() in 20ms lib/actions/session-profile.ts
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ GET /dashboard/tool-loans 200 in 125ms (next.js: 55ms, proxy.ts: 8ms, application-code: 62ms)
+ GET /api/auth/session 200 in 24ms (next.js: 7ms, application-code: 16ms)
+ GET /api/auth/session 200 in 17ms (next.js: 1.1ms, application-code: 16ms)
+ POST /dashboard/tool-loans 200 in 73ms (next.js: 6ms, proxy.ts: 27ms, application-code: 39ms)
+  └─ ƒ listToolLoans() in 25ms lib/actions/tool-loans.ts
+ GET /api/auth/session 200 in 21ms (next.js: 2ms, application-code: 19ms)
+ GET /api/auth/session 200 in 24ms (next.js: 1.5ms, application-code: 23ms)
+ POST /dashboard/tool-loans 200 in 67ms (next.js: 16ms, proxy.ts: 14ms, application-code: 37ms)
+  └─ ƒ listToolProducts() in 28ms lib/actions/products.ts
+ POST /dashboard/tool-loans 200 in 43ms (next.js: 6ms, proxy.ts: 7ms, application-code: 30ms)
+  └─ ƒ listAssignableWorkers() in 21ms lib/actions/tool-loans.ts
+ POST /dashboard/tool-loans 200 in 47ms (next.js: 6ms, proxy.ts: 8ms, application-code: 34ms)
+  └─ ƒ getFeatureFlags() in 25ms lib/actions/provisioning.ts
+ POST /dashboard/tool-loans 200 in 55ms (next.js: 6ms, proxy.ts: 8ms, application-code: 42ms)
+  └─ ƒ listToolLoans() in 33ms lib/actions/tool-loans.ts
+ POST /dashboard/tool-loans 200 in 42ms (next.js: 6ms, proxy.ts: 8ms, application-code: 29ms)
+  └─ ƒ listToolProducts() in 20ms lib/actions/products.ts
+ POST /dashboard/tool-loans 200 in 43ms (next.js: 6ms, proxy.ts: 8ms, application-code: 29ms)
+  └─ ƒ listAssignableWorkers() in 21ms lib/actions/tool-loans.ts
+ POST /dashboard/tool-loans 200 in 48ms (next.js: 7ms, proxy.ts: 7ms, application-code: 33ms)
+  └─ ƒ getFeatureFlags() in 25ms lib/actions/provisioning.ts
+ POST /dashboard/tool-loans 200 in 53ms (next.js: 6ms, proxy.ts: 8ms, application-code: 40ms)
+  └─ ƒ getSessionProfile() in 30ms lib/actions/session-profile.ts
+ POST /dashboard/tool-loans 200 in 32ms (next.js: 7ms, proxy.ts: 7ms, application-code: 18ms)
+  └─ ƒ getSessionProfile() in 8ms lib/actions/session-profile.ts
+ POST /dashboard/tool-loans 200 in 53ms (next.js: 7ms, proxy.ts: 7ms, application-code: 38ms)
+  └─ ƒ getSessionProfile() in 29ms lib/actions/session-profile.ts
+ POST /dashboard/tool-loans 200 in 57ms (next.js: 7ms, proxy.ts: 8ms, application-code: 42ms)
+  └─ ƒ getSessionProfile() in 32ms lib/actions/session-profile.ts
+ POST /dashboard/tool-loans 200 in 44ms (next.js: 7ms, proxy.ts: 8ms, application-code: 30ms)
+  └─ ƒ getSessionProfile() in 20ms lib/actions/session-profile.ts
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ GET /dashboard/zone-map 200 in 104ms (next.js: 48ms, proxy.ts: 6ms, application-code: 50ms)
+ GET /api/auth/session 200 in 23ms (next.js: 7ms, application-code: 16ms)
+ GET /api/auth/session 200 in 14ms (next.js: 1.5ms, application-code: 13ms)
+ POST /dashboard/zone-map 200 in 70ms (next.js: 9ms, proxy.ts: 27ms, application-code: 33ms)
+  └─ ƒ listBinLocations() in 21ms lib/actions/bin-locations.ts
+ GET /api/auth/session 200 in 17ms (next.js: 1.4ms, application-code: 15ms)
+ GET /api/auth/session 200 in 15ms (next.js: 1.5ms, application-code: 14ms)
+ POST /dashboard/zone-map 200 in 61ms (next.js: 9ms, proxy.ts: 13ms, application-code: 40ms)
+  └─ ƒ listProducts() in 29ms lib/actions/products.ts
+ POST /dashboard/zone-map 200 in 47ms (next.js: 6ms, proxy.ts: 7ms, application-code: 33ms)
+  └─ ƒ getFeatureFlags() in 23ms lib/actions/provisioning.ts
+ POST /dashboard/zone-map 200 in 55ms (next.js: 6ms, proxy.ts: 9ms, application-code: 40ms)
+  └─ ƒ listBinLocations() in 30ms lib/actions/bin-locations.ts
+ POST /dashboard/zone-map 200 in 44ms (next.js: 6ms, proxy.ts: 7ms, application-code: 30ms)
+  └─ ƒ listProducts() in 21ms lib/actions/products.ts
+ POST /dashboard/zone-map 200 in 61ms (next.js: 7ms, proxy.ts: 8ms, application-code: 47ms)
+  └─ ƒ getFeatureFlags() in 37ms lib/actions/provisioning.ts
+ POST /dashboard/zone-map 200 in 52ms (next.js: 6ms, proxy.ts: 9ms, application-code: 36ms)
+  └─ ƒ getSessionProfile() in 26ms lib/actions/session-profile.ts
+ POST /dashboard/zone-map 200 in 58ms (next.js: 7ms, proxy.ts: 21ms, application-code: 30ms)
+  └─ ƒ getSessionProfile() in 20ms lib/actions/session-profile.ts
+ POST /dashboard/zone-map 200 in 43ms (next.js: 7ms, proxy.ts: 7ms, application-code: 29ms)
+  └─ ƒ getSessionProfile() in 19ms lib/actions/session-profile.ts
+ POST /dashboard/zone-map 200 in 44ms (next.js: 6ms, proxy.ts: 8ms, application-code: 30ms)
+  └─ ƒ getSessionProfile() in 20ms lib/actions/session-profile.ts
+ POST /dashboard/zone-map 200 in 43ms (next.js: 7ms, proxy.ts: 8ms, application-code: 28ms)
+  └─ ƒ getSessionProfile() in 18ms lib/actions/session-profile.ts
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ GET /dashboard/ledger 200 in 113ms (next.js: 51ms, proxy.ts: 7ms, application-code: 55ms)
+ GET /api/auth/session 200 in 22ms (next.js: 7ms, application-code: 15ms)
+ GET /api/auth/session 200 in 17ms (next.js: 1.8ms, application-code: 15ms)
+ POST /dashboard/ledger 200 in 72ms (next.js: 9ms, proxy.ts: 27ms, application-code: 36ms)
+  └─ ƒ listProducts() in 24ms lib/actions/products.ts
+ GET /api/auth/session 200 in 18ms (next.js: 1.5ms, application-code: 17ms)
+ GET /api/auth/session 200 in 15ms (next.js: 1.8ms, application-code: 13ms)
+ POST /dashboard/ledger 200 in 68ms (next.js: 8ms, proxy.ts: 12ms, application-code: 47ms)
+  └─ ƒ getKardex(undefined, undefined, undefined) in 37ms lib/actions/kardex.ts
+ POST /dashboard/ledger 200 in 58ms (next.js: 6ms, proxy.ts: 8ms, application-code: 43ms)
+  └─ ƒ getFeatureFlags() in 33ms lib/actions/provisioning.ts
+ POST /dashboard/ledger 200 in 54ms (next.js: 6ms, proxy.ts: 8ms, application-code: 41ms)
+  └─ ƒ listProducts() in 32ms lib/actions/products.ts
+ POST /dashboard/ledger 200 in 62ms (next.js: 6ms, proxy.ts: 7ms, application-code: 48ms)
+  └─ ƒ getKardex(undefined, undefined, undefined) in 37ms lib/actions/kardex.ts
+ POST /dashboard/ledger 200 in 58ms (next.js: 6ms, proxy.ts: 8ms, application-code: 44ms)
+  └─ ƒ getFeatureFlags() in 34ms lib/actions/provisioning.ts
+ POST /dashboard/ledger 200 in 53ms (next.js: 6ms, proxy.ts: 8ms, application-code: 39ms)
+  └─ ƒ getSessionProfile() in 29ms lib/actions/session-profile.ts
+ POST /dashboard/ledger 200 in 44ms (next.js: 7ms, proxy.ts: 6ms, application-code: 31ms)
+  └─ ƒ getSessionProfile() in 21ms lib/actions/session-profile.ts
+ POST /dashboard/ledger 200 in 43ms (next.js: 7ms, proxy.ts: 7ms, application-code: 29ms)
+  └─ ƒ getSessionProfile() in 20ms lib/actions/session-profile.ts
+ POST /dashboard/ledger 200 in 42ms (next.js: 7ms, proxy.ts: 7ms, application-code: 28ms)
+  └─ ƒ getSessionProfile() in 19ms lib/actions/session-profile.ts
+ POST /dashboard/ledger 200 in 43ms (next.js: 7ms, proxy.ts: 7ms, application-code: 29ms)
+  └─ ƒ getSessionProfile() in 20ms lib/actions/session-profile.ts
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ GET / 200 in 108ms (next.js: 13ms, proxy.ts: 5ms, application-code: 91ms)
+ GET /auth/login?next=%2Ficon.svg 200 in 72ms (next.js: 12ms, proxy.ts: 3ms, application-code: 57ms)
+ GET /dashboard/integrations 200 in 121ms (next.js: 49ms, proxy.ts: 7ms, application-code: 66ms)
+ GET /api/auth/session 200 in 24ms (next.js: 7ms, application-code: 16ms)
+ GET /api/auth/session 200 in 16ms (next.js: 1.9ms, application-code: 14ms)
+ POST /dashboard/integrations 200 in 76ms (next.js: 9ms, proxy.ts: 27ms, application-code: 40ms)
+  └─ ƒ listApiKeys() in 27ms lib/api/actions.ts
+ GET /api/auth/session 200 in 19ms (next.js: 1.7ms, application-code: 17ms)
+ GET /api/auth/session 200 in 23ms (next.js: 1.5ms, application-code: 21ms)
+ POST /dashboard/integrations 200 in 59ms (next.js: 15ms, proxy.ts: 14ms, application-code: 30ms)
+  └─ ƒ getFeatureFlags() in 21ms lib/actions/provisioning.ts
+ POST /dashboard/integrations 200 in 53ms (next.js: 6ms, proxy.ts: 7ms, application-code: 40ms)
+  └─ ƒ listApiKeys() in 31ms lib/api/actions.ts
+ POST /dashboard/integrations 200 in 48ms (next.js: 6ms, proxy.ts: 7ms, application-code: 35ms)
+  └─ ƒ getFeatureFlags() in 26ms lib/actions/provisioning.ts
+ POST /dashboard/integrations 200 in 52ms (next.js: 12ms, proxy.ts: 7ms, application-code: 33ms)
+  └─ ƒ getSessionProfile() in 24ms lib/actions/session-profile.ts
+ POST /dashboard/integrations 200 in 43ms (next.js: 6ms, proxy.ts: 7ms, application-code: 30ms)
+  └─ ƒ getSessionProfile() in 20ms lib/actions/session-profile.ts
+ POST /dashboard/integrations 200 in 45ms (next.js: 6ms, proxy.ts: 8ms, application-code: 30ms)
+  └─ ƒ getSessionProfile() in 21ms lib/actions/session-profile.ts
+ POST /dashboard/integrations 200 in 44ms (next.js: 6ms, proxy.ts: 7ms, application-code: 31ms)
+  └─ ƒ getSessionProfile() in 21ms lib/actions/session-profile.ts
+ POST /dashboard/integrations 200 in 44ms (next.js: 7ms, proxy.ts: 7ms, application-code: 30ms)
+  └─ ƒ getSessionProfile() in 21ms lib/actions/session-profile.ts
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)
+ GET /dashboard/reports 200 in 190ms (next.js: 63ms, proxy.ts: 6ms, application-code: 121ms)
+ GET /api/auth/session 200 in 22ms (next.js: 8ms, application-code: 14ms)
+ GET /api/auth/session 200 in 14ms (next.js: 1.6ms, application-code: 12ms)
+ POST /dashboard/reports 200 in 72ms (next.js: 9ms, proxy.ts: 26ms, application-code: 36ms)
+  └─ ƒ getReportData(30) in 25ms lib/actions/reports.ts
+ GET /api/auth/session 200 in 17ms (next.js: 1.8ms, application-code: 15ms)
+ GET /api/auth/session 200 in 14ms (next.js: 2ms, application-code: 12ms)
+ POST /dashboard/reports 200 in 68ms (next.js: 8ms, proxy.ts: 12ms, application-code: 47ms)
+  └─ ƒ getFeatureFlags() in 38ms lib/actions/provisioning.ts
+ POST /dashboard/reports 200 in 37ms (next.js: 6ms, proxy.ts: 7ms, application-code: 23ms)
+  └─ ƒ getReportData(30) in 13ms lib/actions/reports.ts
+ POST /dashboard/reports 200 in 55ms (next.js: 6ms, proxy.ts: 7ms, application-code: 41ms)
+  └─ ƒ getFeatureFlags() in 32ms lib/actions/provisioning.ts
+ POST /dashboard/reports 200 in 53ms (next.js: 6ms, proxy.ts: 7ms, application-code: 40ms)
+  └─ ƒ getSessionProfile() in 28ms lib/actions/session-profile.ts
+ POST /dashboard/reports 200 in 51ms (next.js: 7ms, proxy.ts: 7ms, application-code: 37ms)
+  └─ ƒ getSessionProfile() in 17ms lib/actions/session-profile.ts
+ POST /dashboard/reports 200 in 46ms (next.js: 6ms, proxy.ts: 7ms, application-code: 32ms)
+  └─ ƒ getSessionProfile() in 23ms lib/actions/session-profile.ts
+ POST /dashboard/reports 200 in 44ms (next.js: 7ms, proxy.ts: 6ms, application-code: 31ms)
+  └─ ƒ getSessionProfile() in 21ms lib/actions/session-profile.ts
+[db] embedded PGlite at C:\Users\kurtj\OneDrive\Documents\VMS-Demo-V0\.vms-data (attached to 127.0.0.1:60548)

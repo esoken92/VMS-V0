@@ -11,14 +11,14 @@ import { Mail } from 'lucide-react';
 import { GithubIcon } from '@/components/icons/github';
 import { ThemeScript } from './theme-script';
 
-export const GITHUB_URL = 'https://github.com/esoken92/VMS-Demo-V0';
+export const GITHUB_URL = 'https://github.com/esoken92/VMS-V0';
 const LICENSE_URL = 'https://creativecommons.org/licenses/by-nc-sa/4.0/';
 const ESO_URL = 'https://esoind.co.za';
 const TYRESYNC_URL = 'https://tyresync.co.za';
 const CONTACT_EMAIL = 'esoken92@gmail.com';
 
 const productLinks = [
-  { label: 'Live demo', href: '/dashboard' },
+  { label: 'Live app', href: '/dashboard' },
   { label: 'Sign in', href: '/auth/login' },
   { label: 'Create account', href: '/auth/signup' },
 ];

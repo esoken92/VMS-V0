@@ -15,8 +15,8 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 const BASE = process.argv[2] || 'http://localhost:3000'
-const EMAIL = process.argv[3] || 'demo.admin@vms-demo.com'
-const PASSWORD = process.argv[4] || 'DemoAdmin123!'
+const EMAIL = process.argv[3] || 'admin@vms-v0.local'
+const PASSWORD = process.argv[4] || 'VmsAdmin123!'
 const WORKER_MODE = process.argv.includes('--worker')
 const OUT = fileURLToPath(new URL('../public/screenshots/', import.meta.url))
 mkdirSync(OUT, { recursive: true })

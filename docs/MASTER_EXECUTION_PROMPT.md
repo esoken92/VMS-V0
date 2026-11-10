@@ -1,4 +1,4 @@
-# VMS-Demo-V0 — Master Execution Prompt
+# VMS-V0 — Master Execution Prompt
 
 > Single source of truth for taking this repo from "secure consolidated foundation"
 > to "public, marketable template". Combines competitive research (8 systems,
@@ -10,9 +10,9 @@
 ## ROLE & OBJECTIVE
 
 You are an elite Lead Implementation AI and System Architect. Finalize the VMS
-(Warehouse/Vehicle-parts inventory management) demo repository: transform it from
+(Warehouse/Vehicle-parts inventory management) template repository: transform it from
 a secure, consolidated foundation into a production-ready, highly marketable
-template. End state: `gh repo edit esoken92/VMS-Demo-V0 --visibility public --template`
+template. End state: `gh repo edit esoken92/VMS-V0 --visibility public --template`
 can run immediately with a world-class public presentation.
 
 ---
@@ -20,13 +20,13 @@ can run immediately with a world-class public presentation.
 ## 🛑 HARD CONSTRAINTS
 
 - **Concurrency:** max 3 subagents at any time.
-- **Write access:** ONLY this repository (`Documents/VMS-Demo-V0`). Read access to
+- **Write access:** ONLY this repository (`Documents/VMS-V0`). Read access to
   any repo/web source for research.
 - **Production safety:** NEVER deploy to production, flip env keys live, or change
   repo visibility/template status — the owner flips those manually after review.
 - **License:** CC BY-NC-SA 4.0. No copyleft-incompatible code copied from AGPL
   projects (Part-DB, Homebox, Snipe-IT, Carbon) — patterns only, never code.
-- **Secrets:** never commit credentials. `seed.sql` demo passwords are intentional
+- **Secrets:** never commit credentials. `seed.sql` seed passwords are intentional
   and documented — do not "fix" them, but never reuse them elsewhere.
 - **Stack:** Next.js 16 App Router + TypeScript strict + Tailwind CSS 4 +
   Postgres/PGlite (Drizzle) + Auth.js v5 + handwritten service worker +
@@ -44,7 +44,7 @@ can run immediately with a world-class public presentation.
   pinned `search_path`, `SECURITY INVOKER` read helpers.
 - Middleware auth gating re-enabled (was pass-through); no hardcoded project refs.
 - `profiles.id = auth.users.id` convention fixed in `seed.sql` + `create_user_with_profile`.
-- Migrations sequential 001–011; demo users/sample data moved to `supabase/seed.sql`.
+- Migrations sequential 001–011; seed users/sample data moved to `supabase/seed.sql`.
 - `.eslintrc.json` added; lint errors fixed; `npm run build` green env-free
   (placeholder Supabase fallback in `lib/supabase/client.ts`).
 - Users page aligned to middleware gating; `manager` role option added.
@@ -52,7 +52,7 @@ can run immediately with a world-class public presentation.
 
 ---
 
-## PHASE 1 — BENCHMARKING & SYSTEM DESIGN (logic-chain demo)
+## PHASE 1 — BENCHMARKING & SYSTEM DESIGN (logic-chain walkthrough)
 
 ### 1a. Market research — DONE, use these findings
 
@@ -90,7 +90,7 @@ can run immediately with a world-class public presentation.
 - **`docs/LOGIC_CHAIN.md`** — visible architecture + UX-flow document:
   request → middleware → Supabase RLS → SECURITY DEFINER RPC → movement ledger →
   UI update; plus the "one scan → one action" UX chain and the MCP query chain.
-  This is a demo artifact — write it for a smart non-engineer.
+  This is a living artifact — write it for a smart non-engineer.
 - **`docs/ARCHITECTURE.md`** — deeper: schema map, RLS model, RPC inventory,
   API/MCP surface, PDF pipeline.
 - **Marketing mockups/screenshots** — produce screenshot-ready pages (see Phase 3
@@ -300,8 +300,8 @@ and bypass.*
 95. Climate timeline chart per room (Recharts) + excursion report (PDF via Typst)
 96. Door-open events logged as stock-relevant audit entries
 97. Sensor health monitoring — stale-reading detection (no data > X min → alert)
-98. Dry-run/demo sensor simulator — generates realistic temp/humidity/door
-    data so the feature demos without hardware
+98. Sensor simulator — generates realistic temp/humidity/door
+    data so the feature works without hardware
 99. Vendor-agnostic connector docs — how to wire common sensors (ESP32/MQTT,
     off-the-shelf IoT gateways, building-management webhooks)
 
@@ -489,8 +489,8 @@ Every item below maps to a documented, quantified industry problem.*
 195. Guided wizards for irreversible flows — progressive disclosure +
     confirmation before destructive actions
 196. Two-path first screen — "Set up" vs "Explore with sample data";
-    demo dataset manifest-owned, banner-marked, one-click verified removal,
-    demo activity never fires alerts/webhooks
+    seed dataset manifest-owned, banner-marked, one-click verified removal,
+    simulated activity never fires alerts/webhooks
 197. Server-side setup checklist — only real actions tick it (create site →
     location → item → print label → invite teammate)
 198. Location labels as onboarding step — print+mount QR labels during
@@ -626,9 +626,9 @@ Grocy ~28 granular permissions, Snipe-IT permission groups.*
 243. MCP setup page — copy-paste config snippet
     (`claude_desktop_config` / Cursor `mcpServers` entry) so visitors connect live.
 244. API playground page — try-it UI against REST API.
-245. **Demo-mode reset button** — one click reseeds demo data (critical for
-    live demos/screenshots; admin-only, confirm-gated).
-246. `DEMO.md` presenter script — 5-minute flow: login → scan → stock take →
+245. **Seed-data reset button** — one click reseeds seed data (critical for
+    live walkthroughs/screenshots; admin-only, confirm-gated).
+246. `PRESENTER.md` presenter script — 5-minute flow: login → scan → stock take →
     MCP query → PDF report.
 247. Typst-generated architecture/system PDF (same pipeline) for "how it's built".
 248. Realistic seed story: tyre-shop inventory (tyres by size, fluids, tools,
@@ -645,7 +645,7 @@ Grocy ~28 granular permissions, Snipe-IT permission groups.*
 
 ---
 
-## PHASE 4 — DEPLOYMENT, ON-PREM & LOCAL DEMO
+## PHASE 4 — DEPLOYMENT, ON-PREM & LOCAL REHEARSAL
 
 *The system is free and runs on the client's OWN internal/intranet
 infrastructure — including old/broken kit. It must be solid, hardened,
@@ -702,8 +702,8 @@ remains one option; self-hosted is the differentiator.*
     endpoint for support
 267. **Air-gapped mode** — verified full-offline incl. no license check,
     no telemetry, no external fonts/CDN; documented as supported config
-268. **First-boot wizard** — set admin password (force-change on demo
-    creds), org name, timezone, currency, demo-data on/off
+268. **First-boot wizard** — set admin password (force-change on seed
+    creds), org name, timezone, currency, seed-data on/off
 269. **Security hardening for LAN** — bind-address config, TLS via
     self-signed or LAN cert guide, forced credential change, rate limits,
     service-role never leaves server env
@@ -713,18 +713,18 @@ remains one option; self-hosted is the differentiator.*
     low RAM, Windows firewall, Docker Desktop licensing on old Windows,
     WSL2 requirements, proxy environments
 
-**Local demo & rehearsal (BEFORE go-live):**
+**Local rehearsal (BEFORE go-live):**
 
-272. **Local demo kit** — `docker compose up` OR `npm run dev` reproduces
-    the FULL demo incl. seed data; works offline; DEMO.md script runs
+272. **Local sample kit** — `docker compose up` OR `npm run dev` reproduces
+    the FULL app incl. seed data; works offline; PRESENTER.md script runs
     end-to-end (login → scan → stock take → MCP query → PDF report)
-273. **Old-hardware rehearsal** — actually run the complete demo on a
+273. **Old-hardware rehearsal** — actually run the complete walkthrough on a
     constrained VM/old machine; record results; fix what breaks; this is
     a go-live gate, not optional
 274. **Smoke-test suite** — `scripts/smoke.mjs` hits key routes + API +
-    MCP tool calls + PDF render; run in CI and before every demo
-275. **Demo data portability** — seed + demo-reset work identically in
-    cloud and self-hosted modes; demo never requires internet
+    MCP tool calls + PDF render; run in CI and before every release
+275. **Seed data portability** — seed + reset work identically in
+    cloud and self-hosted modes; seeded data never requires internet
 
 ---
 
@@ -785,10 +785,10 @@ afterthought; the PWA should feel like a native app without an app store.*
     device checklist (iPhone SE, budget Samsung, tablet); smoke tests
     cover mobile flows; documented in TESTING.md
 
-**Local playtest & UI sanity pass (manual, before every demo AND go-live):**
+**Local playtest & UI sanity pass (manual, before every release AND go-live):**
 
 295. **Full click-through playtest** — run `npm run dev` locally and
-    manually click EVERY route and flow as each demo role: landing →
+    manually click EVERY route and flow as each persona role: landing →
     signup/login/reset → dashboard → inventory CRUD → stock movement →
     stock take → tool loans → suppliers → bin locations → zone map →
     reports → audit log → users → settings → profile → scan → MCP/API
@@ -808,7 +808,7 @@ afterthought; the PWA should feel like a native app without an app store.*
     retry) — no white screens or infinite spinners
 299. **Playtest sign-off checklist** — `docs/PLAYTEST.md` records date,
     routes covered, bugs found/fixed, console-error count; required
-    before demo + before public flip
+    before release + before public flip
 
 ---
 
@@ -839,7 +839,7 @@ run the core floor workflows standalone on a single PC.*
     same 5-role model + permission checks enforced in Rust query layer
     (no RLS in SQLite — authorization lives in the handler layer, tested)
 304. **First-boot offline wizard** — create admin, org name, import or
-    seed demo data; everything local, zero network calls
+    seed seed data; everything local, zero network calls
 
 **Offline feature tiers:**
 
@@ -872,7 +872,7 @@ run the core floor workflows standalone on a single PC.*
 311. **Rust quality gates** — `cargo clippy -- -D warnings`,
     `cargo test`, `cargo audit`/`cargo deny` in CI; same smoke suite
     (item 274) extended to hit the offline binary's localhost API
-312. **Offline demo parity** — the 5-minute DEMO.md flow runs IDENTICALLY
+312. **Offline parity** — the 5-minute PRESENTER.md flow runs IDENTICALLY
     on the .exe with network cable pulled; verified in the old-hardware
     rehearsal (item 273 covers both artifacts)
 313. **License & repo layout** — `offline/` cargo workspace inside this
@@ -1096,7 +1096,7 @@ it makes a 340-item system feel like a 40-item one.*
 372. **Setup wizard (first-run, re-runnable)** — step flow: org basics →
     industry/vertical select → product types handled → stock policies →
     locations/storerooms → users/roles → review+provision. Skippable to
-    demo mode; re-runnable from settings (answers editable later)
+    seeded mode; re-runnable from settings (answers editable later)
 373. **Industry/vertical selector** — pick from the 12 packs (360–371)
     + "general inventory" default; multi-select allowed (e.g. pharmacy
     that also does equipment loans); drives which packs activate
@@ -1131,7 +1131,7 @@ it makes a 340-item system feel like a 40-item one.*
     "what changed" summary
 383. **Preset templates** — named presets beyond wizard: "Pharmacy",
     "Tool Library", "Fleet Parts", "Cold Storage", "School", "General"
-    — one-click full provisioning incl. demo-ish starter data shape
+    — one-click full provisioning incl. sample starter data shape
 384. **Setup completeness score** — checklist widget: % of recommended
     config done (locations mapped? thresholds set? labels printed?
     users invited?) — gamifies onboarding (extends item 197)
@@ -1211,7 +1211,7 @@ Research agents are DONE (reports merged above). Suggested build-time split
   toggle audit, playtest pass)
 - **Agent C — Integrations/reports:** items 53–62, 67–72, 75, 90, 92,
   262–265, 269–276, 314–319, 328–330, 335–340 (PDF, MCP, AI, webhooks,
-  email, sensor simulator, monitoring console, demo kit, principles,
+  email, sensor simulator, monitoring console, sample kit, principles,
   scheduled reports, connectors)
 - **Agent D (Phase 6, later wave) — Rust offline:** items 300–313
   (Tauri shell, Axum+SQLite backend, shared API contract, offline tiers,
@@ -1256,13 +1256,13 @@ Status legend: ✅ verified live · ⏳ owner/hardware-gated · 🚧 roadmap ·
       unavailable locally; the PGlite embedded path (`npm run
       dev:standalone`, zero services) is verified and documented
 - [ ] Rust offline artifact 🚧 Phase 6 roadmap — not started
-- [ ] Full local demo rehearsed on constrained/old hardware — BOTH
+- [ ] Full local walkthrough rehearsed on constrained/old hardware — BOTH
       artifacts ⏳ needs hardware + the Rust artifact
 - [x] Admin monitoring console working; NO telemetry/beacon ✅ (monitoring,
       users, audit log all live; zero outbound phone-home code exists)
 - [x] No secrets; AGPL code never copied; license intact ✅ (scan clean;
       CC BY-NC-SA 4.0)
-- [x] README accurate; demo creds documented as demo-only ✅
+- [x] README accurate; seed creds documented as seed-only ✅
 - [ ] Owner flips repo public + template manually ⏳ owner action
 
 ### Build status by phase (audited)

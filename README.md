@@ -1,6 +1,6 @@
 <div align="center">
 
-# VMS — Inventory Management, Open Source
+# VMS V0 — Inventory Management, Open Source
 
 **Inventory management that respects the people doing the work.**
 
@@ -10,16 +10,17 @@ workflows, an append-only ledger, tool custody, sensor monitoring, and
 an audit trail that never forgets.
 
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
-[![CI](https://github.com/esoken92/VMS-Demo-V0/actions/workflows/ci.yml/badge.svg)](https://github.com/esoken92/VMS-Demo-V0/actions/workflows/ci.yml)
+[![CI](https://github.com/esoken92/VMS-V0/actions/workflows/ci.yml/badge.svg)](https://github.com/esoken92/VMS-V0/actions/workflows/ci.yml)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![Postgres 16](https://img.shields.io/badge/Postgres-16-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8)](https://web.dev/progressive-web-apps/)
 
-[Live demo](#demo-credentials) ·
+**[Live app — vms-v0.vercel.app](https://vms-v0.vercel.app)** ·
+[Seed credentials](#seeded-accounts) ·
 [Documentation](docs/ARCHITECTURE.md) ·
 [Integrations](docs/INTEGRATIONS.md) ·
-[Report an issue](https://github.com/esoken92/VMS-Demo-V0/issues)
+[Report an issue](https://github.com/esoken92/VMS-V0/issues)
 
 ![VMS landing page](public/screenshots/landing.png)
 
@@ -44,7 +45,7 @@ research behind it in [docs/research/](docs/research/).
 
 ## Quickstart — under 5 minutes
 
-**Option A — zero install (Node.js 18+ only, no Docker):**
+**Option A — zero install (Node.js 20.9+ only, no Docker):**
 
 ```bash
 cp .env.example .env          # set AUTH_SECRET (openssl rand -base64 32)
@@ -53,7 +54,7 @@ npm run dev:standalone        # → http://localhost:3000
 ```
 
 `dev:standalone` uses an **embedded Postgres** (PGlite) stored in
-`./.vms-data` — on first run it bootstraps the full schema and demo
+`./.vms-data` — on first run it bootstraps the full schema and seed
 dataset automatically, then starts Next.js. Nothing else to install.
 
 How it works: one process owns the embedded postgres and serves it over a
@@ -74,24 +75,24 @@ npm install && npm run dev  # → http://localhost:3000
 ```
 
 `docker-compose.yml` mounts `supabase/migrations/` into the Postgres
-container, so the schema builds itself on first boot. Load the demo
+container, so the schema builds itself on first boot. Load the seed
 dataset (`npm run db:seed`) to sign in with the accounts below — it
 seeds users, bin locations, suppliers, products, movements, tool loans,
 and stock takes. With `DATABASE_URL` set, the app always uses the real
 server (`lib/db/driver.ts` picks the driver); embedded mode is what runs
 when it's unset.
 
-> ⚠️ The seed creates **well-known public credentials**. Demos and local
+> ⚠️ The seed creates **well-known public credentials**. Evaluation and local
 > development only — never on data you care about.
 
-## Demo credentials
+## Seeded accounts
 
-| Role            | Email                        | Password          |
-|-----------------|------------------------------|-------------------|
-| Super Admin     | `demo.admin@vms-demo.com`    | `DemoAdmin123!`   |
-| Manager         | `demo.manager@vms-demo.com`  | `DemoManager123!` |
-| Fleet Dispatch  | `demo.fleet@vms-demo.com`    | `DemoFleet123!`   |
-| Warehouse Staff | `demo.worker@vms-demo.com`   | `DemoWorker123!`  |
+| Role            | Email                  | Password         |
+|-----------------|------------------------|------------------|
+| Super Admin     | `admin@vms-v0.local`   | `VmsAdmin123!`   |
+| Manager         | `manager@vms-v0.local` | `VmsManager123!` |
+| Fleet Dispatch  | `fleet@vms-v0.local`   | `VmsFleet123!`   |
+| Warehouse Staff | `worker@vms-v0.local`  | `VmsWorker123!`  |
 
 New sign-ups get the `staff` role; promote accounts from the Users page
 as a super admin.
@@ -110,7 +111,7 @@ as a super admin.
 | Storerooms | Monitoring | Reports |
 |---|---|---|
 | ![Storerooms](public/screenshots/rooms.png) | ![Monitoring](public/screenshots/monitoring.png) | ![Reports](public/screenshots/reports.png) |
-| Typed rooms — cold, secure, hazmat — with access levels and occupancy | Live temp/humidity telemetry, excursion alerts, demo simulator | KPIs, movement trends, valuation, CSV export |
+| Typed rooms — cold, secure, hazmat — with access levels and occupancy | Live temp/humidity telemetry, excursion alerts, sensor simulator | KPIs, movement trends, valuation, CSV export |
 
 | Stock ledger (Kardex) | Integrations & MCP |
 |---|---|
@@ -142,7 +143,7 @@ color-blind-safe status pairs:
 ```html
 <!-- components consume tokens — no hex, no bg-blue-600, anywhere -->
 <button class="bg-primary text-primary-foreground hover:bg-primary/90">
-  View demo
+  Open the app
 </button>
 <span class="bg-success/10 text-success">In stock</span>
 ```
@@ -162,7 +163,7 @@ color-blind-safe status pairs:
 - **Tool loans** — check-out/check-in with condition logging and overdue
   tracking
 - **Sensor monitoring** — temp/humidity/door telemetry per room,
-  threshold rules, excursion alerts, built-in demo simulator
+  threshold rules, excursion alerts, built-in sensor simulator
 - **REST API + MCP server** — scoped API keys; agents and assistants can
   query stock through MCP tools with the same permission checks
 - **Installable PWA** — manifest + service worker ship today; the queued
@@ -195,9 +196,9 @@ Narrative walkthrough: [docs/LOGIC_CHAIN.md](docs/LOGIC_CHAIN.md)
 | Path | What you do | Best for |
 |---|---|---|
 | **Embedded (PGlite)** | `npm run dev:standalone` — zero install, DB in `./.vms-data` | Instant evaluation, laptops without Docker |
-| **Local Docker** | `docker compose up -d` + `npm run dev` | Demos, evaluation, development |
+| **Local Docker** | `docker compose up -d` + `npm run dev` | Evaluation, testing, development |
 | **Self-hosted server** | Postgres + `npm run build && npm start` on an entry-level box (~i5/8 GB); reverse proxy for TLS | Real deployments — site servers, LAN, air-gapped |
-| **Vercel + hosted Postgres** | Deploy to Vercel, point `DATABASE_URL` at Supabase/Neon/RDS (pooler URL) | Hosted demos, teams that want managed infra |
+| **Vercel + hosted Postgres** | Deploy to Vercel, point `DATABASE_URL` at Supabase/Neon/RDS (pooler URL) | Hosted instances, teams that want managed infra |
 
 All three run the same code — there is no cloud-only feature to unlock.
 Details per topology in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#deployment-topologies).

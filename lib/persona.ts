@@ -1,5 +1,5 @@
 /**
- * lib/persona — the single source of truth for the demo persona model.
+ * lib/persona — the single source of truth for the persona model.
  *
  * Two personas:
  *

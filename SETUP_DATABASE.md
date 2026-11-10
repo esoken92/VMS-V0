@@ -15,9 +15,9 @@ supabase link --project-ref YOUR_PROJECT_REF
 supabase db push
 ```
 
-## Step 2: (Optional) Seed Demo Data
+## Step 2: (Optional) Seed Data
 
-To get four demo accounts (one per role) plus sample inventory:
+To get four seed accounts (one per role) plus sample inventory:
 
 ```bash
 # hosted project: paste the file into the SQL Editor, or
@@ -27,7 +27,7 @@ psql "$SUPABASE_DB_URL" -f supabase/seed.sql
 supabase db reset   # runs migrations + seed.sql
 ```
 
-Demo logins — see the table in README.md. Only seed demo credentials into
+Seed logins — see the table in README.md. Only seed seed credentials into
 environments you don't mind being public.
 
 ## Step 3: Create Your Own Admin Account
@@ -71,5 +71,5 @@ Expected tables:
 ## Step 5: Test the App
 
 1. Go to http://localhost:3000
-2. Sign in with a demo account or your own account
+2. Sign in with a seed account or your own account
 3. You should now have full access matching your role

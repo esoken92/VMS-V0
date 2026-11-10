@@ -2,7 +2,7 @@
  * POST /api/sensors/ingest — device/gateway telemetry ingest.
  *
  * Auth: `Authorization: Bearer $SENSOR_API_KEY` (hardware) OR an
- * authenticated session (staff+ — e.g. demo UI, technician tablet).
+ * authenticated session (staff+ — e.g. dashboard UI, technician tablet).
  * Body: `{ readings: [...] }`, max 500 per call. Zod-validated.
  *
  * Writes are idempotent on UNIQUE(room_id, device_id, metric, recorded_at)

@@ -1,7 +1,7 @@
 /**
  * lib/storerooms/ingest — the single write path for sensor readings.
  * Used by POST /api/sensors/ingest (devices) and /api/sensors/simulate
- * (demo data) so both share idempotent upsert + alert evaluation.
+ * (seed data) so both share idempotent upsert + alert evaluation.
  *
  * Idempotency: UNIQUE(room_id, device_id, metric, recorded_at) +
  * ON CONFLICT DO NOTHING — replays and retries are cheap no-ops, and only

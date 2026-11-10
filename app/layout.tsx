@@ -17,17 +17,17 @@ const plexMono = IBM_Plex_Mono({
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 const DESCRIPTION =
-  'VMS is a free, open-source, self-hosted inventory management template: ' +
+  'VMS V0 is a free, open-source, self-hosted inventory management template: ' +
   'typed storerooms, scan-first barcode/QR/RFID workflows, an append-only ' +
   'ledger, RBAC, stock takes, tool loans, sensor monitoring, and a REST + ' +
   'MCP API. Next.js 16 and Postgres — runs on a laptop or a site server.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  applicationName: 'VMS',
+  applicationName: 'VMS V0',
   title: {
-    default: 'VMS — Inventory Management, Open Source',
-    template: '%s · VMS',
+    default: 'VMS V0 — Inventory Management, Open Source',
+    template: '%s · VMS V0',
   },
   description: DESCRIPTION,
   keywords: [
@@ -46,14 +46,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     url: '/',
-    siteName: 'VMS',
-    title: 'VMS — Inventory Management, Open Source',
+    siteName: 'VMS V0',
+    title: 'VMS V0 — Inventory Management, Open Source',
     description: DESCRIPTION,
     locale: 'en_ZA',
   },
   twitter: {
     card: 'summary',
-    title: 'VMS — Inventory Management, Open Source',
+    title: 'VMS V0 — Inventory Management, Open Source',
     description: DESCRIPTION,
   },
 }

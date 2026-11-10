@@ -13,7 +13,7 @@
  * logged loudly on first use and MUST be overridden in production
  * (docs/.env.example documents the variable).
  *
- * Replay/anomaly strategy (kept deliberately simple for the demo):
+ * Replay/anomaly strategy (kept deliberately simple for v0):
  *   - Verification checks signature + iat/exp bounds.
  *   - The label_tokens table is the nonce cache: a presented token must
  *     exist there (i.e. WE issued it) and have consumed_at IS NULL.

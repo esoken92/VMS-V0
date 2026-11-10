@@ -35,7 +35,7 @@ export default function Sidebar() {
             <Package className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-lg font-bold">VMS</h1>
+            <h1 className="text-lg font-bold">VMS V0</h1>
             <p className="text-xs text-sidebar-muted">Inventory</p>
           </div>
         </Link>

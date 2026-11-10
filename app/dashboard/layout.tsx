@@ -65,7 +65,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       {mobileMenuOpen && (
         <div className="fixed inset-y-0 left-0 z-50 w-64 bg-sidebar md:hidden">
           <div className="p-6 border-b border-sidebar-border">
-            <h1 className="text-lg font-bold text-sidebar-foreground">VMS</h1>
+            <h1 className="text-lg font-bold text-sidebar-foreground">VMS V0</h1>
             <p className="text-xs text-sidebar-muted">Inventory</p>
           </div>
           {/* Mobile menu items would go here */}

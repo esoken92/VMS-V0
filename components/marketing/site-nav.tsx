@@ -1,6 +1,6 @@
 /**
  * SiteNav — landing-page header. Sticky, translucent, section anchors on
- * the left; GitHub + demo CTA on the right. Section links collapse on
+ * the left; GitHub + app CTA on the right. Section links collapse on
  * small screens (the page below still carries every anchor).
  */
 
@@ -60,7 +60,7 @@ export function SiteNav() {
             href="/dashboard"
             className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            View demo
+            Open app
           </Link>
         </div>
       </div>

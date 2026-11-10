@@ -1,13 +1,13 @@
 /**
  * GET|POST /api/sensors/simulate — generate realistic telemetry for every
  * active room and push it through the real ingest path. Admin only
- * (super_admin/admin) — this endpoint exists so demos work without hardware.
+ * (super_admin/admin) — this endpoint exists so the app works without hardware.
  *
  * Query params (both verbs):
  *   ?points=N         ticks per room (history backfill, default 1, max 500)
  *   ?step_minutes=N   spacing between ticks (default 15)
  *   ?excursion=1      force the newest tick to breach each room's temp range
- *                     (opens threshold alerts on demand — great for demos)
+ *                     (opens threshold alerts on demand — handy for testing)
  *   ?room=<uuid>      restrict to one room
  */
 

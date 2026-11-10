@@ -102,7 +102,7 @@ export default function LoginForm() {
     <div className="w-full max-w-md mx-auto">
       {/* Header */}
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-foreground">VMS Inventory</h1>
+        <h1 className="text-3xl font-bold text-foreground">VMS V0</h1>
         <p className="text-muted-foreground mt-2">Inventory Management System</p>
       </div>
 
@@ -251,25 +251,25 @@ export default function LoginForm() {
         </Link>
       </p>
 
-      {/* Demo Credentials (seeded via `npm run db:seed` — local demo only) */}
+      {/* Seed accounts (created by `npm run db:seed` — local development only) */}
       <div className="mt-8 p-4 bg-info/10 border border-info/30 rounded-lg">
-        <p className="text-sm font-medium text-info mb-3">🎯 Demo Credentials</p>
+        <p className="text-sm font-medium text-info mb-3">Seed accounts</p>
         <div className="space-y-2 text-xs">
           <div className="flex justify-between items-center">
             <span className="text-info font-medium">Admin:</span>
-            <span className="text-info">demo.admin@vms-demo.com / DemoAdmin123!</span>
+            <span className="text-info">admin@vms-v0.local / VmsAdmin123!</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-info font-medium">Manager:</span>
-            <span className="text-info">demo.manager@vms-demo.com / DemoManager123!</span>
+            <span className="text-info">manager@vms-v0.local / VmsManager123!</span>
           </div>
           <div className="flex justify-between items-center">
             <span className="text-info font-medium">Staff:</span>
-            <span className="text-info">demo.worker@vms-demo.com / DemoWorker123!</span>
+            <span className="text-info">worker@vms-v0.local / VmsWorker123!</span>
           </div>
         </div>
         <p className="text-xs text-info mt-3 italic">
-          Local demo accounts only — change or remove before any real deployment
+          Seed accounts for local development — change or remove before any real deployment
         </p>
       </div>
     </div>

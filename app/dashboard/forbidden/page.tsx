@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { ShieldAlert, ArrowLeft } from 'lucide-react';
 
 export const metadata = {
-  title: 'Access denied — VMS',
+  title: 'Access denied — VMS V0',
 };
 
 export default async function ForbiddenPage(

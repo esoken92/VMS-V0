@@ -1,6 +1,6 @@
 {
-  "name": "VMS Inventory Management",
-  "short_name": "VMS Inventory",
+  "name": "VMS V0",
+  "short_name": "VMS V0",
   "description": "Heavy-Duty Truck Parts Warehouse Inventory Management System",
   "start_url": "/",
   "display": "standalone",

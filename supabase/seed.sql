@@ -1,9 +1,9 @@
 -- ============================================================================
--- VMS Demo Seed Data
+-- VMS V0 Seed Data
 -- ============================================================================
--- OPTIONAL demo dataset: 4 demo accounts (one per role) + sample inventory.
+-- OPTIONAL seed dataset: 4 seed accounts (one per role) + sample inventory.
 --
--- SECURITY NOTE: these are well-known credentials for local/demo use only.
+-- SECURITY NOTE: these are well-known credentials for local development and evaluation only.
 -- Do NOT run this seed on any environment you consider sensitive.
 --
 -- Run with:  npm run db:seed     (scripts/seed.ts executes this file, then
@@ -11,7 +11,7 @@
 -- ============================================================================
 
 -- ============================================================================
--- DEMO USERS
+-- SEED USERS
 -- ============================================================================
 -- The app and RLS policies treat profiles.id = auth.users.id (1:1 identity),
 -- so the profile PK is intentionally the same UUID as the auth user.
@@ -22,17 +22,17 @@
 -- produce argon2, so this file only creates the identity rows.
 
 INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at) VALUES
-  ('a0000000-0000-4000-8000-000000000001', 'demo.admin@vms-demo.com',   '', NOW()),
-  ('a0000000-0000-4000-8000-000000000002', 'demo.manager@vms-demo.com', '', NOW()),
-  ('a0000000-0000-4000-8000-000000000003', 'demo.fleet@vms-demo.com',   '', NOW()),
-  ('a0000000-0000-4000-8000-000000000004', 'demo.worker@vms-demo.com',  '', NOW())
+  ('a0000000-0000-4000-8000-000000000001', 'admin@vms-v0.local',   '', NOW()),
+  ('a0000000-0000-4000-8000-000000000002', 'manager@vms-v0.local', '', NOW()),
+  ('a0000000-0000-4000-8000-000000000003', 'fleet@vms-v0.local',   '', NOW()),
+  ('a0000000-0000-4000-8000-000000000004', 'worker@vms-v0.local',  '', NOW())
 ON CONFLICT (email) DO NOTHING;
 
 INSERT INTO profiles (id, user_id, full_name, role) VALUES
-  ('a0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000001', 'Demo Admin',          'super_admin'),
-  ('a0000000-0000-4000-8000-000000000002', 'a0000000-0000-4000-8000-000000000002', 'Demo Manager',        'manager'),
-  ('a0000000-0000-4000-8000-000000000003', 'a0000000-0000-4000-8000-000000000003', 'Demo Fleet Dispatch', 'fleet_dispatch'),
-  ('a0000000-0000-4000-8000-000000000004', 'a0000000-0000-4000-8000-000000000004', 'Demo Worker',         'staff')
+  ('a0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000001', 'VMS Admin',          'super_admin'),
+  ('a0000000-0000-4000-8000-000000000002', 'a0000000-0000-4000-8000-000000000002', 'VMS Manager',        'manager'),
+  ('a0000000-0000-4000-8000-000000000003', 'a0000000-0000-4000-8000-000000000003', 'VMS Fleet Dispatch', 'fleet_dispatch'),
+  ('a0000000-0000-4000-8000-000000000004', 'a0000000-0000-4000-8000-000000000004', 'VMS Worker',         'staff')
 ON CONFLICT (id) DO UPDATE SET
   user_id = EXCLUDED.user_id,
   full_name = EXCLUDED.full_name,
@@ -133,7 +133,7 @@ INSERT INTO products (sku, name, item_type, current_stock, min_threshold, unit_o
 ON CONFLICT (sku) DO NOTHING;
 
 -- ============================================================================
--- STOCK MOVEMENTS (attributed to the demo admin)
+-- STOCK MOVEMENTS (attributed to the seed admin)
 -- ============================================================================
 -- Guarded so re-running the seed doesn't duplicate history rows.
 DO $$
@@ -141,17 +141,17 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM stock_movements) THEN
 INSERT INTO stock_movements (product_id, user_id, type, quantity, reason) VALUES
 -- Inbound movements
-((SELECT id FROM products WHERE sku = 'BRK-001'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'inbound', 100, 'Initial stock'),
-((SELECT id FROM products WHERE sku = 'OIL-001'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'inbound', 50, 'Initial stock'),
-((SELECT id FROM products WHERE sku = 'TL-001'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'inbound', 10, 'Initial stock'),
-((SELECT id FROM products WHERE sku = 'TIR-001'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'inbound', 30, 'Initial stock'),
+((SELECT id FROM products WHERE sku = 'BRK-001'), (SELECT id FROM auth.users WHERE email = 'admin@vms-v0.local'), 'inbound', 100, 'Initial stock'),
+((SELECT id FROM products WHERE sku = 'OIL-001'), (SELECT id FROM auth.users WHERE email = 'admin@vms-v0.local'), 'inbound', 50, 'Initial stock'),
+((SELECT id FROM products WHERE sku = 'TL-001'), (SELECT id FROM auth.users WHERE email = 'admin@vms-v0.local'), 'inbound', 10, 'Initial stock'),
+((SELECT id FROM products WHERE sku = 'TIR-001'), (SELECT id FROM auth.users WHERE email = 'admin@vms-v0.local'), 'inbound', 30, 'Initial stock'),
 -- Outbound movements
-((SELECT id FROM products WHERE sku = 'BRK-001'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'outbound', -20, 'Used for vehicle service'),
-((SELECT id FROM products WHERE sku = 'OIL-001'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'outbound', -15, 'Used for oil change'),
-((SELECT id FROM products WHERE sku = 'FLT-001'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'outbound', -10, 'Used for vehicle service'),
+((SELECT id FROM products WHERE sku = 'BRK-001'), (SELECT id FROM auth.users WHERE email = 'admin@vms-v0.local'), 'outbound', -20, 'Used for vehicle service'),
+((SELECT id FROM products WHERE sku = 'OIL-001'), (SELECT id FROM auth.users WHERE email = 'admin@vms-v0.local'), 'outbound', -15, 'Used for oil change'),
+((SELECT id FROM products WHERE sku = 'FLT-001'), (SELECT id FROM auth.users WHERE email = 'admin@vms-v0.local'), 'outbound', -10, 'Used for vehicle service'),
 -- Scrap movements
-((SELECT id FROM products WHERE sku = 'BRK-002'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'scrap', -5, 'Damaged goods'),
-((SELECT id FROM products WHERE sku = 'TIR-002'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'scrap', -2, 'Damaged tire');
+((SELECT id FROM products WHERE sku = 'BRK-002'), (SELECT id FROM auth.users WHERE email = 'admin@vms-v0.local'), 'scrap', -5, 'Damaged goods'),
+((SELECT id FROM products WHERE sku = 'TIR-002'), (SELECT id FROM auth.users WHERE email = 'admin@vms-v0.local'), 'scrap', -2, 'Damaged tire');
 
 -- Opening balances: one 'receiving' movement per product equal to
 -- current_stock minus the net of the seeded movements above, so the
@@ -159,7 +159,7 @@ INSERT INTO stock_movements (product_id, user_id, type, quantity, reason) VALUES
 -- days so period reports show only real recent activity.
 INSERT INTO stock_movements (product_id, user_id, type, quantity, reason, created_at)
 SELECT p.id,
-       (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'),
+       (SELECT id FROM auth.users WHERE email = 'admin@vms-v0.local'),
        'receiving',
        p.current_stock - COALESCE(SUM(sm.quantity), 0),
        'Opening balance',
@@ -175,14 +175,14 @@ HAVING p.current_stock - COALESCE(SUM(sm.quantity), 0) <> 0;
 -- TOOL LOANS
 -- ============================================================================
 INSERT INTO tool_loans (tool_product_id, worker_profile_id, checked_out_by_user_id, condition_on_checkout, notes) VALUES
-((SELECT id FROM products WHERE sku = 'TL-001'), (SELECT id FROM auth.users WHERE email = 'demo.worker@vms-demo.com'), (SELECT id FROM auth.users WHERE email = 'demo.fleet@vms-demo.com'), 'Good', 'Routine maintenance'),
-((SELECT id FROM products WHERE sku = 'TL-003'), (SELECT id FROM auth.users WHERE email = 'demo.worker@vms-demo.com'), (SELECT id FROM auth.users WHERE email = 'demo.fleet@vms-demo.com'), 'Excellent', 'Tightening bolts'),
-((SELECT id FROM products WHERE sku = 'TL-004'), (SELECT id FROM auth.users WHERE email = 'demo.fleet@vms-demo.com'), (SELECT id FROM auth.users WHERE email = 'demo.manager@vms-demo.com'), 'Good', 'Socket work');
+((SELECT id FROM products WHERE sku = 'TL-001'), (SELECT id FROM auth.users WHERE email = 'worker@vms-v0.local'), (SELECT id FROM auth.users WHERE email = 'fleet@vms-v0.local'), 'Good', 'Routine maintenance'),
+((SELECT id FROM products WHERE sku = 'TL-003'), (SELECT id FROM auth.users WHERE email = 'worker@vms-v0.local'), (SELECT id FROM auth.users WHERE email = 'fleet@vms-v0.local'), 'Excellent', 'Tightening bolts'),
+((SELECT id FROM products WHERE sku = 'TL-004'), (SELECT id FROM auth.users WHERE email = 'fleet@vms-v0.local'), (SELECT id FROM auth.users WHERE email = 'manager@vms-v0.local'), 'Good', 'Socket work');
 
 -- Add some returned tool loans
 INSERT INTO tool_loans (tool_product_id, worker_profile_id, checked_out_by_user_id, condition_on_checkout, condition_on_return, returned_at, notes) VALUES
-((SELECT id FROM products WHERE sku = 'TL-002'), (SELECT id FROM auth.users WHERE email = 'demo.worker@vms-demo.com'), (SELECT id FROM auth.users WHERE email = 'demo.fleet@vms-demo.com'), 'Good', 'Good', NOW() - INTERVAL '2 days', 'Returned after use'),
-((SELECT id FROM products WHERE sku = 'TL-005'), (SELECT id FROM auth.users WHERE email = 'demo.worker@vms-demo.com'), (SELECT id FROM auth.users WHERE email = 'demo.fleet@vms-demo.com'), 'Excellent', 'Excellent', NOW() - INTERVAL '1 day', 'Returned after use');
+((SELECT id FROM products WHERE sku = 'TL-002'), (SELECT id FROM auth.users WHERE email = 'worker@vms-v0.local'), (SELECT id FROM auth.users WHERE email = 'fleet@vms-v0.local'), 'Good', 'Good', NOW() - INTERVAL '2 days', 'Returned after use'),
+((SELECT id FROM products WHERE sku = 'TL-005'), (SELECT id FROM auth.users WHERE email = 'worker@vms-v0.local'), (SELECT id FROM auth.users WHERE email = 'fleet@vms-v0.local'), 'Excellent', 'Excellent', NOW() - INTERVAL '1 day', 'Returned after use');
   END IF;
 
   IF NOT EXISTS (SELECT 1 FROM stock_takes) THEN
@@ -190,8 +190,8 @@ INSERT INTO tool_loans (tool_product_id, worker_profile_id, checked_out_by_user_
 -- STOCK TAKES
 -- ============================================================================
 INSERT INTO stock_takes (started_by, status, notes) VALUES
-((SELECT id FROM auth.users WHERE email = 'demo.manager@vms-demo.com'), 'open', 'Monthly inventory count - Zone A'),
-((SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'completed', 'Weekly spot check - Zone B');
+((SELECT id FROM auth.users WHERE email = 'manager@vms-v0.local'), 'open', 'Monthly inventory count - Zone A'),
+((SELECT id FROM auth.users WHERE email = 'admin@vms-v0.local'), 'completed', 'Weekly spot check - Zone B');
 
 -- Add stock take items for the open stock take
 INSERT INTO stock_take_items (stock_take_id, product_id, system_qty, physical_qty, variance) VALUES
@@ -211,7 +211,7 @@ WHERE status = 'completed';
   END IF;
 END $$;
 
--- Demo storerooms (idempotent)
+-- Sample storerooms (idempotent)
 INSERT INTO storerooms (id, name, type, description, temp_min, temp_max, capacity_units, access_level, allowed_roles, item_allowlist, feature_toggles, quarantine, active)
 VALUES
   ('a1000000-0000-4000-8000-000000000001', 'Cold Room A', 'cold', 'Chilled goods — vaccines, perishables', 2, 8, 500, 'restricted', ARRAY['super_admin','admin','manager'], ARRAY['fluids','consumables'], '{"threshold_alerts":true,"scan_required":true,"photo_on_entry":false,"sensor_monitoring":true,"quarantine_hold":false,"access_log":true,"climate_chart":true,"door_sensor":true,"capacity_alerts":true}'::jsonb, false, true),
@@ -219,7 +219,7 @@ VALUES
   ('a1000000-0000-4000-8000-000000000003', 'Secure Cage', 'secure', 'High-value items — controlled access', 15, 25, 100, 'locked', ARRAY['super_admin','admin'], ARRAY['tools'], '{"threshold_alerts":true,"scan_required":true,"photo_on_entry":true,"sensor_monitoring":true,"quarantine_hold":false,"access_log":true,"climate_chart":true,"door_sensor":true,"capacity_alerts":true}'::jsonb, false, true)
 ON CONFLICT (id) DO NOTHING;
 
--- Link a couple of bins into Cold Room A + Main Store for occupancy demo
+-- Link a couple of bins into Cold Room A + Main Store for occupancy display
 UPDATE bin_locations SET room_id = 'a1000000-0000-4000-8000-000000000001'
 WHERE bin_location LIKE 'A%' OR bin_location LIKE 'C%';
 UPDATE bin_locations SET room_id = 'a1000000-0000-4000-8000-000000000002'

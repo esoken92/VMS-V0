@@ -153,7 +153,7 @@ export default function SignupForm() {
     <div className="w-full max-w-md mx-auto">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold text-foreground">Create Account</h1>
-        <p className="text-muted-foreground mt-2">VMS Inventory</p>
+        <p className="text-muted-foreground mt-2">VMS V0</p>
       </div>
 
       {displayError && (

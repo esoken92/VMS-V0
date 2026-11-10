@@ -7,7 +7,7 @@
  *   - stale-sensor card (rooms silent for 30+ minutes)
  *   - alert lifecycle list (acknowledge / resolve — manager+)
  *   - per-room climate history chart
- *   - "Simulate" buttons (admin only) driving /api/sensors/simulate so demos
+ *   - "Simulate" buttons (admin only) driving /api/sensors/simulate so the app
  *     need no hardware
  */
 

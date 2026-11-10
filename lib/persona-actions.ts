@@ -17,7 +17,7 @@ import {
 } from '@/lib/persona';
 import { actionError, fail, ok, type Result } from '@/lib/result';
 
-/** Short-lived: the preview is for demos, not a persistent mode. */
+/** Short-lived: the preview is for evaluation, not a persistent mode. */
 const PREVIEW_MAX_AGE_SECONDS = 2 * 60 * 60; // 2h
 
 export async function enterWorkerPreview(): Promise<Result<null>> {

@@ -12,7 +12,7 @@ security advisory rather than a public issue.
   directory `.vms-data/` are git-ignored.
 - `.env.example`, `docker-compose.yml`, seeds, and docs contain only
   placeholders or explicit local-development defaults (e.g. `vms_local_dev`,
-  `DemoAdmin123!` demo accounts). These are intentional and not real
+  `VmsAdmin123!` seed accounts). These are intentional and not real
   credentials.
 - Set real secrets only via environment variables in your deployment target.
 
