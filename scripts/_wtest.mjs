@@ -1,0 +1,15 @@
+import puppeteer from 'puppeteer-core'
+import { existsSync } from 'node:fs'
+const EDGE = ['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','C:/Program Files/Microsoft/Edge/Application/msedge.exe'].find(existsSync)
+const browser = await puppeteer.launch({ executablePath: EDGE, headless: 'new' })
+const page = await browser.newPage()
+await page.goto('http://localhost:3000/auth/login', { waitUntil: 'networkidle2' })
+await page.type('input#email', 'demo.worker@vms-demo.com', { delay: 15 })
+await page.type('input#password', 'DemoWorker123!', { delay: 15 })
+await page.waitForFunction(() => !document.querySelector('button[type="submit"]').disabled, { timeout: 8000 })
+await page.keyboard.press('Enter')
+await new Promise(r => setTimeout(r, 8000))
+console.log('URL:', page.url())
+const err = await page.$eval('.text-red-700, .text-red-800', el => el.textContent).catch(() => null)
+console.log('error:', err)
+await browser.close()

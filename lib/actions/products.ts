@@ -3,7 +3,7 @@
 import { asc, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { products } from '@/drizzle/schema';
+import { products, stockMovements } from '@/drizzle/schema';
 import { setAuditContext } from '@/lib/db/context';
 import { requirePermission } from '@/lib/auth/session';
 import { actionError, ok, type Result } from '@/lib/result';
@@ -140,11 +140,38 @@ export async function upsertProduct(input: unknown): Promise<Result<ProductDTO>>
         binLocationId: data.bin_location_id ?? null,
       };
       if (data.id) {
+        // Lock the row so the stock delta below is computed atomically.
+        const [existing] = await tx
+          .select({ current_stock: products.currentStock })
+          .from(products)
+          .where(eq(products.id, data.id))
+          .for('update')
+          .limit(1);
+        if (!existing) return undefined;
+        const delta =
+          data.current_stock !== undefined
+            ? data.current_stock - Number(existing.current_stock)
+            : 0;
         const [row] = await tx
           .update(products)
-          .set(values)
+          .set({
+            ...values,
+            ...(delta !== 0 ? { lastMovementDate: new Date() } : {}),
+          })
           .where(eq(products.id, data.id))
           .returning(productSelect);
+        // Ledger parity: a direct stock edit must leave a movement row so
+        // opening + Σ stock_movements == current_stock (verify-ledger).
+        if (delta !== 0) {
+          await tx.insert(stockMovements).values({
+            productId: data.id,
+            userId: ctx.user.id,
+            impersonatedByUserId: ctx.impersonating ? ctx.actor.id : null,
+            type: 'adjustment',
+            quantity: String(delta),
+            reason: 'Stock corrected via product edit',
+          });
+        }
         return row;
       }
       const [row] = await tx
@@ -152,8 +179,21 @@ export async function upsertProduct(input: unknown): Promise<Result<ProductDTO>>
         .values({
           ...values,
           currentStock: String(data.current_stock ?? 0),
+          ...(data.current_stock ? { lastMovementDate: new Date() } : {}),
         })
         .returning(productSelect);
+      // Ledger parity: opening stock is a 'receiving' movement — the same
+      // convention seed.sql uses for seeded products ('Opening balance').
+      if (data.current_stock && data.current_stock > 0) {
+        await tx.insert(stockMovements).values({
+          productId: row.id,
+          userId: ctx.user.id,
+          impersonatedByUserId: ctx.impersonating ? ctx.actor.id : null,
+          type: 'receiving',
+          quantity: String(data.current_stock),
+          reason: 'Opening balance',
+        });
+      }
       return row;
     });
 

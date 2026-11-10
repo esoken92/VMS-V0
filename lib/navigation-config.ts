@@ -16,6 +16,7 @@ import {
   SUPER_ADMIN_ONLY,
   isUserRoleIn,
 } from '@/lib/persona';
+import { isFeatureEnabled, type FeatureFlag } from '@/lib/features';
 
 export interface NavigationItem {
   label: string;
@@ -24,6 +25,13 @@ export interface NavigationItem {
   description?: string;
   /** Roles that see this item; undefined = all authenticated users. */
   roles?: readonly UserRole[];
+  /**
+   * Feature flag that must be enabled (provisioning) for this item to
+   * show. Unprovisioned instances enable everything, so items only hide
+   * once the setup wizard has run and turned the flag off. UX only —
+   * direct URL hits still reach the page; no data is deleted.
+   */
+  feature?: FeatureFlag;
 }
 
 export const navigationConfig: NavigationItem[] = [
@@ -58,12 +66,14 @@ export const navigationConfig: NavigationItem[] = [
     href: '/dashboard/stock-takes',
     icon: '📋',
     description: 'Inventory counts',
+    feature: 'stock_takes',
   },
   {
     label: 'Tool Loans',
     href: '/dashboard/tool-loans',
     icon: '🔧',
     description: 'Tool checkout/return',
+    feature: 'tool_loans',
   },
   {
     label: 'Zone Map',
@@ -122,6 +132,15 @@ export const navigationConfig: NavigationItem[] = [
     roles: BUILDER_ROLES,
   },
 
+  /* --- Configure: setup wizard (builder persona incl. manager) --- */
+  {
+    label: 'Setup',
+    href: '/dashboard/setup',
+    icon: '🧭',
+    description: 'Configure this instance',
+    roles: BUILDER_ROLES,
+  },
+
   /* --- Admin-only: manager excluded (integrations / user mgmt) --- */
   {
     label: 'Integrations',
@@ -162,7 +181,9 @@ export const navigationConfig: NavigationItem[] = [
  */
 export function visibleNavItems(role: UserRole | null | undefined): NavigationItem[] {
   return navigationConfig.filter(
-    (item) => !item.roles || (!!role && isUserRoleIn(role, item.roles)),
+    (item) =>
+      (!item.roles || (!!role && isUserRoleIn(role, item.roles))) &&
+      (!item.feature || isFeatureEnabled(item.feature)),
   );
 }
 

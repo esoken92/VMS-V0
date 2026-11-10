@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Search, ClipboardList, CheckCircle, Clock, Play, Eye } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import {
@@ -27,6 +27,8 @@ export default function StockTakesPage() {
   const [countingMode, setCountingMode] = useState(false);
   const [countedItems, setCountedItems] = useState<Record<string, number>>({});
   const [notes, setNotes] = useState('');
+  const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false); // sync guard — blocks same-tick double-clicks
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
@@ -56,7 +58,9 @@ export default function StockTakesPage() {
   };
 
   const handleStartStockTake = async () => {
-    if (!profile) return;
+    if (!profile || busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
     try {
       const result = await startStockTake({});
       if (!result.success) throw new Error(result.error);
@@ -64,6 +68,9 @@ export default function StockTakesPage() {
       fetchStockTakes();
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to start stock take' });
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
     }
   };
 
@@ -97,7 +104,9 @@ export default function StockTakesPage() {
   };
 
   const handleSaveDraft = async () => {
-    if (!activeStockTake || !profile) return;
+    if (!activeStockTake || !profile || busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
 
     try {
       const result = await saveStockTakeCounts({
@@ -116,11 +125,16 @@ export default function StockTakesPage() {
       fetchStockTakes();
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Save failed' });
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
     }
   };
 
   const handleCompleteStockTake = async () => {
-    if (!activeStockTake || !profile) return;
+    if (!activeStockTake || !profile || busyRef.current) return;
+    busyRef.current = true;
+    setBusy(true);
 
     try {
       // Send an entry for every product — null when uncounted (matches the
@@ -141,6 +155,9 @@ export default function StockTakesPage() {
       fetchStockTakes();
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Complete failed' });
+    } finally {
+      busyRef.current = false;
+      setBusy(false);
     }
   };
 
@@ -169,10 +186,11 @@ export default function StockTakesPage() {
         </div>
         <button
           onClick={handleStartStockTake}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          disabled={busy}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
         >
           <Plus className="h-4 w-4" />
-          Start New Stock Take
+          {busy ? 'Working…' : 'Start New Stock Take'}
         </button>
       </div>
 
@@ -242,16 +260,18 @@ export default function StockTakesPage() {
           <div className="flex justify-end gap-3 mt-4">
             <button
               onClick={handleSaveDraft}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              disabled={busy}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
             >
-              Save Draft
+              {busy ? 'Saving…' : 'Save Draft'}
             </button>
             <button
               onClick={handleCompleteStockTake}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              disabled={busy}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
             >
               <CheckCircle className="h-4 w-4" />
-              Complete Stock Take
+              {busy ? 'Completing…' : 'Complete Stock Take'}
             </button>
           </div>
         </div>

@@ -10,6 +10,7 @@ workflows, an append-only ledger, tool custody, sensor monitoring, and
 an audit trail that never forgets.
 
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![CI](https://github.com/esoken92/VMS-Demo-V0/actions/workflows/ci.yml/badge.svg)](https://github.com/esoken92/VMS-Demo-V0/actions/workflows/ci.yml)
 [![Next.js 14](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
 [![Postgres 16](https://img.shields.io/badge/Postgres-16-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -190,7 +191,8 @@ Wiring instructions for each: **[docs/INTEGRATIONS.md](docs/INTEGRATIONS.md)**.
 ## 🤝 Contributing
 
 Issues and PRs welcome — this is a template, so the bar is "useful to the
-next person who forks it".
+next person who forks it". Dev setup, commands, and the rules that keep
+the ledger honest: **[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
 - `npm run type-check` and `npm run lint` must pass
 - **Additive migrations only** — never edit an applied migration file

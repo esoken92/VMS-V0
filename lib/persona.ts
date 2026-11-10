@@ -69,6 +69,7 @@ export function isBuilderRole(role: UserRole | null | undefined): boolean {
  */
 export const ROUTE_ACCESS: ReadonlyArray<{ prefix: string; roles: readonly UserRole[] }> = [
   // Builder surfaces — manager included.
+  { prefix: '/dashboard/setup', roles: BUILDER_ROLES },
   { prefix: '/dashboard/bin-locations', roles: BUILDER_ROLES },
   { prefix: '/dashboard/rooms', roles: BUILDER_ROLES },
   { prefix: '/dashboard/monitoring', roles: BUILDER_ROLES },

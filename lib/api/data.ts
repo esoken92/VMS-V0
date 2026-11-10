@@ -14,7 +14,7 @@
  *   - audit log                          admin/super_admin role only
  */
 
-import { and, asc, desc, eq, gte, ilike, isNull, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, ilike, inArray, isNull, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { db } from '@/lib/db';
 import {
@@ -535,7 +535,7 @@ export async function apiCheckoutTools(
       const skuRows = await tx
         .select({ id: products.id })
         .from(products)
-        .where(sql`${products.sku} = ANY(${skus}::text[])`);
+        .where(inArray(products.sku, skus));
       const found = new Set(skuRows.map((r) => r.id));
       if (found.size !== skus.length) {
         throw new ApiError('not_found', 'One or more tool SKUs not found');

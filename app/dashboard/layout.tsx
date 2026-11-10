@@ -1,20 +1,45 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Sidebar from '@/components/dashboard/Sidebar';
 import TopBar from '@/components/dashboard/TopBar';
 import PreviewBanner from '@/components/dashboard/PreviewBanner';
 import { AuthProvider, useAuth } from '@/components/providers/AuthProvider';
+import { getFeatureFlags } from '@/lib/actions/provisioning';
+import { setClientFeatures } from '@/lib/features';
 import { Shield, LogOut } from 'lucide-react';
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isImpersonating, profile, impersonatedByUser, exitImpersonation, ensureProfile } = useAuth();
+  const { isImpersonating, profile, impersonatedByUser, exitImpersonation, ensureProfile, persona } = useAuth();
+  // Assume provisioned until the flags load — avoids flashing the banner.
+  const [provisioned, setProvisioned] = useState(true);
+  const [flagsLoaded, setFlagsLoaded] = useState(false);
 
   // Load profile lazily when dashboard is accessed
   useEffect(() => {
     ensureProfile();
   }, [ensureProfile]);
+
+  // Load provisioning-derived feature flags once per session and publish
+  // them into the client flag cache — visibleNavItems() consults it when
+  // the Sidebar re-renders (this state change is the trigger), so flag-gated
+  // nav items hide without touching Sidebar or prop drilling.
+  useEffect(() => {
+    let cancelled = false;
+    getFeatureFlags()
+      .then((res) => {
+        if (cancelled || !res.success) return;
+        setClientFeatures(res.data);
+        setProvisioned(res.data !== null);
+        setFlagsLoaded(true);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleExitImpersonation = async () => {
     const result = await exitImpersonation();
@@ -54,6 +79,27 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
         {/* "View as worker" preview banner (renders only when active) */}
         <PreviewBanner />
+
+        {/* "Finish setup" banner — builder persona only, shown until the
+            provisioning wizard has run at least once. Operators never see
+            it (persona already accounts for worker preview). */}
+        {flagsLoaded && !provisioned && persona === 'builder' && (
+          <div className="bg-indigo-50 border-b border-indigo-200 px-6 py-2">
+            <div className="flex items-center justify-between max-w-7xl mx-auto">
+              <p className="text-sm text-indigo-900">
+                This instance hasn&apos;t been configured yet — pick an
+                industry and stock policies to tailor the menus, fields and
+                workflows.
+              </p>
+              <Link
+                href="/dashboard/setup"
+                className="ml-4 shrink-0 px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+              >
+                Finish setup
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* Impersonation Banner */}
         {isImpersonating && (

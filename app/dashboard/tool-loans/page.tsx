@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Search, LogOut, AlertCircle, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import {
@@ -43,6 +43,8 @@ export default function ToolLoansPage() {
     notes: '',
     condition_in: 'good',
   });
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false); // sync guard — blocks same-tick double-clicks
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
@@ -120,7 +122,9 @@ export default function ToolLoansPage() {
 
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile) return;
+    if (!profile || submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
 
     try {
       const result = await checkOutTools({
@@ -135,12 +139,17 @@ export default function ToolLoansPage() {
       fetchToolLoans();
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Checkout failed' });
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
     }
   };
 
   const handleReturnSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedLoan || !profile) return;
+    if (!selectedLoan || !profile || submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
 
     try {
       const result = await returnTools({
@@ -154,12 +163,17 @@ export default function ToolLoansPage() {
       fetchToolLoans();
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Return failed' });
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
     }
   };
 
   const handleBulkCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile || selectedToolIds.length === 0 || !formData.user_id) return;
+    if (!profile || selectedToolIds.length === 0 || !formData.user_id || submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
 
     try {
       const result = await checkOutTools({
@@ -176,12 +190,17 @@ export default function ToolLoansPage() {
       fetchToolLoans();
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Bulk checkout failed' });
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
     }
   };
 
   const handleBulkReturnSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile || selectedToolIds.length === 0) return;
+    if (!profile || selectedToolIds.length === 0 || submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
 
     try {
       const result = await returnTools({
@@ -196,6 +215,9 @@ export default function ToolLoansPage() {
       fetchToolLoans();
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Bulk return failed' });
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
     }
   };
 
@@ -433,9 +455,10 @@ export default function ToolLoansPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
                 >
-                  Check Out
+                  {submitting ? 'Checking out…' : 'Check Out'}
                 </button>
               </div>
             </form>
@@ -484,10 +507,11 @@ export default function ToolLoansPage() {
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  disabled={submitting}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
                 >
                   <CheckCircle className="h-4 w-4" />
-                  Return Tool
+                  {submitting ? 'Returning…' : 'Return Tool'}
                 </button>
               </div>
             </form>
@@ -574,10 +598,10 @@ export default function ToolLoansPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={selectedToolIds.length === 0}
+                  disabled={selectedToolIds.length === 0 || submitting}
                   className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-purple-400 transition-colors"
                 >
-                  Check Out {selectedToolIds.length} Tools
+                  {submitting ? 'Checking out…' : `Check Out ${selectedToolIds.length} Tools`}
                 </button>
               </div>
             </form>
@@ -641,10 +665,10 @@ export default function ToolLoansPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={selectedToolIds.length === 0}
+                  disabled={selectedToolIds.length === 0 || submitting}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-green-400 transition-colors"
                 >
-                  Return {selectedToolIds.length} Tools
+                  {submitting ? 'Returning…' : `Return ${selectedToolIds.length} Tools`}
                 </button>
               </div>
             </form>

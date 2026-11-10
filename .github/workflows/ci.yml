@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Type-check, lint & build
+    runs-on: ubuntu-latest
+    env:
+      # Dummy values — nothing connects during `next build`.
+      # lib/db/driver.ts creates a postgres.js pool when DATABASE_URL is
+      # set, but postgres.js only connects on first query, and every
+      # DB-touching route is server-rendered on demand.
+      # (Leaving DATABASE_URL unset would instead spawn the embedded
+      # PGlite engine at module evaluation — slower and pointless in CI.)
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/vms
+      AUTH_SECRET: ci-secret
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run type-check
+      - run: npx eslint . --max-warnings=0
+      - run: npm run build
+
+  ledger:
+    name: Ledger reconciliation (embedded Postgres)
+    runs-on: ubuntu-latest
+    # Deliberately NO DATABASE_URL: scripts fall back to the embedded
+    # PGlite store at ./.vms-data, so this job needs zero services.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Fresh checkout → build the embedded store: prelude + migrations + demo seed.
+      - run: npm run db:bootstrap
+      # Read-only check: opening + Σ stock_movements == current_stock
+      # for every product. Fails if any stock write bypassed the ledger.
+      - run: npx tsx scripts/verify-ledger.ts

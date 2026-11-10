@@ -1,11 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Search, Filter, MoreVertical, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { listProducts, upsertProduct, deleteProduct as deleteProductAction } from '@/lib/actions/products';
 import { listSuppliers } from '@/lib/actions/suppliers';
 import { listBinLocations } from '@/lib/actions/bin-locations';
+import {
+  getFeatureFlags,
+  getProductTracking,
+  saveProductTracking,
+} from '@/lib/actions/provisioning';
+import { isFeatureEnabled, type FeatureFlag } from '@/lib/features';
 import type { ProductDTO } from '@/lib/types';
 
 type Product = ProductDTO;
@@ -32,6 +38,11 @@ export default function InventoryPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false); // sync guard — blocks same-tick double-clicks
+  // undefined = flags not loaded yet (tracking section stays hidden until
+  // they resolve); null = unprovisioned → every feature enabled.
+  const [features, setFeatures] = useState<FeatureFlag[] | null | undefined>(undefined);
   const [formData, setFormData] = useState({
     sku: '',
     name: '',
@@ -43,17 +54,34 @@ export default function InventoryPage() {
     issuing_unit: '',
     supplier_id: '',
     bin_location_id: '',
+    expiry_tracked: false,
+    serialized: false,
   });
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const canEdit = hasRole(['manager', 'admin', 'super_admin']);
   const canDelete = hasRole(['admin', 'super_admin']);
 
+  const showExpiryFields =
+    features !== undefined && isFeatureEnabled('expiry', features);
+  const showSerialFields =
+    features !== undefined && isFeatureEnabled('serialization', features);
+
   useEffect(() => {
     fetchProducts();
     fetchSuppliers();
     fetchBinLocations();
+    fetchFeatures();
   }, []);
+
+  const fetchFeatures = async () => {
+    try {
+      const result = await getFeatureFlags();
+      if (result.success) setFeatures(result.data);
+    } catch (err) {
+      console.error('Error fetching feature flags:', err);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -98,11 +126,13 @@ export default function InventoryPage() {
       issuing_unit: '',
       supplier_id: '',
       bin_location_id: '',
+      expiry_tracked: false,
+      serialized: false,
     });
     setShowModal(true);
   };
 
-  const handleEditProduct = (product: Product) => {
+  const handleEditProduct = async (product: Product) => {
     setEditingProduct(product);
     setFormData({
       sku: product.sku,
@@ -115,8 +145,24 @@ export default function InventoryPage() {
       issuing_unit: product.issuing_unit,
       supplier_id: product.supplier_id || '',
       bin_location_id: product.bin_location_id || '',
+      expiry_tracked: false,
+      serialized: false,
     });
     setShowModal(true);
+    // Pre-fill tracking attributes (stored per-product in instance_config).
+    try {
+      const res = await getProductTracking(product.id);
+      if (res.success && res.data) {
+        const tracking = res.data;
+        setFormData((cur) => ({
+          ...cur,
+          expiry_tracked: tracking.expiry_tracked,
+          serialized: tracking.serialized,
+        }));
+      }
+    } catch {
+      // tracking attributes are best-effort prefill — leave defaults
+    }
   };
 
   const handleDeleteProduct = async () => {
@@ -134,6 +180,9 @@ export default function InventoryPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
     try {
       const result = await upsertProduct({
         ...(editingProduct ? { id: editingProduct.id } : {}),
@@ -149,6 +198,14 @@ export default function InventoryPage() {
         bin_location_id: formData.bin_location_id || null,
       });
       if (!result.success) throw new Error(result.error);
+      // Persist tracking attributes for the fields the flags expose.
+      if (result.data && (showExpiryFields || showSerialFields)) {
+        await saveProductTracking({
+          product_id: result.data.id,
+          expiry_tracked: showExpiryFields ? formData.expiry_tracked : false,
+          serialized: showSerialFields ? formData.serialized : false,
+        });
+      }
       setMessage({
         type: 'success',
         text: editingProduct
@@ -159,6 +216,9 @@ export default function InventoryPage() {
       fetchProducts();
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Save failed' });
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
     }
   };
 
@@ -303,7 +363,7 @@ export default function InventoryPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.sku}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">{product.item_type}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium {getStockColor(stockStatus)}">
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${getStockColor(stockStatus)}`}>
                       {product.current_stock}
                       {stockStatus === 'low_stock' && <AlertTriangle className="h-3 w-3 inline ml-1" />}
                     </td>
@@ -475,6 +535,43 @@ export default function InventoryPage() {
                   ))}
                 </select>
               </div>
+              {/* Tracking attributes — shown only when the provisioning
+                  wizard enabled the matching feature flags. */}
+              {(showExpiryFields || showSerialFields) && (
+                <div className="border-t border-gray-200 pt-4">
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                    Tracking attributes
+                  </p>
+                  <div className="flex flex-wrap gap-6">
+                    {showExpiryFields && (
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={formData.expiry_tracked}
+                          onChange={(e) => setFormData({ ...formData, expiry_tracked: e.target.checked })}
+                          className="h-4 w-4 text-blue-600 rounded"
+                        />
+                        <span className="text-sm text-gray-700">
+                          Expiry-tracked product
+                        </span>
+                      </label>
+                    )}
+                    {showSerialFields && (
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={formData.serialized}
+                          onChange={(e) => setFormData({ ...formData, serialized: e.target.checked })}
+                          className="h-4 w-4 text-blue-600 rounded"
+                        />
+                        <span className="text-sm text-gray-700">
+                          Serialized item
+                        </span>
+                      </label>
+                    )}
+                  </div>
+                </div>
+              )}
               <div className="flex justify-end gap-3 pt-4">
                 <button
                   type="button"
@@ -485,9 +582,10 @@ export default function InventoryPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
                 >
-                  {editingProduct ? 'Update' : 'Add'} Product
+                  {submitting ? 'Saving…' : editingProduct ? 'Update' : 'Add'} Product
                 </button>
               </div>
             </form>

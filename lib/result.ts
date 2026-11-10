@@ -37,5 +37,35 @@ export function actionError<T = never>(err: unknown): Result<T> {
     return fail(`Invalid input: ${err.message}`, 'VALIDATION');
   }
   const message = err instanceof Error ? err.message : 'Unexpected error';
+
+  // DB driver errors (drizzle's FailedQuery dumps the full SQL + params into
+  // err.message) must never reach the client — map known Postgres codes and
+  // fall back to a generic message. postgres.js and PGlite both put the SQLSTATE
+  // on `err.code` or on `err.cause.code`.
+  const code =
+    (err as { code?: string } | null | undefined)?.code ??
+    (err as { cause?: { code?: string } } | null | undefined)?.cause?.code;
+  if (
+    code === '23505' ||
+    /duplicate key value|violates unique constraint/i.test(message)
+  ) {
+    return fail('A record with this value already exists.', 'CONFLICT');
+  }
+  if (
+    code === '23503' ||
+    /violates foreign key constraint/i.test(message)
+  ) {
+    return fail(
+      'This record is referenced by other data and cannot be changed.',
+      'CONFLICT',
+    );
+  }
+  if (code === '23502' || /violates not-null constraint/i.test(message)) {
+    return fail('A required field is missing.', 'VALIDATION');
+  }
+  if (code || /^Failed query:/.test(message)) {
+    console.error('[actionError] database error:', message.slice(0, 4000));
+    return fail('A database error occurred. Please try again.');
+  }
   return fail(message);
 }

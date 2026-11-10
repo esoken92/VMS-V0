@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Plus, Search, ArrowDown, ArrowUp, Trash2, Upload } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import {
@@ -28,6 +28,8 @@ export default function StockMovementsPage() {
     reference: '',
     scrap_image: null as File | null,
   });
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false); // sync guard — blocks same-tick double-clicks
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
@@ -70,7 +72,9 @@ export default function StockMovementsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile) return;
+    if (!profile || submittingRef.current) return;
+    submittingRef.current = true;
+    setSubmitting(true);
 
     try {
       let scrapImageUrl: string | null = null;
@@ -107,6 +111,9 @@ export default function StockMovementsPage() {
       fetchProducts();
     } catch (err) {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to record movement' });
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
     }
   };
 
@@ -236,7 +243,7 @@ export default function StockMovementsPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {movement.product_name || 'Unknown'} ({movement.product_sku || ''})
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium {getQuantityColor(movement.type)}">
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${getQuantityColor(movement.type)}`}>
                     {movement.quantity > 0 ? '+' : ''}{movement.quantity} {movement.product_unit || ''}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{movement.reason || '-'}</td>
@@ -331,9 +338,10 @@ export default function StockMovementsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
                 >
-                  Record Movement
+                  {submitting ? 'Recording…' : 'Record Movement'}
                 </button>
               </div>
             </form>

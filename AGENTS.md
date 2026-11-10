@@ -2,13 +2,18 @@
 
 ## Architecture decisions (decided, do not revert)
 
-- **Self-hosted first. Local-only build.** No Vercel, no Supabase Cloud,
-  no external services provisioned by us. App must run on the dev's PC and
-  later on a client's PC — including old/constrained hardware.
+- **Self-hosted first.** App must run on the dev's PC and later on a
+  client's PC — including old/constrained hardware. A Vercel-hosted demo
+  copy is ALSO in scope: project `vms-demo-v0` is linked and deployed by
+  the owner, pointed at a hosted Postgres (Supabase/Neon) via
+  `DATABASE_URL` — see `docs/DEPLOYMENT-LIVE.md`. Never create/switch
+  live resources without explicit owner approval.
 - **Postgres + Auth.js** — Postgres 16 via `docker-compose.yml` (the only
   required service). Auth.js v5 credentials provider, argon2id hashing.
-  No Supabase anywhere: remove `@supabase/*` deps, `lib/supabase/*`,
-  middleware Supabase clients, supabase-js call sites.
+  No Supabase client SDK anywhere — `@supabase/*` deps, `lib/supabase/*`,
+  and all client call sites were removed in the port (complete); the
+  `supabase/` directory now only holds the plain-SQL migration files the
+  container initdb consumes.
 - **Deployment topology:** the DB+app server runs on a company server —
   entry-level target is ~i5/8GB or Xeon/16GB, NOT a toaster. "Old PC"
   refers to the *client* device (browser/PWA) — that's a front-end
@@ -58,6 +63,11 @@ docker compose up -d          # Postgres 16 (+ auto-applies migrations)
 npm install                   # after supabase deps removed
 npm run dev                   # app at localhost:3000
 npm run type-check && npm run lint && npm run build
+
+# Verification + evidence
+npx tsx scripts/verify-ledger.ts    # opening + movements = closing, all products
+node scripts/screenshot.mjs [base] [email] [pass] [prefix]  # authed page captures
+npx tsx scripts/render-sample-pdf.ts  # offline Typst render smoke test
 ```
 
 Driver selection lives in `lib/db/driver.ts`: `DATABASE_URL` set →
@@ -75,12 +85,36 @@ For the same reason do not delete `.vms-data/postmaster.pid` while a dev
 server might be running — its pid (-42) is fake and cannot be liveness-
 checked; `vms-owner.json` is the real liveness signal.
 
+### Hard-won runtime rules (observed bugs — keep them)
+
+- **`db.execute()` return shape differs by driver.** postgres.js returns a
+  row array; the PGlite socket path returns `{ rows }`. Normalize both
+  before iterating (see the `rows<T>()` pattern in `lib/actions/sensors.ts`).
+  Prefer Drizzle `.select()` — it's shape-safe on both drivers.
+- **Postgres custom GUC names must be dot-separated simple identifiers —
+  no hyphens.** `set_config('request.headers.x-client-ip', …)` fails with
+  `invalid configuration parameter name`; use `x_client_ip` /
+  `x_user_agent` (see `lib/db/context.ts`). Audit triggers read the same
+  names — keep them in sync.
+- **Stock ledger invariant: `products.current_stock` is NEVER written
+  directly.** All quantity change goes through `stock_movements` rows
+  (signed `quantity`); the opening position is a backdated `receiving`
+  row (see `supabase/seed.sql`). `npx tsx scripts/verify-ledger.ts`
+  checks `opening + Σ movements = current_stock` for every product and
+  must exit 0 — run it after touching seeds or movement code.
+- **Persona gates live in ONE place**: `lib/persona.ts` `ROUTE_ACCESS`
+  (longest-prefix) drives both middleware denies and nav visibility.
+  Adding a builder surface? Add its prefix there — hiding nav alone is
+  not enforcement. `/dashboard/forbidden` is the deny target.
+- **Authentication copy**: `components/auth/LoginForm.tsx` demo-creds
+  box must stay in sync with `scripts/seed.ts` accounts.
+
 ## Definition of done
 
 - type-check / lint / build green; no console errors in dev click-through
+- `npx tsx scripts/verify-ledger.ts` exits 0 (all products reconcile)
 - `docs/PLAYTEST.md` updated after every manual pass
-- Seed users log in; every existing page works end-to-end on the new
-  stack before ANY new feature work
+- Seed users log in; persona gates verified (staff 403s on builder URLs)
 - Commits stay private; repo flips public ONLY on explicit owner
   instruction (see `docs/MASTER_EXECUTION_PROMPT.md` acceptance list)
 

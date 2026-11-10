@@ -1,6 +1,6 @@
 'use server';
 
-import { and, desc, eq, isNotNull, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNotNull, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { products, profiles, stockTakeItems, stockTakes } from '@/drizzle/schema';
@@ -135,7 +135,7 @@ async function upsertCounts(
   const productRows = await tx
     .select({ id: products.id, current_stock: products.currentStock })
     .from(products)
-    .where(sql`${products.id} = ANY(${ids}::uuid[])`);
+    .where(inArray(products.id, ids));
   const stockById = new Map(productRows.map((p) => [p.id, Number(p.current_stock)]));
 
   for (const c of counts) {
