@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { visibleNavItems } from '@/lib/navigation-config';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Package } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -31,7 +31,9 @@ export default function Sidebar() {
       {/* Logo Section */}
       <div className="p-6 border-b border-gray-800">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="text-2xl">📦</div>
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Package className="h-5 w-5" />
+          </div>
           <div>
             <h1 className="text-lg font-bold">VMS</h1>
             <p className="text-xs text-gray-400">Inventory</p>
@@ -52,7 +54,7 @@ export default function Sidebar() {
                 transition-all duration-200 relative
                 ${
                   active
-                    ? 'bg-blue-600 text-white shadow-lg'
+                    ? 'bg-primary text-white shadow-lg'
                     : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                 }
               `}
@@ -64,7 +66,7 @@ export default function Sidebar() {
                   <p className="font-medium text-sm">{item.label}</p>
                   <p
                     className={`text-xs ${
-                      active ? 'text-blue-100' : 'text-gray-500'
+                      active ? 'text-white/80' : 'text-gray-500'
                     }`}
                   >
                     {item.description}
@@ -72,7 +74,7 @@ export default function Sidebar() {
                 </div>
               </div>
               {active && (
-                <ChevronRight className="h-4 w-4 text-blue-200 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="h-4 w-4 text-white/50 group-hover:translate-x-1 transition-transform" />
               )}
             </Link>
           );
@@ -85,7 +87,7 @@ export default function Sidebar() {
           <p className="text-xs text-gray-400 mb-1">
             {previewAsOperator ? 'Previewing as' : 'Current Role'}
           </p>
-          <p className="text-sm font-bold text-blue-400 uppercase">
+          <p className="text-sm font-bold text-primary uppercase">
             {(previewAsOperator ? 'operator' : effectiveRole?.replace('_', ' ')) ||
               profile?.role?.replace('_', ' ')}
           </p>

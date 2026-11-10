@@ -84,16 +84,16 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             provisioning wizard has run at least once. Operators never see
             it (persona already accounts for worker preview). */}
         {flagsLoaded && !provisioned && persona === 'builder' && (
-          <div className="bg-indigo-50 border-b border-indigo-200 px-6 py-2">
+          <div className="bg-amber-50 border-b border-amber-200 px-6 py-2">
             <div className="flex items-center justify-between max-w-7xl mx-auto">
-              <p className="text-sm text-indigo-900">
+              <p className="text-sm text-amber-900">
                 This instance hasn&apos;t been configured yet — pick an
                 industry and stock policies to tailor the menus, fields and
                 workflows.
               </p>
               <Link
                 href="/dashboard/setup"
-                className="ml-4 shrink-0 px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                className="ml-4 shrink-0 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm"
               >
                 Finish setup
               </Link>

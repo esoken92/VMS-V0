@@ -75,9 +75,9 @@ const FEATURES: Feature[] = [
   },
   {
     icon: WifiOff,
-    title: 'Offline-capable',
+    title: 'Installable PWA',
     description:
-      'Installable PWA that keeps scanning when the network drops — local queue, honest sync, conflicts surfaced not hidden.',
+      'Manifest and service worker included — add to a device home screen and it behaves like an app. Queued offline writes are on the roadmap.',
   },
   {
     icon: Server,

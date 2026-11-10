@@ -96,7 +96,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
                   </div>
                 </div>
                 <div className="p-4 border-t border-gray-100 text-center">
-                  <button className="text-xs font-medium text-blue-600 hover:text-blue-700">
+                  <button className="text-xs font-medium text-primary hover:text-primary/80">
                     View All Notifications
                   </button>
                 </div>

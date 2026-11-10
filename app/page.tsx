@@ -101,7 +101,7 @@ export default function Home() {
             </div>
 
             <p className="mt-6 text-sm text-muted-foreground">
-              Runs locally in under five minutes — demo credentials are in the{' '}
+              Runs locally in under 5 minutes — demo credentials are in the{' '}
               <a
                 href={`${GITHUB_URL}#demo-credentials`}
                 target="_blank"
@@ -204,8 +204,8 @@ export default function Home() {
               eyebrow="The product"
               title="Built for the floor, not the boardroom"
             >
-              Mobile-first, glove-friendly, and honest about connectivity.
-              Real screenshots land here as the template ships.
+              Mobile-first and glove-friendly. These are real captures of
+              the app you run — no mockups.
             </SectionHeading>
             <div className="mt-14">
               <ScreenshotGrid />
@@ -218,11 +218,11 @@ export default function Home() {
           <div className="container">
             <div className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-8 text-center shadow-sm sm:p-12">
               <h2 className="text-3xl font-bold tracking-tight">
-                Run it on your laptop in five minutes
+                Run it on your laptop in 5 minutes
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-                Postgres in Docker, one Next.js app, zero external services
-                required. Fork it, brand it, and make it yours.
+                One Next.js app with an embedded Postgres — zero external
+                services required. Fork it, brand it, and make it yours.
               </p>
               <div className="mx-auto mt-8 flex max-w-xl items-center gap-3 overflow-x-auto rounded-lg bg-muted px-4 py-3 text-left">
                 <Terminal
@@ -230,7 +230,7 @@ export default function Home() {
                   aria-hidden="true"
                 />
                 <code className="whitespace-nowrap text-sm">
-                  docker compose up -d &amp;&amp; npm install &amp;&amp; npm run dev
+                  npm install &amp;&amp; npm run dev:standalone
                 </code>
               </div>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">

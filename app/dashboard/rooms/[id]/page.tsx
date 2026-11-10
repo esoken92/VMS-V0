@@ -59,7 +59,7 @@ import ToggleSwitch from '../_components/ToggleSwitch';
 
 const MANAGER_UP = ['super_admin', 'admin', 'manager'];
 const inputCls =
-  'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm';
+  'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm';
 
 export default function RoomDetailPage() {
   const params = useParams<{ id: string }>();
@@ -377,7 +377,7 @@ export default function RoomDetailPage() {
             {canEdit && !editingAccess && (
               <button
                 onClick={() => setEditingAccess(true)}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-primary hover:underline"
               >
                 Edit
               </button>
@@ -495,7 +495,7 @@ export default function RoomDetailPage() {
                 </button>
                 <button
                   onClick={handleAccessSave}
-                  className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                  className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm hover:bg-primary/90"
                 >
                   Save access
                 </button>
@@ -514,7 +514,7 @@ export default function RoomDetailPage() {
             {canEdit && (
               <button
                 onClick={() => setShowRuleForm(!showRuleForm)}
-                className="flex items-center gap-1 text-sm text-blue-600 hover:underline"
+                className="flex items-center gap-1 text-sm text-primary hover:underline"
               >
                 <Plus className="h-4 w-4" /> Add rule
               </button>
@@ -621,7 +621,7 @@ export default function RoomDetailPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                  className="px-3 py-1.5 bg-primary text-white rounded-lg text-sm hover:bg-primary/90"
                 >
                   Save rule
                 </button>

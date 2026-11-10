@@ -200,7 +200,7 @@ export default function SetupWizardPage() {
           <div className="mt-6 flex items-center justify-center gap-3">
             <Link
               href="/dashboard"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
             >
               Go to dashboard
             </Link>
@@ -237,9 +237,9 @@ export default function SetupWizardPage() {
             <span
               className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-medium ${
                 i < step
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-primary text-white'
                   : i === step
-                    ? 'bg-blue-100 text-blue-700 ring-2 ring-blue-600'
+                    ? 'bg-blue-100 text-blue-700 ring-2 ring-primary'
                     : 'bg-gray-100 text-gray-500'
               }`}
             >
@@ -275,7 +275,7 @@ export default function SetupWizardPage() {
                     key={id}
                     className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                       checked
-                        ? 'border-blue-500 bg-blue-50'
+                        ? 'border-primary bg-blue-50'
                         : 'border-gray-200 hover:bg-gray-50'
                     }`}
                   >
@@ -283,7 +283,7 @@ export default function SetupWizardPage() {
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleIndustry(id)}
-                      className="h-4 w-4 text-blue-600 rounded"
+                      className="h-4 w-4 text-primary rounded"
                     />
                     <span className="text-sm font-medium text-gray-900">
                       {INDUSTRY_LABELS[id]}
@@ -326,7 +326,7 @@ export default function SetupWizardPage() {
                   key={key}
                   className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                     stock[key]
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-primary bg-blue-50'
                       : 'border-gray-200 hover:bg-gray-50'
                   }`}
                 >
@@ -334,7 +334,7 @@ export default function SetupWizardPage() {
                     type="checkbox"
                     checked={stock[key]}
                     onChange={() => toggleStock(key)}
-                    className="h-4 w-4 text-blue-600 rounded"
+                    className="h-4 w-4 text-primary rounded"
                   />
                   <span className="text-sm font-medium text-gray-900">
                     {STOCK_CHARACTERISTIC_LABELS[key]}
@@ -363,7 +363,7 @@ export default function SetupWizardPage() {
                       picking_strategy: e.target.value as PickingStrategy,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   {PICKING_STRATEGIES.map((v) => (
                     <option key={v} value={v}>
@@ -385,7 +385,7 @@ export default function SetupWizardPage() {
                         .value as PickingEnforcement,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   {PICKING_ENFORCEMENTS.map((v) => (
                     <option key={v} value={v}>
@@ -406,7 +406,7 @@ export default function SetupWizardPage() {
                       valuation_method: e.target.value as ValuationMethod,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   {VALUATION_METHODS.map((v) => (
                     <option key={v} value={v}>
@@ -427,7 +427,7 @@ export default function SetupWizardPage() {
                       expiry_policy: e.target.value as ExpiryPolicy,
                     })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   {EXPIRY_POLICIES.map((v) => (
                     <option key={v} value={v}>
@@ -516,7 +516,7 @@ export default function SetupWizardPage() {
                     {preview.report_packs.map((p) => (
                       <span
                         key={p}
-                        className="px-2 py-1 text-xs rounded-full bg-blue-50 text-blue-700 border border-blue-200"
+                        className="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary border border-primary/30"
                       >
                         {REPORT_PACK_LABELS[p]}
                       </span>
@@ -559,7 +559,7 @@ export default function SetupWizardPage() {
           <button
             onClick={() => setStep((s) => s + 1)}
             disabled={!canContinue}
-            className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next <ChevronRight className="h-4 w-4" />
           </button>

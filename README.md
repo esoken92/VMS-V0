@@ -14,7 +14,7 @@ an audit trail that never forgets.
 [![Next.js 14](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
 [![Postgres 16](https://img.shields.io/badge/Postgres-16-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![PWA](https://img.shields.io/badge/PWA-offline--capable-5A0FC8)](https://web.dev/progressive-web-apps/)
+[![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8)](https://web.dev/progressive-web-apps/)
 
 [Live demo](#demo-credentials) ·
 [Documentation](docs/ARCHITECTURE.md) ·
@@ -42,7 +42,7 @@ UX), packaged so a single `docker compose up` gets you a working system.
 See the reasoning in [docs/LOGIC_CHAIN.md](docs/LOGIC_CHAIN.md) and the
 research behind it in [docs/research/](docs/research/).
 
-## ⚡ Quickstart — under 5 minutes
+## Quickstart — under 5 minutes
 
 **Option A — zero install (Node.js 18+ only, no Docker):**
 
@@ -96,7 +96,7 @@ when it's unset.
 New sign-ups get the `staff` role; promote accounts from the Users page
 as a super admin.
 
-## 📸 Screenshots
+## Screenshots
 
 | Landing | Sign in |
 |---|---|
@@ -117,7 +117,7 @@ as a super admin.
 | ![Ledger](public/screenshots/ledger.png) | ![Integrations](public/screenshots/integrations.png) |
 | Per-product running balance — every product reconciles: opening + movements = closing | Scoped API keys, REST v1 + OpenAPI, MCP tools for agents |
 
-## ✨ Features
+## Features
 
 - **Storerooms by type** — cold room, dry store, secure cage, vehicle bay,
   hazmat; per-room rules, item allowlists, and access levels
@@ -135,12 +135,13 @@ as a super admin.
   threshold rules, excursion alerts, built-in demo simulator
 - **REST API + MCP server** — scoped API keys; agents and assistants can
   query stock through MCP tools with the same permission checks
-- **Offline-capable PWA** — installable; scans queue locally and sync
-  honestly when the network returns
+- **Installable PWA** — manifest + service worker ship today; the queued
+  offline write-path is roadmap work (the Rust companion is the
+  deep-offline target)
 - **Self-hosted** — Postgres + one Next.js app. No telemetry, no per-seat
   fees, your data stays yours
 
-## 🏗 Architecture
+## Architecture
 
 Every request walks one chain — nothing reaches the database without
 passing every gate:
@@ -152,13 +153,13 @@ request → middleware → auth gate → permission check
 
 Stack: **Next.js 14** (App Router) · **React 18** · **TypeScript strict** ·
 **Tailwind** · **Postgres 16** · **Drizzle ORM** · **Auth.js v5**
-(credentials, argon2id) · **next-pwa** + Dexie offline queue ·
+(credentials, argon2id) · **next-pwa** ·
 **Recharts** · **Typst** PDF reports (in-process — no Chromium).
 
 Deep dive: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
 Narrative walkthrough: [docs/LOGIC_CHAIN.md](docs/LOGIC_CHAIN.md)
 
-## 🚀 Deployment paths
+## Deployment paths
 
 | Path | What you do | Best for |
 |---|---|---|
@@ -170,7 +171,7 @@ Narrative walkthrough: [docs/LOGIC_CHAIN.md](docs/LOGIC_CHAIN.md)
 All three run the same code — there is no cloud-only feature to unlock.
 Details per topology in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#deployment-topologies).
 
-## 🔌 Integrations
+## Integrations
 
 Every integration point ships built — adapters, routes, env hooks — but
 nothing is provisioned. Unset env vars disable the feature gracefully;
@@ -188,7 +189,7 @@ the app runs fully without them.
 
 Wiring instructions for each: **[docs/INTEGRATIONS.md](docs/INTEGRATIONS.md)**.
 
-## 🤝 Contributing
+## Contributing
 
 Issues and PRs welcome — this is a template, so the bar is "useful to the
 next person who forks it". Dev setup, commands, and the rules that keep
@@ -202,7 +203,7 @@ the ledger honest: **[CONTRIBUTING.md](CONTRIBUTING.md)**.
   never copy their code, it isn't license-compatible
 - Evaluating the app as a user? Follow [docs/PLAYTEST.md](docs/PLAYTEST.md)
 
-## 📄 License
+## License
 
 [CC BY-NC-SA 4.0](LICENSE) — free to use, modify, and share for
 **non-commercial** purposes, with attribution, under the same license.

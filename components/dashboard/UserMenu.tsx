@@ -74,10 +74,10 @@ export default function UserMenu() {
         className="
           flex items-center gap-3 px-4 py-2 rounded-lg
           hover:bg-gray-100 transition-colors
-          focus:outline-none focus:ring-2 focus:ring-blue-500
+          focus:outline-none focus:ring-2 focus:ring-primary
         "
       >
-        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white font-bold text-sm">
           {profile?.full_name?.charAt(0).toUpperCase() || 'U'}
         </div>
         <div className="hidden sm:block">
@@ -106,7 +106,7 @@ export default function UserMenu() {
             </p>
             <p className="text-xs text-gray-500">{user?.email}</p>
             <div className="mt-2 flex gap-2">
-              <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
+              <span className="px-2 py-1 bg-blue-100 text-primary text-xs font-medium rounded">
                 {profile?.role?.replace('_', ' ')}
               </span>
             </div>
@@ -135,11 +135,11 @@ export default function UserMenu() {
               <button
                 onClick={handleExitWorkerPreview}
                 className="
-                  w-full flex items-center gap-3 px-4 py-2 text-sm text-blue-700
+                  w-full flex items-center gap-3 px-4 py-2 text-sm text-primary
                   hover:bg-blue-50 transition-colors
                 "
               >
-                <EyeOff className="h-4 w-4 text-blue-500" />
+                <EyeOff className="h-4 w-4 text-primary/70" />
                 Exit Worker Preview
               </button>
             ) : (

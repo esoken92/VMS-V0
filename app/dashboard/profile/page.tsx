@@ -138,7 +138,7 @@ export default function ProfilePage() {
           {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+              className="text-primary hover:text-primary/80 font-medium text-sm"
             >
               Edit
             </button>
@@ -153,14 +153,14 @@ export default function ProfilePage() {
                 type="text"
                 value={editForm.full_name}
                 onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
             <div className="flex gap-3">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-blue-400 transition-colors"
               >
                 <Save className="h-4 w-4" />
                 {isSubmitting ? 'Saving...' : 'Save Changes'}
@@ -181,7 +181,7 @@ export default function ProfilePage() {
           <div className="space-y-4">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-blue-100 rounded-lg">
-                <User className="h-6 w-6 text-blue-600" />
+                <User className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Full Name</p>
@@ -198,8 +198,8 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Lock className="h-6 w-6 text-purple-600" />
+              <div className="p-3 bg-primary/10 rounded-lg">
+                <Lock className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Role</p>
@@ -214,7 +214,7 @@ export default function ProfilePage() {
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-blue-100 rounded-lg">
-            <Bell className="h-5 w-5 text-blue-600" />
+            <Bell className="h-5 w-5 text-primary" />
           </div>
           <h2 className="text-lg font-semibold text-gray-900">Alert Preferences</h2>
         </div>
@@ -231,7 +231,7 @@ export default function ProfilePage() {
                 onChange={(e) => setAlertPreferences({ ...alertPreferences, alert_low_stock: e.target.checked })}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
           <div className="flex items-center justify-between">
@@ -246,7 +246,7 @@ export default function ProfilePage() {
                 onChange={(e) => setAlertPreferences({ ...alertPreferences, alert_overdue_tools: e.target.checked })}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
         </div>
@@ -254,7 +254,7 @@ export default function ProfilePage() {
           <button
             onClick={handleAlertPreferencesSave}
             disabled={isSubmitting}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-blue-400 transition-colors"
           >
             <Save className="h-4 w-4" />
             {isSubmitting ? 'Saving...' : 'Save Preferences'}
@@ -278,7 +278,7 @@ export default function ProfilePage() {
             </button>
             <button
               onClick={() => setShowPasswordForm(true)}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
             >
               <Lock className="h-4 w-4" />
               Change Password
@@ -292,7 +292,7 @@ export default function ProfilePage() {
                 type="password"
                 value={passwordForm.newPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Enter new password"
               />
             </div>
@@ -302,7 +302,7 @@ export default function ProfilePage() {
                 type="password"
                 value={passwordForm.confirmPassword}
                 onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Confirm new password"
               />
             </div>
@@ -310,7 +310,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-blue-400 transition-colors"
               >
                 <Save className="h-4 w-4" />
                 {isSubmitting ? 'Updating...' : 'Update Password'}

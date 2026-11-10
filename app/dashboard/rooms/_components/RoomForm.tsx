@@ -35,7 +35,7 @@ interface RoomFormProps {
 }
 
 const inputCls =
-  'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500';
+  'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary';
 
 export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
   const router = useRouter();
@@ -422,7 +422,7 @@ export default function RoomForm({ initial, roomOptions }: RoomFormProps) {
         <button
           type="submit"
           disabled={saving}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
         >
           {saving ? 'Saving…' : initial ? 'Update room' : 'Create room'}
         </button>

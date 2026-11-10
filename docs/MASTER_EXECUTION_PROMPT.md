@@ -1231,25 +1231,59 @@ ships are forgeable, and permissions must exist before features gate on them.
 
 ## ACCEPTANCE CRITERIA
 
-- [ ] `npx tsc --noEmit` clean
-- [ ] `npx eslint . --max-warnings=0` clean
-- [ ] `npm run build` green env-free
-- [ ] Every `app/api/**` route: auth + Zod + role check
-- [ ] RLS: every table has policies; `manager` gap closed; `(select auth.uid())`
-- [ ] MCP endpoint live w/ scoped keys; smoke-tested tools
-- [ ] Typst PDF renders a real report w/o Chromium
-- [ ] Landing page + dashboard screenshots captured
-- [ ] Mobile web + PWA verified on real budget device (scan, stock take,
-      receive, approve flows one-handed)
-- [ ] Self-hosted path verified: `docker compose up` (or documented
-      fallback) runs full demo offline on LAN
-- [ ] Rust offline artifact: `vms-setup.exe` (or interim `cargo run`)
-      runs Tier-1 flows with network DISABLED; parity matrix documented
-- [ ] Full local demo rehearsed end-to-end on constrained/old hardware —
-      BOTH artifacts — go-live gate
-- [ ] Admin monitoring console working (health, users, sync, storage);
-      NO telemetry/beacon of any kind — free open-use product, zero
-      outbound phone-home
-- [ ] No secrets; AGPL code never copied; license intact
-- [ ] README accurate; demo creds documented as demo-only
-- [ ] Owner flips repo public + template manually
+Status legend: ✅ verified live · ⏳ owner/hardware-gated · 🚧 roadmap ·
+➖ superseded by the clean-slate reboot.
+
+- [x] `npx tsc --noEmit` clean ✅
+- [x] `npx eslint . --max-warnings=0` clean ✅
+- [x] `npm run build` green env-free ✅ (dummy `DATABASE_URL`; PGlite
+      standalone also verified)
+- [x] Every `app/api/**` route: auth + Zod + role check ✅ (401/403
+      exercised in the click audit — 44 flows)
+- ➖ RLS policies per table — superseded: vanilla Postgres + app-layer
+      permission matrix is the primary check (Phase 0 reboot); RLS remains
+      documented optional defense-in-depth
+- [x] MCP endpoint live w/ scoped keys; smoke-tested tools ✅ (13 tools,
+      `initialize` + `tools/list` verified)
+- [x] Typst PDF renders a real report w/o Chromium ✅
+      (`/api/reports/inventory-valuation`, real seeded data, 2 pages)
+- [x] Landing page + dashboard screenshots captured ✅ (real authenticated
+      captures in `public/screenshots/`, refreshed after the theme pass)
+- [ ] Mobile web + PWA verified on real budget device ⏳ needs owner's
+      physical device
+- [x] Self-hosted path verified ✅ via the documented fallback — Docker was
+      unavailable locally; the PGlite embedded path (`npm run
+      dev:standalone`, zero services) is verified and documented
+- [ ] Rust offline artifact 🚧 Phase 6 roadmap — not started
+- [ ] Full local demo rehearsed on constrained/old hardware — BOTH
+      artifacts ⏳ needs hardware + the Rust artifact
+- [x] Admin monitoring console working; NO telemetry/beacon ✅ (monitoring,
+      users, audit log all live; zero outbound phone-home code exists)
+- [x] No secrets; AGPL code never copied; license intact ✅ (scan clean;
+      CC BY-NC-SA 4.0)
+- [x] README accurate; demo creds documented as demo-only ✅
+- [ ] Owner flips repo public + template manually ⏳ owner action
+
+### Build status by phase (audited)
+
+| Phase | Status |
+|---|---|
+| 1a–1b research | ✅ done (docs/research + logic-chain) |
+| 2a tech debt | ✅ done — as Phase 0 reboot: Postgres+Drizzle+Auth.js |
+| 2b stock engine | ✅ ledger + Kardex + reconciliation (41/41 in click audit) |
+| 2c workflows | 🚧 partial — core receive/issue/count/loan; transfers/kits pending |
+| 2d UX | 🚧 partial — responsive, provisioning banner, re-themed |
+| 2e labels/scan | ✅ scan engine + HMAC labels + scan UX |
+| 2f docs/PDF | ✅ Typst valuation report; more report types pending |
+| 2g API/MCP | ✅ REST v1 + scoped keys + MCP + OpenAPI/llms.txt |
+| 2h auth/security | ✅ Auth.js + argon2id + append-only audit (DB-enforced) |
+| 2i storerooms | ✅ rooms, zones, sensors, thresholds, simulator |
+| 2j industry pain-points | 🚧 roadmap |
+| 2k RBAC | ✅ permission matrix + personas + forbidden gate |
+| 2l/2m market fit + packs | 🚧 framework seeded via wizard; packs pending |
+| 2n provisioning | ✅ 4-step wizard + feature flags + preview |
+| 2o personas/audit/reports | ✅ personas + append-only audit + verify-ledger; report builder pending |
+| 3 branding/go-live | ✅ README, screenshots, LICENSE, CI, templates |
+| 4 deployment | ✅ docker-compose + PGlite + Vercel/Supabase runbook (hosted copy needs owner's Supabase project) |
+| 5 mobile/PWA | 🚧 installable shell; offline write-queue + device test pending |
+| 6 Rust offline | 🚧 roadmap |

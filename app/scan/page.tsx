@@ -51,8 +51,8 @@ export default function ScanPage() {
         {lastScan && (
           <div className="mt-6 w-full max-w-sm bg-white rounded-lg p-4 shadow-lg">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Package className="h-5 w-5 text-blue-600" />
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Package className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-sm text-gray-600">Last Scanned</p>

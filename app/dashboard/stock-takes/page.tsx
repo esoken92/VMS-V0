@@ -187,7 +187,7 @@ export default function StockTakesPage() {
         <button
           onClick={handleStartStockTake}
           disabled={busy}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           <Plus className="h-4 w-4" />
           {busy ? 'Working…' : 'Start New Stock Take'}
@@ -203,13 +203,13 @@ export default function StockTakesPage() {
 
       {/* Counting Mode */}
       {countingMode && activeStockTake && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <ClipboardList className="h-6 w-6 text-blue-600" />
+              <ClipboardList className="h-6 w-6 text-primary" />
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">Stock Take in Progress</h2>
-                <p className="text-sm text-gray-600">ID: {activeStockTake.id}</p>
+                <p className="text-sm text-gray-600">ID: {activeStockTake.id.slice(0, 8)}</p>
               </div>
             </div>
             <button
@@ -225,7 +225,7 @@ export default function StockTakesPage() {
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               rows={2}
               placeholder="Add notes about this stock take..."
             />
@@ -236,7 +236,7 @@ export default function StockTakesPage() {
               <div key={product.id} className="flex items-center gap-4 p-3 bg-white rounded-lg border border-gray-200">
                 <div className="flex-1">
                   <p className="font-medium text-gray-900">{product.sku} - {product.name}</p>
-                  <p className="text-sm text-gray-600">System: {product.current_stock} {product.unit_of_measure}</p>
+                  <p className="text-sm text-gray-600">{product.unit_of_measure}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <label className="text-sm text-gray-700">Count:</label>
@@ -248,7 +248,7 @@ export default function StockTakesPage() {
                       ...countedItems,
                       [product.id]: parseFloat(e.target.value) || 0
                     })}
-                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="0"
                   />
                   <span className="text-sm text-gray-600">{product.unit_of_measure}</span>
@@ -286,13 +286,13 @@ export default function StockTakesPage() {
             placeholder="Search stock takes by ID, zone, or status..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
       </div>
 
       {/* Stock Takes Table */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
         {loading ? (
           <div className="p-8 text-center text-gray-500">Loading stock takes...</div>
         ) : (
@@ -310,7 +310,7 @@ export default function StockTakesPage() {
             <tbody className="divide-y divide-gray-200">
               {filteredStockTakes.map((stockTake) => (
                 <tr key={stockTake.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{stockTake.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" title={stockTake.id}>{stockTake.id.slice(0, 8)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {stockTake.started_by_name || 'Unknown'}
                   </td>
@@ -327,7 +327,7 @@ export default function StockTakesPage() {
                     {stockTake.status === 'open' ? (
                       <button
                         onClick={() => handleContinueStockTake(stockTake)}
-                        className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium"
+                        className="flex items-center gap-1 text-primary hover:text-primary/80 font-medium"
                       >
                         <Play className="h-4 w-4" />
                         Continue
@@ -335,7 +335,7 @@ export default function StockTakesPage() {
                     ) : (
                       <button
                         onClick={() => handleViewStockTake(stockTake)}
-                        className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium"
+                        className="flex items-center gap-1 text-primary hover:text-primary/80 font-medium"
                       >
                         <Eye className="h-4 w-4" />
                         View
@@ -365,7 +365,7 @@ export default function StockTakesPage() {
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
                   <p className="text-sm text-gray-600">ID</p>
-                  <p className="font-medium text-gray-900">{activeStockTake.id}</p>
+                  <p className="font-medium text-gray-900" title={activeStockTake.id}>{activeStockTake.id.slice(0, 8)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Status</p>

@@ -71,7 +71,7 @@ function Section({
   return (
     <section className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 space-y-4">
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-blue-50 text-blue-600">{icon}</div>
+        <div className="p-2 rounded-lg bg-blue-50 text-primary">{icon}</div>
         <div>
           <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
           <p className="text-sm text-gray-500">{subtitle}</p>
@@ -300,7 +300,7 @@ export default function IntegrationsPage() {
           </p>
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm"
           >
             <KeyRound className="h-4 w-4" />
             Create Key
@@ -396,7 +396,7 @@ export default function IntegrationsPage() {
         <CodeBlock title="curl" code={curlExample} />
         <div className="text-sm text-gray-600 space-y-1">
           <p>
-            <a href="/api/v1/openapi.json" target="_blank" className="text-blue-600 hover:underline">
+            <a href="/api/v1/openapi.json" target="_blank" className="text-primary hover:underline">
               OpenAPI 3.0 spec →
             </a>
           </p>
@@ -416,11 +416,11 @@ export default function IntegrationsPage() {
       >
         <div className="text-sm text-gray-600 space-y-2">
           <p>
-            <a href="/llms.txt" target="_blank" className="text-blue-600 hover:underline">
+            <a href="/llms.txt" target="_blank" className="text-primary hover:underline">
               /llms.txt
             </a>{' '}
             — static manifest, and{' '}
-            <a href="/api/llms" target="_blank" className="text-blue-600 hover:underline">
+            <a href="/api/llms" target="_blank" className="text-primary hover:underline">
               /api/llms
             </a>{' '}
             — live version generated from the current tool registry.
@@ -445,7 +445,7 @@ export default function IntegrationsPage() {
                   placeholder="e.g. Claude Desktop on Kurt's laptop"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -480,7 +480,7 @@ export default function IntegrationsPage() {
                   onChange={(e) =>
                     setForm({ ...form, expires_in_days: e.target.value as typeof form.expires_in_days })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Never expires</option>
                   <option value="30">30 days</option>
@@ -499,7 +499,7 @@ export default function IntegrationsPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting || form.scopes.length === 0}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-blue-400 transition-colors"
                 >
                   {isSubmitting ? 'Creating…' : 'Create key'}
                 </button>

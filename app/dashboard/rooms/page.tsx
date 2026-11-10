@@ -70,7 +70,7 @@ export default function RoomsPage() {
           {canEdit && (
             <Link
               href="/dashboard/rooms/new"
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
             >
               <Plus className="h-4 w-4" />
               Add Room
@@ -90,7 +90,7 @@ export default function RoomsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search rooms…"
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
       </div>
@@ -130,7 +130,7 @@ export default function RoomsPage() {
                     <td className="px-6 py-4">
                       <Link
                         href={`/dashboard/rooms/${r.id}`}
-                        className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:underline"
+                        className="flex items-center gap-2 text-sm font-medium text-primary hover:underline"
                       >
                         <Warehouse className="h-4 w-4 text-gray-400" />
                         {r.name}

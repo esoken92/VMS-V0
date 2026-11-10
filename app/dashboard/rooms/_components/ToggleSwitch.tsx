@@ -38,8 +38,8 @@ export default function ToggleSwitch({
       className={[
         'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full',
         'transition-colors duration-200 ease-in-out',
-        'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
-        checked ? 'bg-blue-600' : 'bg-gray-300',
+        'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+        checked ? 'bg-primary' : 'bg-gray-300',
         disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
       ].join(' ')}
     >

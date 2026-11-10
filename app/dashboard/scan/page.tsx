@@ -512,7 +512,7 @@ export default function ScanDashboardPage() {
                         <button
                           onClick={doToolToggle}
                           disabled={busy}
-                          className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium hover:bg-blue-500 disabled:opacity-40 transition-colors"
+                          className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-medium hover:bg-primary/90 disabled:opacity-40 transition-colors"
                         >
                           <Wrench className="h-4 w-4" />
                           {result.active_loan ? 'Return tool' : 'Check out'}
@@ -522,7 +522,7 @@ export default function ScanDashboardPage() {
                         <button
                           onClick={doJoinTake}
                           disabled={busy}
-                          className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium hover:bg-blue-500 disabled:opacity-40 transition-colors"
+                          className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-medium hover:bg-primary/90 disabled:opacity-40 transition-colors"
                         >
                           <ClipboardList className="h-4 w-4" /> Join stock take
                         </button>

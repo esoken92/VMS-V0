@@ -246,7 +246,7 @@ export default function ToolLoansPage() {
         <div className="flex gap-2">
           <button
             onClick={handleCheckout}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
           >
             <Plus className="h-4 w-4" />
             Check Out Tool
@@ -275,7 +275,7 @@ export default function ToolLoansPage() {
           className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
         >
           <div className="p-2 bg-blue-100 rounded-lg">
-            <LogOut className="h-5 w-5 text-blue-600" />
+            <LogOut className="h-5 w-5 text-primary" />
           </div>
           <div className="text-left">
             <p className="font-medium text-gray-900">Check Out Tool</p>
@@ -317,7 +317,7 @@ export default function ToolLoansPage() {
             placeholder="Search by tool name or holder..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
       </div>
@@ -366,7 +366,7 @@ export default function ToolLoansPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <button
                         onClick={() => handleReturn(loan)}
-                        className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium"
+                        className="flex items-center gap-1 text-primary hover:text-primary/80 font-medium"
                       >
                         <ArrowLeft className="h-4 w-4" />
                         Return
@@ -399,7 +399,7 @@ export default function ToolLoansPage() {
                   required
                   value={formData.product_id}
                   onChange={(e) => setFormData({ ...formData, product_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Select Tool</option>
                   {products.map(p => (
@@ -413,7 +413,7 @@ export default function ToolLoansPage() {
                   required
                   value={formData.user_id}
                   onChange={(e) => setFormData({ ...formData, user_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Select User</option>
                   {users.map(u => (
@@ -427,7 +427,7 @@ export default function ToolLoansPage() {
                   required
                   value={formData.condition_out}
                   onChange={(e) => setFormData({ ...formData, condition_out: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="excellent">Excellent</option>
                   <option value="good">Good</option>
@@ -440,7 +440,7 @@ export default function ToolLoansPage() {
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   rows={3}
                   placeholder="Optional notes..."
                 />
@@ -456,7 +456,7 @@ export default function ToolLoansPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
                 >
                   {submitting ? 'Checking out…' : 'Check Out'}
                 </button>
@@ -488,7 +488,7 @@ export default function ToolLoansPage() {
                   required
                   value={formData.condition_in}
                   onChange={(e) => setFormData({ ...formData, condition_in: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="excellent">Excellent</option>
                   <option value="good">Good</option>
@@ -533,7 +533,7 @@ export default function ToolLoansPage() {
                   required
                   value={formData.user_id}
                   onChange={(e) => setFormData({ ...formData, user_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Select User</option>
                   {users.map(u => (
@@ -547,7 +547,7 @@ export default function ToolLoansPage() {
                   required
                   value={formData.condition_out}
                   onChange={(e) => setFormData({ ...formData, condition_out: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="excellent">Excellent</option>
                   <option value="good">Good</option>
@@ -570,7 +570,7 @@ export default function ToolLoansPage() {
                             setSelectedToolIds(selectedToolIds.filter(id => id !== p.id));
                           }
                         }}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 text-primary focus:ring-primary"
                       />
                       <span className="text-sm text-gray-900">{p.sku} - {p.name}</span>
                     </label>
@@ -583,7 +583,7 @@ export default function ToolLoansPage() {
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   rows={3}
                   placeholder="Optional notes..."
                 />
@@ -646,7 +646,7 @@ export default function ToolLoansPage() {
                   required
                   value={formData.condition_in}
                   onChange={(e) => setFormData({ ...formData, condition_in: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="excellent">Excellent</option>
                   <option value="good">Good</option>

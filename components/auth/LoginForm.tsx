@@ -135,7 +135,7 @@ export default function LoginForm() {
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${
               errors.email
                 ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 focus:ring-blue-500'
+                : 'border-gray-300 focus:ring-primary'
             } disabled:bg-gray-100 disabled:cursor-not-allowed`}
             placeholder="you@example.com"
           />
@@ -161,7 +161,7 @@ export default function LoginForm() {
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition pr-12 ${
                 errors.password
                   ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-blue-500'
+                  : 'border-gray-300 focus:ring-primary'
               } disabled:bg-gray-100 disabled:cursor-not-allowed`}
               placeholder="••••••••"
             />
@@ -198,7 +198,7 @@ export default function LoginForm() {
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${
               errors.station
                 ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 focus:ring-blue-500'
+                : 'border-gray-300 focus:ring-primary'
             } disabled:bg-gray-100 disabled:cursor-not-allowed`}
           >
             <option value="">Select your station</option>
@@ -217,7 +217,7 @@ export default function LoginForm() {
         <div className="flex justify-end">
           <Link
             href="/auth/forgot-password"
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            className="text-sm text-primary hover:text-primary/80 font-medium"
           >
             Forgot password?
           </Link>
@@ -227,7 +227,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={isSubmitting || loading || !isFormValid()}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+          className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
         >
           {isSubmitting || loading ? (
             <>
@@ -245,7 +245,7 @@ export default function LoginForm() {
         Don&apos;t have an account?{' '}
         <Link
           href="/auth/signup"
-          className="text-blue-600 hover:text-blue-700 font-medium"
+          className="text-primary hover:text-primary/80 font-medium"
         >
           Sign up
         </Link>

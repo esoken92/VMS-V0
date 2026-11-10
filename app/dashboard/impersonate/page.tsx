@@ -158,7 +158,7 @@ export default function ImpersonatePage() {
                 required
                 value={selectedUserId}
                 onChange={(e) => setSelectedUserId(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="">Choose a user...</option>
                 {filteredUsers.map((user) => (
@@ -175,7 +175,7 @@ export default function ImpersonatePage() {
                 required
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Why are you impersonating this user?"
               />
             </div>
@@ -190,7 +190,7 @@ export default function ImpersonatePage() {
               placeholder="Search users by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
         </div>
@@ -233,7 +233,7 @@ export default function ImpersonatePage() {
                         <button
                           type="button"
                           onClick={() => setSelectedUserId(user.id)}
-                          className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                          className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm"
                         >
                           <UserCheck className="h-4 w-4" />
                           Impersonate
@@ -251,7 +251,7 @@ export default function ImpersonatePage() {
           <button
             type="submit"
             disabled={!selectedUserId || isSubmitting}
-            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+            className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:bg-blue-400 transition-colors"
           >
             <UserCheck className="h-4 w-4" />
             {isSubmitting ? 'Starting...' : 'Start Impersonation'}

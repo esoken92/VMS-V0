@@ -92,3 +92,24 @@
 - "I expected it to work like X" is data, not a support request.
 - Severity guide: **P0** data loss/corruption · **P1** wrong result or
   blocked flow · **P2** confusion/friction · **P3** polish.
+
+## Pass: slop audit + re-theme (self-audit vs 20 published AI-slop tells)
+
+Fixed this pass:
+
+- **Claims made true.** "Blind counts" now actually blind (system qty removed
+  from the counting row); "append-only audit log" now DB-enforced
+  (migration 013 — triggers block UPDATE/DELETE/TRUNCATE on activity_logs,
+  verified live); offline-queue claims de-scoped to honest roadmap
+  (unused `dexie` deps + empty `lib/offline/` removed).
+- **Theme.** Default shadcn blue → safety-orange primary + warm neutrals;
+  Inter → IBM Plex Sans/Mono; all hardcoded `blue-*` UI chrome moved to the
+  `primary` token; decorative purples removed; emoji-as-icons replaced with
+  Lucide; README emoji headers stripped; "Welcome back" greeting replaced
+  with a functional header; "Finish setup" banner aligned to palette.
+- **Bugs.** Stock-takes table overflowed the viewport (full UUID in a
+  column) — IDs truncated to 8 chars + `overflow-x-auto`.
+- Deduped the `executeRows` normalizer into `lib/db/rows.ts`.
+
+Re-verified: tsc clean · eslint 0 warnings · build green · ledger 35/35 ·
+UPDATE/DELETE on activity_logs both raise · all screenshots re-captured.

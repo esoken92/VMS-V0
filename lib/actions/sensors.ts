@@ -15,6 +15,7 @@
 import { and, asc, desc, eq, gte, inArray, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/lib/db';
+import { executeRows } from '@/lib/db/rows';
 import { profiles } from '@/drizzle/schema';
 import {
   alertRules,
@@ -124,11 +125,7 @@ export async function listRoomStatuses(): Promise<Result<RoomStatusDTO[]>> {
       .orderBy(asc(storerooms.name));
 
     // Latest temperature + humidity + overall latest reading per room.
-    // db.execute() returns array rows on postgres.js but {rows} on the
-    // PGlite socket path — normalize both shapes.
-    const rows = <T>(res: unknown): T[] =>
-      Array.isArray(res) ? (res as T[]) : ((res as { rows?: T[] })?.rows ?? []);
-    const latest = rows<{
+    const latest = executeRows<{
       room_id: string;
       metric: string;
       value: string;
@@ -141,7 +138,7 @@ export async function listRoomStatuses(): Promise<Result<RoomStatusDTO[]>> {
         ORDER BY room_id, metric, recorded_at DESC
       `),
     );
-    const latestAny = rows<{ room_id: string; recorded_at: Date }>(
+    const latestAny = executeRows<{ room_id: string; recorded_at: Date }>(
       await db.execute(sql`
         SELECT DISTINCT ON (room_id) room_id, recorded_at
         FROM sensor_readings

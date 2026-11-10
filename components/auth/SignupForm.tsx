@@ -129,8 +129,8 @@ export default function SignupForm() {
             credentials now.
           </p>
 
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
-            <p className="text-sm text-blue-800 font-mono">{formData.email}</p>
+          <div className="p-4 bg-secondary border border-border rounded-lg mb-6">
+            <p className="text-sm text-foreground font-mono">{formData.email}</p>
           </div>
 
           <p className="text-sm text-gray-600 mb-6">
@@ -140,7 +140,7 @@ export default function SignupForm() {
 
           <Link
             href="/auth/login"
-            className="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition duration-200"
+            className="inline-block w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 rounded-lg transition duration-200"
           >
             Return to Sign In
           </Link>
@@ -182,7 +182,7 @@ export default function SignupForm() {
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${
               errors.fullName
                 ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 focus:ring-blue-500'
+                : 'border-gray-300 focus:ring-primary'
             } disabled:bg-gray-100 disabled:cursor-not-allowed`}
             placeholder="John Doe"
           />
@@ -206,7 +206,7 @@ export default function SignupForm() {
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${
               errors.email
                 ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 focus:ring-blue-500'
+                : 'border-gray-300 focus:ring-primary'
             } disabled:bg-gray-100 disabled:cursor-not-allowed`}
             placeholder="you@example.com"
           />
@@ -231,7 +231,7 @@ export default function SignupForm() {
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition pr-12 ${
                 errors.password
                   ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-blue-500'
+                  : 'border-gray-300 focus:ring-primary'
               } disabled:bg-gray-100 disabled:cursor-not-allowed`}
               placeholder="••••••••"
             />
@@ -272,7 +272,7 @@ export default function SignupForm() {
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition pr-12 ${
                 errors.confirmPassword
                   ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-blue-500'
+                  : 'border-gray-300 focus:ring-primary'
               } disabled:bg-gray-100 disabled:cursor-not-allowed`}
               placeholder="••••••••"
             />
@@ -310,15 +310,15 @@ export default function SignupForm() {
               }
             }}
             disabled={isSubmitting || loading}
-            className="mt-1 h-4 w-4 border-gray-300 rounded focus:ring-blue-500 disabled:cursor-not-allowed"
+            className="mt-1 h-4 w-4 border-gray-300 rounded focus:ring-primary disabled:cursor-not-allowed"
           />
           <label htmlFor="terms" className="text-sm text-gray-700 flex-1">
             I agree to the{' '}
-            <Link href="/terms" className="text-blue-600 hover:text-blue-700 underline">
+            <Link href="/terms" className="text-primary hover:text-primary/80 underline">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="/privacy" className="text-blue-600 hover:text-blue-700 underline">
+            <Link href="/privacy" className="text-primary hover:text-primary/80 underline">
               Privacy Policy
             </Link>
           </label>
@@ -330,7 +330,7 @@ export default function SignupForm() {
         <button
           type="submit"
           disabled={isSubmitting || loading || !isFormValid()}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+          className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
         >
           {isSubmitting || loading ? (
             <>
@@ -345,7 +345,7 @@ export default function SignupForm() {
 
       <p className="text-center text-gray-600 mt-6">
         Already have an account?{' '}
-        <Link href="/auth/login" className="text-blue-600 hover:text-blue-700 font-medium">
+        <Link href="/auth/login" className="text-primary hover:text-primary/80 font-medium">
           Sign in
         </Link>
       </p>

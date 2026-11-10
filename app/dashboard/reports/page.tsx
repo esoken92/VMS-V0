@@ -144,7 +144,7 @@ export default function ReportsPage() {
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="7d">Last 7 Days</option>
             <option value="30d">Last 30 Days</option>
@@ -184,7 +184,7 @@ export default function ReportsPage() {
               <p className="text-2xl font-bold text-gray-900 mt-1">{kpiData.totalMovements}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-lg">
-              <BarChart3 className="h-6 w-6 text-blue-600" />
+              <BarChart3 className="h-6 w-6 text-primary" />
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">Stock movements in period</p>
@@ -374,7 +374,7 @@ export default function ReportsPage() {
                   >
                     <div className="flex items-center gap-3 mb-2">
                       <div className="p-2 bg-blue-100 rounded-lg">
-                        <BarChart3 className="h-5 w-5 text-blue-600" />
+                        <BarChart3 className="h-5 w-5 text-primary" />
                       </div>
                       <h3 className="font-semibold text-gray-900">Total Movements</h3>
                     </div>
@@ -421,7 +421,7 @@ export default function ReportsPage() {
                 <div>
                   <button
                     onClick={() => setSelectedReport(null)}
-                    className="mb-4 text-sm text-blue-600 hover:text-blue-700"
+                    className="mb-4 text-sm text-primary hover:text-primary/80"
                   >
                     ← Back to reports
                   </button>

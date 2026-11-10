@@ -101,13 +101,13 @@ export default function AuditLogPage() {
               placeholder="Search by user, action, or table..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="all">All Actions</option>
             <option value="INSERT">Insert</option>
@@ -121,7 +121,7 @@ export default function AuditLogPage() {
       {/* Activity Table */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
-          <Shield className="h-5 w-5 text-blue-600" />
+          <Shield className="h-5 w-5 text-primary" />
           <h2 className="text-sm font-semibold text-gray-900">Activity Log</h2>
         </div>
         {loading ? (
@@ -166,7 +166,7 @@ export default function AuditLogPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <button
                         onClick={() => handleViewDetails(log)}
-                        className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                        className="text-primary hover:text-primary/80 font-medium flex items-center gap-1"
                       >
                         <Eye className="h-4 w-4" />
                         View

@@ -15,6 +15,7 @@ import { asc, eq, inArray, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 import { db } from '@/lib/db';
+import { executeRows } from '@/lib/db/rows';
 import { products } from '@/drizzle/schema';
 import {
   alerts,
@@ -161,9 +162,11 @@ export async function listRooms(): Promise<Result<RoomListItemDTO[]>> {
       WHERE metric = 'temperature'
       ORDER BY room_id, recorded_at DESC
     `);
-    const latestTemps = Array.isArray(latestTempsRes)
-      ? latestTempsRes
-      : ((latestTempsRes as { rows?: typeof latestTempsRes })?.rows ?? []);
+    const latestTemps = executeRows<{
+      room_id: string;
+      value: string;
+      recorded_at: Date;
+    }>(latestTempsRes);
     const tempMap = new Map(
       latestTemps.map((r) => [
         r.room_id,

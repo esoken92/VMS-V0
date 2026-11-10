@@ -63,11 +63,11 @@ export default function ForgotPasswordForm() {
             instance — no mail provider is configured yet.
           </p>
 
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
-            <p className="text-sm text-blue-900">
+          <div className="p-4 bg-secondary border border-border rounded-lg mb-6">
+            <p className="text-sm text-foreground">
               Ask an admin to reset the password for:
             </p>
-            <p className="text-sm text-blue-800 font-mono mt-2">{email}</p>
+            <p className="text-sm text-foreground font-mono mt-2">{email}</p>
           </div>
 
           <p className="text-sm text-gray-600 mb-6">
@@ -78,7 +78,7 @@ export default function ForgotPasswordForm() {
 
           <Link
             href="/auth/login"
-            className="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition duration-200 mb-4"
+            className="inline-block w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 rounded-lg transition duration-200 mb-4"
           >
             Return to Sign In
           </Link>
@@ -88,7 +88,7 @@ export default function ForgotPasswordForm() {
               setSubmitted(false);
               setEmail('');
             }}
-            className="text-blue-600 hover:text-blue-700 text-sm underline"
+            className="text-primary hover:text-primary/80 text-sm underline"
           >
             Try another email address
           </button>
@@ -133,7 +133,7 @@ export default function ForgotPasswordForm() {
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition ${
               error
                 ? 'border-red-500 focus:ring-red-500'
-                : 'border-gray-300 focus:ring-blue-500'
+                : 'border-gray-300 focus:ring-primary'
             } disabled:bg-gray-100 disabled:cursor-not-allowed`}
             placeholder="you@example.com"
           />
@@ -142,7 +142,7 @@ export default function ForgotPasswordForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+          className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
@@ -157,7 +157,7 @@ export default function ForgotPasswordForm() {
 
       <p className="text-center text-gray-600 mt-6">
         Remember your password?{' '}
-        <Link href="/auth/login" className="text-blue-600 hover:text-blue-700 font-medium">
+        <Link href="/auth/login" className="text-primary hover:text-primary/80 font-medium">
           Sign in
         </Link>
       </p>

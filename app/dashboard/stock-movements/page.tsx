@@ -137,7 +137,7 @@ export default function StockMovementsPage() {
   const getQuantityColor = (type: string) => {
     switch (type) {
       case 'inbound': return 'text-green-600';
-      case 'outbound': return 'text-blue-600';
+      case 'outbound': return 'text-primary';
       case 'scrap': return 'text-red-600';
       default: return 'text-gray-600';
     }
@@ -178,7 +178,7 @@ export default function StockMovementsPage() {
           className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
         >
           <div className="p-2 bg-blue-100 rounded-lg">
-            <ArrowUp className="h-5 w-5 text-blue-600" />
+            <ArrowUp className="h-5 w-5 text-primary" />
           </div>
           <div className="text-left">
             <p className="font-medium text-gray-900">Outbound Issue</p>
@@ -208,7 +208,7 @@ export default function StockMovementsPage() {
             placeholder="Search movements by product, reference, or user..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
       </div>
@@ -278,7 +278,7 @@ export default function StockMovementsPage() {
                   required
                   value={formData.product_id}
                   onChange={(e) => setFormData({ ...formData, product_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Select Product</option>
                   {products.map(p => (
@@ -295,7 +295,7 @@ export default function StockMovementsPage() {
                   step="0.01"
                   value={formData.quantity}
                   onChange={(e) => setFormData({ ...formData, quantity: parseFloat(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -303,7 +303,7 @@ export default function StockMovementsPage() {
                 <textarea
                   value={formData.reason}
                   onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   rows={3}
                   placeholder="Enter reason for this movement..."
                 />
@@ -339,7 +339,7 @@ export default function StockMovementsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
                 >
                   {submitting ? 'Recording…' : 'Record Movement'}
                 </button>

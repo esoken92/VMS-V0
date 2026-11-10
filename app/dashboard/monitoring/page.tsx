@@ -198,7 +198,7 @@ export default function MonitoringPage() {
             <button
               onClick={seedHistory}
               disabled={simulating}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm disabled:opacity-50"
               title="Backfill 24h of readings for charts"
             >
               <Activity className="h-4 w-4" />
@@ -262,7 +262,7 @@ export default function MonitoringPage() {
         {statuses.length === 0 && !loading && (
           <div className="col-span-full bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-500">
             No active rooms — create one under{' '}
-            <Link href="/dashboard/rooms" className="text-blue-600 underline">
+            <Link href="/dashboard/rooms" className="text-primary underline">
               Storerooms
             </Link>
             .
@@ -343,7 +343,7 @@ export default function MonitoringPage() {
                   <td className="py-2.5 text-sm">
                     <Link
                       href={`/dashboard/rooms/${a.room_id}`}
-                      className="text-blue-600 hover:underline"
+                      className="text-primary hover:underline"
                     >
                       {a.room_name ?? a.room_id.slice(0, 8)}
                     </Link>
@@ -411,7 +411,7 @@ export default function MonitoringPage() {
           <select
             value={chartRoom}
             onChange={(e) => setChartRoom(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           >
             {statuses.map((s) => (
               <option key={s.room_id} value={s.room_id}>

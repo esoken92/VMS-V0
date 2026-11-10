@@ -257,7 +257,7 @@ export default function InventoryPage() {
         {canEdit && (
           <button
             onClick={handleAddProduct}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
           >
             <Plus className="h-4 w-4" />
             Add Product
@@ -282,7 +282,7 @@ export default function InventoryPage() {
               placeholder="Search by SKU, name, or barcode..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <button
@@ -298,7 +298,7 @@ export default function InventoryPage() {
           <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                 <option value="">All Categories</option>
                 <option value="consumable">Consumable</option>
                 <option value="fluid">Fluid</option>
@@ -308,7 +308,7 @@ export default function InventoryPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                 <option value="">All Suppliers</option>
                 {suppliers.map(s => (
                   <option key={s.id} value={s.id}>{s.name}</option>
@@ -317,7 +317,7 @@ export default function InventoryPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Stock Status</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                 <option value="">All Status</option>
                 <option value="in_stock">In Stock</option>
                 <option value="low_stock">Low Stock</option>
@@ -326,7 +326,7 @@ export default function InventoryPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Bin Location</label>
-              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
                 <option value="">All Bins</option>
                 {binLocations.map(b => (
                   <option key={b.id} value={b.id}>{b.zone}-{b.bin_location}</option>
@@ -423,7 +423,7 @@ export default function InventoryPage() {
                     required
                     value={formData.sku}
                     onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -433,7 +433,7 @@ export default function InventoryPage() {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
@@ -444,7 +444,7 @@ export default function InventoryPage() {
                     required
                     value={formData.item_type}
                     onChange={(e) => setFormData({ ...formData, item_type: e.target.value as Product['item_type'] })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="consumable">Consumable</option>
                     <option value="fluid">Fluid</option>
@@ -457,7 +457,7 @@ export default function InventoryPage() {
                   <select
                     value={formData.supplier_id}
                     onChange={(e) => setFormData({ ...formData, supplier_id: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="">Select Supplier</option>
                     {suppliers.map(s => (
@@ -474,7 +474,7 @@ export default function InventoryPage() {
                     step="0.01"
                     value={formData.current_stock}
                     onChange={(e) => setFormData({ ...formData, current_stock: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -484,7 +484,7 @@ export default function InventoryPage() {
                     step="0.01"
                     value={formData.min_threshold}
                     onChange={(e) => setFormData({ ...formData, min_threshold: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -494,7 +494,7 @@ export default function InventoryPage() {
                     step="0.01"
                     value={formData.average_cost}
                     onChange={(e) => setFormData({ ...formData, average_cost: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
@@ -506,7 +506,7 @@ export default function InventoryPage() {
                     required
                     value={formData.unit_of_measure}
                     onChange={(e) => setFormData({ ...formData, unit_of_measure: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="e.g., Each, Drum, Box"
                   />
                 </div>
@@ -517,7 +517,7 @@ export default function InventoryPage() {
                     required
                     value={formData.issuing_unit}
                     onChange={(e) => setFormData({ ...formData, issuing_unit: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                     placeholder="e.g., Piece, Liter"
                   />
                 </div>
@@ -527,7 +527,7 @@ export default function InventoryPage() {
                 <select
                   value={formData.bin_location_id}
                   onChange={(e) => setFormData({ ...formData, bin_location_id: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Select Bin Location</option>
                   {binLocations.map(b => (
@@ -549,7 +549,7 @@ export default function InventoryPage() {
                           type="checkbox"
                           checked={formData.expiry_tracked}
                           onChange={(e) => setFormData({ ...formData, expiry_tracked: e.target.checked })}
-                          className="h-4 w-4 text-blue-600 rounded"
+                          className="h-4 w-4 text-primary rounded"
                         />
                         <span className="text-sm text-gray-700">
                           Expiry-tracked product
@@ -562,7 +562,7 @@ export default function InventoryPage() {
                           type="checkbox"
                           checked={formData.serialized}
                           onChange={(e) => setFormData({ ...formData, serialized: e.target.checked })}
-                          className="h-4 w-4 text-blue-600 rounded"
+                          className="h-4 w-4 text-primary rounded"
                         />
                         <span className="text-sm text-gray-700">
                           Serialized item
@@ -583,7 +583,7 @@ export default function InventoryPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
                 >
                   {submitting ? 'Saving…' : editingProduct ? 'Update' : 'Add'} Product
                 </button>

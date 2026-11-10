@@ -119,7 +119,7 @@ export default function LedgerPage() {
             <select
               value={productId}
               onChange={(e) => setProductId(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="">All products — reconciliation summary</option>
               {products.map((p) => (
@@ -133,7 +133,7 @@ export default function LedgerPage() {
               type="date"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <div>
@@ -142,7 +142,7 @@ export default function LedgerPage() {
               type="date"
               value={to}
               onChange={(e) => setTo(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
         </div>
@@ -150,7 +150,7 @@ export default function LedgerPage() {
           <div className="mt-3">
             <button
               onClick={() => { setProductId(''); setFrom(''); setTo(''); }}
-              className="text-sm text-blue-600 hover:text-blue-800"
+              className="text-sm text-primary hover:text-blue-800"
             >
               Clear filters
             </button>
@@ -273,7 +273,7 @@ export default function LedgerPage() {
                 placeholder="Filter by SKU or product name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
@@ -305,7 +305,7 @@ export default function LedgerPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-green-600">
                       +{fmt(s.inbound + s.receiving)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-blue-600">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-primary">
                       {fmt(s.outbound)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-red-600">

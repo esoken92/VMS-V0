@@ -98,7 +98,7 @@ export default function ResetPasswordForm() {
 
           <Link
             href="/auth/login"
-            className="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition duration-200"
+            className="inline-block w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 rounded-lg transition duration-200"
           >
             Sign In Now
           </Link>
@@ -148,7 +148,7 @@ export default function ResetPasswordForm() {
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition pr-12 ${
                 errors.password
                   ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-blue-500'
+                  : 'border-gray-300 focus:ring-primary'
               } disabled:bg-gray-100 disabled:cursor-not-allowed`}
               placeholder="••••••••"
             />
@@ -189,7 +189,7 @@ export default function ResetPasswordForm() {
               className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition pr-12 ${
                 errors.confirmPassword
                   ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-300 focus:ring-blue-500'
+                  : 'border-gray-300 focus:ring-primary'
               } disabled:bg-gray-100 disabled:cursor-not-allowed`}
               placeholder="••••••••"
             />
@@ -214,7 +214,7 @@ export default function ResetPasswordForm() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+          className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 text-white font-medium py-2.5 rounded-lg transition duration-200 flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
@@ -228,7 +228,7 @@ export default function ResetPasswordForm() {
       </form>
 
       <p className="text-center text-gray-600 mt-6">
-        <Link href="/auth/login" className="text-blue-600 hover:text-blue-700 font-medium">
+        <Link href="/auth/login" className="text-primary hover:text-primary/80 font-medium">
           Return to Sign In
         </Link>
       </p>
