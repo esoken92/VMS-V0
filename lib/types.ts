@@ -5,7 +5,7 @@
  * columns arrive as strings; actions convert them to `number` here.
  */
 
-import type { UserRole } from '@/lib/auth/roles';
+import type { UserRole, MovementType } from '@/lib/auth/roles';
 
 export type { UserRole };
 export { USER_ROLES } from '@/lib/auth/roles';
@@ -199,4 +199,70 @@ export interface ReportMovementDTO {
 export interface ReportDataDTO {
   products: ReportProductDTO[];
   movements: ReportMovementDTO[];
+}
+
+/**
+ * One row of the per-product movement ledger (Kardex). `quantity` is the
+ * signed movement (positive adds stock); `running_balance` is the closing
+ * balance after this row — opening balance + cumulative movements,
+ * computed server-side.
+ */
+export interface KardexEntryDTO {
+  id: string;
+  product_id: string;
+  product_sku: string | null;
+  product_name: string | null;
+  product_unit: string | null;
+  user_id: string;
+  user_name: string | null;
+  type: MovementType;
+  quantity: number;
+  running_balance: number;
+  reason: string | null;
+  created_at: string | null;
+}
+
+/**
+ * Per-product reconciliation — the math shared by the Kardex page, the
+ * /api/v1/reconciliation endpoint and scripts/verify-ledger.ts:
+ *
+ *   expected_closing = opening + Σ stock_movements.quantity
+ *   drift            = products.current_stock − expected_closing
+ *
+ * `opening` is the signed sum of movements before the queried window
+ * (0 when `from` is unset). drift != 0 means current stock is not fully
+ * explained by the ledger — e.g. seed data or direct edits that bypassed
+ * stock_movements.
+ */
+export interface ReconciliationDTO {
+  product_id: string;
+  sku: string;
+  name: string;
+  unit_of_measure: string;
+  opening: number;
+  inbound: number;
+  outbound: number;
+  scrap: number;
+  adjustment: number;
+  receiving: number;
+  tool_checkout: number;
+  movements_total: number;
+  expected_closing: number;
+  actual_stock: number;
+  drift: number;
+  reconciles: boolean;
+}
+
+export interface KardexDTO {
+  /** Balance carried into the window (0 when `from` is unset). */
+  opening_balance: number;
+  /** Ledger rows, chronological; running_balance is per product. */
+  entries: KardexEntryDTO[];
+  /** True when more rows matched than the returned cap — narrow the filter. */
+  entries_truncated: boolean;
+  /**
+   * Per-product reconciliation over the FULL movement history (same math
+   * as GET /api/v1/reconciliation) — filtered to product_id when given.
+   */
+  summaries: ReconciliationDTO[];
 }

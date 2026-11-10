@@ -8,23 +8,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
-import {
-  navigationConfig,
-  adminOnlyNavigation,
-  superAdminNavigation,
-} from '@/lib/navigation-config';
+import { visibleNavItems } from '@/lib/navigation-config';
 import { ChevronRight } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { profile } = useAuth();
+  // effectiveRole already accounts for impersonation AND worker preview —
+  // so the sidebar always renders the persona the user is acting as.
+  const { profile, effectiveRole, previewAsOperator } = useAuth();
 
-  // Determine visible menu items based on role
-  const visibleItems = [
-    ...navigationConfig,
-    ...(['super_admin', 'admin'].includes(profile?.role || '') ? adminOnlyNavigation : []),
-    ...(['super_admin'].includes(profile?.role || '') ? superAdminNavigation : []),
-  ];
+  const visibleItems = visibleNavItems(effectiveRole);
 
   const isActive = (href: string) => {
     if (href === '/dashboard') {
@@ -89,9 +82,12 @@ export default function Sidebar() {
       {/* Role Badge */}
       <div className="border-t border-gray-800 p-4">
         <div className="bg-gray-800 rounded-lg p-3">
-          <p className="text-xs text-gray-400 mb-1">Current Role</p>
+          <p className="text-xs text-gray-400 mb-1">
+            {previewAsOperator ? 'Previewing as' : 'Current Role'}
+          </p>
           <p className="text-sm font-bold text-blue-400 uppercase">
-            {profile?.role?.replace('_', ' ')}
+            {(previewAsOperator ? 'operator' : effectiveRole?.replace('_', ' ')) ||
+              profile?.role?.replace('_', ' ')}
           </p>
         </div>
       </div>

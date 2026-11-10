@@ -2,15 +2,22 @@
  * Next.js Middleware — Auth.js (NextAuth v5) JWT session.
  * Protects routes and enforces authentication/authorization.
  *
- * Role checks mirror the sidebar visibility in lib/navigation-config.ts;
- * server actions re-check the permission matrix on every write — middleware
- * is navigation gating, not the enforcement layer.
+ * Role/persona gates come from ONE place: lib/persona.ts (ROUTE_ACCESS),
+ * which mirrors the per-item visibility in lib/navigation-config.ts.
+ * Denied requests redirect to /dashboard/forbidden (a clean 403 page —
+ * never a silent loop back to /dashboard). Server actions re-check the
+ * permission matrix on every write — middleware is navigation gating,
+ * not the enforcement layer.
  *
  * Impersonation: the signed `vms_impersonation` cookie carries the effective
  * (target) role so a super_admin viewing as staff sees staff-level routes.
  * The cookie only downgrades; the actor's real role comes from the JWT.
  * Server-side helpers validate the impersonation_sessions DB row before
  * attributing writes, so a forged/expired-cookie scenario can't write.
+ *
+ * Worker preview: `vms_preview=operator` (set only via the enterWorkerPreview
+ * server action, admin/super_admin only) forces the operator experience —
+ * nav + route gates behave as `staff` — without touching the session.
  */
 
 import NextAuth from 'next-auth';
@@ -18,6 +25,13 @@ import authConfig from '@/auth.config';
 import { NextResponse, type NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 import type { UserRole } from '@/lib/auth/roles';
+import {
+  FORBIDDEN_PATH,
+  PREVIEW_COOKIE,
+  allowedRolesForPath,
+  canAccessPath,
+  effectiveRoleFor,
+} from '@/lib/persona';
 
 // Routes that don't require authentication
 const PUBLIC_ROUTES = [
@@ -28,16 +42,6 @@ const PUBLIC_ROUTES = [
   '/auth/reset-password',
   '/scan',
 ];
-
-// Routes that require specific roles (same gates as the old middleware)
-const ROLE_BASED_ROUTES: Record<string, UserRole[]> = {
-  '/dashboard/reports': ['super_admin', 'admin'],
-  '/dashboard/users': ['super_admin', 'admin'],
-  '/dashboard/suppliers': ['super_admin', 'admin'],
-  '/dashboard/audit-log': ['super_admin', 'admin'],
-  '/dashboard/settings': ['super_admin'],
-  '/dashboard/impersonate': ['super_admin'],
-};
 
 const IMPERSONATION_COOKIE = 'vms_impersonation';
 
@@ -79,15 +83,19 @@ export default auth(async function middleware(request) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  // Role-based route checks (longest matching prefix wins)
-  const gatedRoute = Object.keys(ROLE_BASED_ROUTES)
-    .filter((route) => pathname === route || pathname.startsWith(route + '/'))
-    .sort((a, b) => b.length - a.length)[0];
-
-  if (gatedRoute) {
-    const effectiveRole = (await impersonatedRole(request)) ?? session.user.role;
-    if (!effectiveRole || !ROLE_BASED_ROUTES[gatedRoute].includes(effectiveRole)) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+  // Persona route gates (longest matching prefix wins — lib/persona.ts).
+  if (allowedRolesForPath(pathname)) {
+    const effectiveRole = effectiveRoleFor({
+      realRole: session.user.role,
+      impersonatedRole: await impersonatedRole(request),
+      previewCookie: request.cookies.get(PREVIEW_COOKIE)?.value ?? null,
+    });
+    if (!canAccessPath(effectiveRole, pathname)) {
+      // Clean 403 page — no silent redirect loop. The denied path is
+      // preserved in the query so the page can show context.
+      const forbiddenUrl = new URL(FORBIDDEN_PATH, request.url);
+      forbiddenUrl.searchParams.set('denied', pathname);
+      return NextResponse.redirect(forbiddenUrl);
     }
   }
 

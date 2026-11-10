@@ -8,16 +8,29 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
+import { canPreviewAsWorker } from '@/lib/persona';
 import {
   LogOut,
   Settings,
   User,
   HelpCircle,
   ChevronDown,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
 export default function UserMenu() {
-  const { profile, user, logout, isImpersonating, exitImpersonation } = useAuth();
+  const {
+    profile,
+    user,
+    logout,
+    isImpersonating,
+    exitImpersonation,
+    previewAsOperator,
+    effectiveRole,
+    enterWorkerPreview,
+    exitWorkerPreview,
+  } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -42,6 +55,16 @@ export default function UserMenu() {
   const handleImpersonationExit = async () => {
     setIsOpen(false);
     await exitImpersonation();
+  };
+
+  const handleEnterWorkerPreview = async () => {
+    setIsOpen(false);
+    await enterWorkerPreview();
+  };
+
+  const handleExitWorkerPreview = async () => {
+    setIsOpen(false);
+    await exitWorkerPreview();
   };
 
   return (
@@ -108,6 +131,32 @@ export default function UserMenu() {
           )}
 
           <div className="py-2">
+            {previewAsOperator ? (
+              <button
+                onClick={handleExitWorkerPreview}
+                className="
+                  w-full flex items-center gap-3 px-4 py-2 text-sm text-blue-700
+                  hover:bg-blue-50 transition-colors
+                "
+              >
+                <EyeOff className="h-4 w-4 text-blue-500" />
+                Exit Worker Preview
+              </button>
+            ) : (
+              canPreviewAsWorker(profile?.role) && (
+                <button
+                  onClick={handleEnterWorkerPreview}
+                  className="
+                    w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700
+                    hover:bg-gray-100 transition-colors
+                  "
+                >
+                  <Eye className="h-4 w-4 text-gray-400" />
+                  View as Worker
+                </button>
+              )
+            )}
+
             <Link
               href="/dashboard/profile"
               onClick={() => setIsOpen(false)}
@@ -120,17 +169,20 @@ export default function UserMenu() {
               My Profile
             </Link>
 
-            <Link
-              href="/dashboard/settings"
-              onClick={() => setIsOpen(false)}
-              className="
-                flex items-center gap-3 px-4 py-2 text-sm text-gray-700
-                hover:bg-gray-100 transition-colors
-              "
-            >
-              <Settings className="h-4 w-4 text-gray-400" />
-              Settings
-            </Link>
+            {/* System settings is super_admin-only (lib/persona ROUTE_ACCESS) */}
+            {effectiveRole === 'super_admin' && (
+              <Link
+                href="/dashboard/settings"
+                onClick={() => setIsOpen(false)}
+                className="
+                  flex items-center gap-3 px-4 py-2 text-sm text-gray-700
+                  hover:bg-gray-100 transition-colors
+                "
+              >
+                <Settings className="h-4 w-4 text-gray-400" />
+                Settings
+              </Link>
+            )}
 
             <Link
               href="#"

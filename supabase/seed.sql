@@ -152,6 +152,22 @@ INSERT INTO stock_movements (product_id, user_id, type, quantity, reason) VALUES
 -- Scrap movements
 ((SELECT id FROM products WHERE sku = 'BRK-002'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'scrap', -5, 'Damaged goods'),
 ((SELECT id FROM products WHERE sku = 'TIR-002'), (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'), 'scrap', -2, 'Damaged tire');
+
+-- Opening balances: one 'receiving' movement per product equal to
+-- current_stock minus the net of the seeded movements above, so the
+-- ledger reconciles (opening + Σ movements = closing). Backdated 60
+-- days so period reports show only real recent activity.
+INSERT INTO stock_movements (product_id, user_id, type, quantity, reason, created_at)
+SELECT p.id,
+       (SELECT id FROM auth.users WHERE email = 'demo.admin@vms-demo.com'),
+       'receiving',
+       p.current_stock - COALESCE(SUM(sm.quantity), 0),
+       'Opening balance',
+       NOW() - INTERVAL '60 days'
+FROM products p
+LEFT JOIN stock_movements sm ON sm.product_id = p.id
+GROUP BY p.id, p.current_stock
+HAVING p.current_stock - COALESCE(SUM(sm.quantity), 0) <> 0;
   END IF;
 
   IF NOT EXISTS (SELECT 1 FROM tool_loans) THEN

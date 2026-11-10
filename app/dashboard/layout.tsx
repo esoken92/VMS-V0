@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/dashboard/Sidebar';
 import TopBar from '@/components/dashboard/TopBar';
+import PreviewBanner from '@/components/dashboard/PreviewBanner';
 import { AuthProvider, useAuth } from '@/components/providers/AuthProvider';
 import { Shield, LogOut } from 'lucide-react';
 
@@ -50,6 +51,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col md:ml-64">
         {/* TopBar */}
         <TopBar onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)} />
+
+        {/* "View as worker" preview banner (renders only when active) */}
+        <PreviewBanner />
 
         {/* Impersonation Banner */}
         {isImpersonating && (

@@ -103,8 +103,18 @@ as a super admin.
 
 | Dashboard | Scan-first | Stock take |
 |---|---|---|
-| *coming soon* | *coming soon* | *coming soon* |
+| ![Dashboard](public/screenshots/dashboard.png) | ![Scan](public/screenshots/scan.png) | ![Stock takes](public/screenshots/stock-takes.png) |
 | Stat cards, alerts, activity feed — every number deep-links to where you act | Camera / wedge / RFID — one scan is one action | Blind counts, variance review, cycle counts |
+
+| Storerooms | Monitoring | Reports |
+|---|---|---|
+| ![Storerooms](public/screenshots/rooms.png) | ![Monitoring](public/screenshots/monitoring.png) | ![Reports](public/screenshots/reports.png) |
+| Typed rooms — cold, secure, hazmat — with access levels and occupancy | Live temp/humidity telemetry, excursion alerts, demo simulator | KPIs, movement trends, valuation, CSV export |
+
+| Stock ledger (Kardex) | Integrations & MCP |
+|---|---|
+| ![Ledger](public/screenshots/ledger.png) | ![Integrations](public/screenshots/integrations.png) |
+| Per-product running balance — every product reconciles: opening + movements = closing | Scoped API keys, REST v1 + OpenAPI, MCP tools for agents |
 
 ## ✨ Features
 
