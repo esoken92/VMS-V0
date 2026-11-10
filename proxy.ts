@@ -41,6 +41,12 @@ const PUBLIC_ROUTES = [
   '/auth/forgot-password',
   '/auth/reset-password',
   '/scan',
+  // crawler + social-card assets must not bounce to the login page
+  '/robots.txt',
+  '/sitemap.xml',
+  '/icon.svg',
+  '/apple-icon.png',
+  '/opengraph-image.png',
 ];
 
 const IMPERSONATION_COOKIE = 'vms_impersonation';
